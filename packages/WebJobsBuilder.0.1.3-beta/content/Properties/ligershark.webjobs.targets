@@ -1,0 +1,240 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+***********************************************************************************************
+ligershark.webjobs.targets
+
+WARNING:  DO NOT MODIFY this file, this file is added to your project automatically
+          through the WebJobsBuilder NuGet package. If you modify this file it may
+          get out of sync when you update the package at a later date.
+
+This file extends the publish process to enable support for WebJobs.
+
+You can specify custom properties by creating the file:
+  $(MSBuildProjectDirectory)\Properties\webjobs.props
+
+Copyright (C) 2014. All rights reserved.
+***********************************************************************************************
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <!-- TODO: needs to be updated to support VB -->
+    <wj-props-folder Condition=" '$(wj-props-folder)'=='' ">$(MSBuildProjectDirectory)\Properties\</wj-props-folder>
+    <WebPublishExtensionsToExclude>$(WebPublishExtensionsToExclude);.tt;.settings;.targets</WebPublishExtensionsToExclude>
+  </PropertyGroup>
+  
+  <Import Project="$(wj-props-folder)webjobs.props" Condition="Exists('$(wj-props-folder)webjobs.props')" />
+  
+  <PropertyGroup>
+    <wj-extendWebPublish Condition=" '$(wj-extendWebPublish)'=='' ">true</wj-extendWebPublish>
+    <wj-extensionTargetsPath Condition=" '$(wj-ExtensionTargetsPath)'=='' ">$(MSBuildThisFileDirectory)ligershark.webjobs.ext.targets</wj-extensionTargetsPath>
+    <wj-configfile Condition=" '$(wj-configfile)'=='' ">$(wj-props-folder)WebJobs.xml</wj-configfile>
+    <wj-jobs-xpath Condition=" '$(ls-jobs-xpath)'=='' ">WebJobs/WebJob/@RelativePath</wj-jobs-xpath>    
+</PropertyGroup>
+
+  <PropertyGroup Condition=" '$(wj-extendWebPublish)'=='true' ">
+    <!-- TODO: Update this -->
+    <BuildDependsOn>
+      ls-AddWebJobFilesToPublish;
+      $(BuildDependsOn);
+    </BuildDependsOn>
+    <!-- TODO: We should be able to remove some of these -->
+    <CopyAllFilesToSingleFolderForPackageDependsOn>
+      ls-AddWebJobFilesToPublish;
+      $(CopyAllFilesToSingleFolderForPackageDependsOn);
+    </CopyAllFilesToSingleFolderForPackageDependsOn>
+
+    <OnAfterPipelinePreDeployCopyAllFilesToOneFolder>
+      ls-AddWebJobFilesToPublish;
+      $(OnAfterPipelinePreDeployCopyAllFilesToOneFolder);
+    </OnAfterPipelinePreDeployCopyAllFilesToOneFolder>
+
+    <CopyAllFilesToSingleFolderForMsdeploy>
+      ls-AddWebJobFilesToPublish;
+      $(CopyAllFilesToSingleFolderForMsdeploy);
+    </CopyAllFilesToSingleFolderForMsdeploy>
+
+    <!-- For VS2012 -->
+    <PipelineCopyAllFilesToOneFolderForMsdeployDependsOn>
+      ls-AddWebJobFilesToPublish;
+      $(PipelineCopyAllFilesToOneFolderForMsdeployDependsOn);
+    </PipelineCopyAllFilesToOneFolderForMsdeployDependsOn>
+
+    <!-- Required for File System -->
+    <PipelinePreDeployCopyAllFilesToOneFolderDependsOn>
+      ls-AddWebJobFilesToPublish;
+      $(PipelinePreDeployCopyAllFilesToOneFolderDependsOn);
+    </PipelinePreDeployCopyAllFilesToOneFolderDependsOn>
+    <!-- required for FS support from the VS publish dialog -->
+    <OnAfterCopyAllFilesToSingleFolderForPackage>
+      ls-AddWebJobFilesToPublish;
+      $(OnAfterCopyAllFilesToSingleFolderForPackage);
+    </OnAfterCopyAllFilesToSingleFolderForPackage>
+  </PropertyGroup>
+  <ItemGroup>
+    <_ls-WebJobsSourceFolers Include="App_Data\jobs\continuous\"/>
+    <_ls-WebJobsSourceFolers Include="App_Data\jobs\triggered\"/>
+  </ItemGroup>
+  
+  <Target Name="ls-DiscoverWebJobs" 
+          DependsOnTargets="$(ls-DiscoverWebJobsDependsOn)"
+          Condition=" Exists('$(wj-configfile)') ">
+
+    <Message Text="Looking for webjobs in config file [$(wj-configfile)]" Importance="low"/>
+    <!-- For this reference see if there is at least one file in the expected location -->
+    <PropertyGroup>
+      <_ls-projectfilename>%(ProjectReference.Filename)</_ls-projectfilename>
+    </PropertyGroup>
+
+    <ReadWebJobsConfigFile ConfigFile="$(wj-configfile)">
+      <Output TaskParameter="JobsFound" ItemName="ls-WebJobs"/>
+    </ReadWebJobsConfigFile>
+    
+    <Message Text="Web jobs found (ls-WebJobs): [@(ls-WebJobs)]" />
+  </Target>
+  <Target Name="ls-MessageForDiscoverWebJobs">
+    <Message Text="webjobs: Looking for webjobs in the project" Importance="low"/>
+  </Target>
+  
+  <PropertyGroup>
+    <ls-DiscoverWebJobsDependsOn>
+      $(ls-DiscoverWebJobsDependsOn);
+      ls-MessageForDiscoverWebJobs
+    </ls-DiscoverWebJobsDependsOn>
+    <BuildDependsOn>
+      ls-DiscoverWebJobs;
+      $(BuildDependsOn);
+    </BuildDependsOn>
+    <ls-AddWebJobFilesToPublishDependsOn>
+      $(ls-AddWebJobFilesToPublishDependsOn);
+      ResolveReferences;
+      ResolveAssemblyReferences;
+      ls-DiscoverWebJobs
+    </ls-AddWebJobFilesToPublishDependsOn>  
+  </PropertyGroup>
+  <!--
+  This target runs once per value in ls-WebJobs
+  
+  Outputs
+    @(_ls-projectRefFiles)
+    @(_ls-projOutputs)
+  -->
+  
+  <Target Name="ls-AddWebJobFilesToPublish" 
+          Outputs="%(ls-WebJobs.Identity)" 
+          DependsOnTargets="$(ls-AddWebJobFilesToPublishDependsOn)">   
+    <!-- 
+    We need to determine what references need to be copied for the project.
+    We can search through @(ReferenceCopyLocalPaths) for this.
+    -->
+    <ItemGroup Condition=" '@(ls-WebJobs)'!='' ">
+      <_ls-tempProjFile Remove="@(_ls-tempProjFile)"/>
+      <_ls-tempProjFile Include="%(ls-WebJobs.Identity)"/>
+    </ItemGroup>
+
+    <PropertyGroup Condition=" '@(ls-WebJobs)'!='' ">
+      <_ls-projName>%(ls-WebJobs.Filename)</_ls-projName>
+      <_ls-projFullPath>%(_ls-tempProjFile.FullPath)</_ls-projFullPath>
+      <_ls-schedule>%(ls-WebJobs.Schedule)</_ls-schedule>
+    </PropertyGroup>
+
+    <Error Text="Schedule metadata missing from webjob [%(ls-WebJobs.Identity)]" Condition=" '$(_ls-schedule)'=='' " />
+    
+    <ItemGroup Condition=" '@(ls-WebJobs)'!='' ">
+      <_ls-projectRefFiles Remove="_ls-projectRefFiles"/>
+      <_ls-projectRefFiles  Include="@(ReferenceCopyLocalPaths)"
+                     Condition=" '%(ReferenceCopyLocalPaths.MSBuildSourceProjectFile)'=='$(_ls-projFullPath)' " />
+    </ItemGroup>
+    <Message Text="webjobs: _ls-projName:$(_ls-projName)" Importance="low" Condition=" '@(ls-WebJobs)'!='' "/>
+    <Message Text="webjobs: Reference files for publishing _ls-projectRefFiles: [@(_ls-projectRefFiles,'%0a%0d')]" Importance="low" Condition=" '@(ls-WebJobs)'!='' "/>
+
+    <!-- Get all the build outputs from the project -->
+    <ItemGroup>
+      <_ls-projOutputs Remove="@(_ls-projOutputs)"/>
+    </ItemGroup>
+    <MSBuild Projects="$(_ls-projFullPath)" 
+             Targets="ResolveProjectReferences;Build;BuiltProjectOutputGroup;DebugSymbolsProjectOutputGroup;SatelliteDllsProjectOutputGroup;ContentFilesProjectOutputGroup;SGenFilesOutputGroup"
+             Condition=" '@(ls-WebJobs)'!='' ">
+      <Output ItemName="_ls-projOutputs" TaskParameter="TargetOutputs" />
+    </MSBuild>
+    <!-- Get copy local files -->
+    <MSBuild Projects="$(_ls-projFullPath)"  
+             Targets="wj-GetCopyLocalFiles"
+             Properties="CustomBeforeMicrosoftCommonTargets=$(wj-extensionTargetsPath)"
+             Condition=" '@(ls-WebJobs)'!='' ">
+      <Output ItemName="_ls-projOutputs" TaskParameter="TargetOutputs" />
+    </MSBuild>
+    
+    <Message Text="WebJobs: Output files for publishing (_ls-projOutputs) [@(_ls-projOutputs->'%(Identity): TargetPath=[%(TargetPath)]','%0a%0d')]" 
+             Condition=" '@(ls-WebJobs)'!='' "/>
+    <!-- Now add these files to the correct item in order to have the published -->
+    <ItemGroup Condition=" '@(ls-WebJobs)'!='' ">
+      <!-- Add references from the project -->
+      <FilesForPackagingFromProject Include="%(_ls-projectRefFiles.Identity)">
+        <DestinationRelativePath>app_data\jobs\$(_ls-schedule)\$(_ls-projName)\%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+
+      <!-- Add outputs from the project -->
+      <FilesForPackagingFromProject Include="%(_ls-projOutputs.Identity)"
+                                    Condition=" '%(_ls-projOutputs.TargetPath)' != '' " >
+        <DestinationRelativePath>app_data\jobs\$(_ls-schedule)\$(_ls-projName)\%(_ls-projOutputs.TargetPath)</DestinationRelativePath>
+      </FilesForPackagingFromProject>      
+      <FilesForPackagingFromProject Include="%(_ls-projOutputs.Identity)"
+                                    Condition=" '%(_ls-projOutputs.TargetPath)' == '' " >
+        <DestinationRelativePath>app_data\jobs\$(_ls-schedule)\$(_ls-projName)\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup Condition=" '$(ls-msbuildtasks-path)'=='' ">
+    <ls-msbuildtasks-path>$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll</ls-msbuildtasks-path>
+    <ls-msbuildtasks-path Condition=" !Exists('$(ls-msbuildtasks-path)')">$(MSBuildFrameworkToolsPath)\Microsoft.Build.Tasks.v4.0.dll</ls-msbuildtasks-path>
+    <ls-msbuildtasks-path Condition=" !Exists('$(ls-msbuildtasks-path)')">$(windir)\Microsoft.NET\Framework\v4.0.30319\Microsoft.Build.Tasks.v4.0.dll</ls-msbuildtasks-path>
+  </PropertyGroup>
+  
+  <UsingTask TaskName="ReadWebJobsConfigFile"
+             TaskFactory="CodeTaskFactory"
+             AssemblyFile="$(ls-msbuildtasks-path)">
+    <ParameterGroup>
+      <ConfigFile Required="true"/>
+      <JobsFound ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true"/>
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.Xml"/>
+      <Reference Include="System.Xml.Linq"/>
+      <Using Namespace="System.Xml.Linq"/>
+      <Code>
+        <![CDATA[
+        // read the xml file and populate the JobsFound result
+
+        if (File.Exists(ConfigFile)) {
+    
+            var doc = XDocument.Load(ConfigFile);
+            var jobs = from wj in doc.Root.Elements("WebJob")
+                       select new {
+                           RelPath = wj.Attribute("RelativePath").Value,
+                           Schedule = wj.Attribute("Schedule").Value
+                       };
+
+            var resultList = new List<ITaskItem>();
+
+            foreach (var job in jobs) {
+
+                var item = new TaskItem(job.RelPath);
+                item.SetMetadata("Schedule", job.Schedule);
+
+                resultList.Add(item);
+            }
+
+            JobsFound = resultList.ToArray();
+        }
+        else {
+            Log.LogMessage("web jobs config file not found at [{0}]", ConfigFile);
+        }
+
+        return !Log.HasLoggedErrors;       
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+</Project>

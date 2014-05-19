@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+***********************************************************************************************
+webjobs.wpp.targets
+
+WARNING:  DO NOT MODIFY this file, this file is added to your project automatically
+          through the WebJobsBuilder NuGet package. If you modify this file it may
+          get out of sync when you update the package at a later date.
+
+This file extends the publish process to enable support for WebJobs.
+
+Copyright (C) 2014. All rights reserved.
+***********************************************************************************************
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="ls-WebJobs">
+    <ls-WebJobsTargetsPath Condition=" '$(ls-WebJobsTargetsPath)'=='' ">$(MSBuildProjectDirectory)\Properties\ligershark.webjobs.targets</ls-WebJobsTargetsPath>
+  </PropertyGroup>
+  <Import Project="$(ls-WebJobsTargetsPath)" Condition="Exists('$(ls-WebJobsTargetsPath)')" Label="ls-WebJobs" />
+</Project>
