@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Web.Hosting;
 
 namespace AzureJobs.Web
@@ -16,11 +17,11 @@ namespace AzureJobs.Web
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
-            foreach (string file in Directory.EnumerateFiles(folder, "*.*"))
+            foreach (string file in Directory.EnumerateFiles(folder, "*.*").Reverse())
             {
                 string src = "/img/" + Path.GetFileName(file);
                 long size = new FileInfo(file).Length;
-                divImages.InnerHtml += string.Format("<img src='{0}' title='{1} bytes' />", src, size);
+                divImages.InnerHtml += string.Format("<span title='{1} bytes'><img src='{0}' /></span>", src, size);
             }
         }
 
@@ -31,7 +32,7 @@ namespace AzureJobs.Web
 
             foreach (var file in files.PostedFiles)
             {
-                string path = Path.Combine(folder, Guid.NewGuid() + Path.GetExtension(file.FileName));
+                string path = Path.Combine(folder, DateTime.Now.Ticks + Path.GetExtension(file.FileName));
                 file.SaveAs(path);
                 Response.Redirect(Request.Path, true);
             }
