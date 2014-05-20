@@ -1,36 +1,30 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="AzureJobs.Web.Default" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" Title="Image Optimization" MasterPageFile="~/Site.Master" CodeBehind="Default.aspx.cs" Inherits="AzureJobs.Web.Default" %>
 
-<!DOCTYPE html>
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
-    <title>Image uploader</title>
+<asp:Content ContentPlaceHolderID="head" runat="server">
     <style>
-        body {
-            max-width: 960px;
-            margin: 2em auto;
-            font: 20px 'century gothic';
+        h1, p {
+            margin: 0;
         }
 
-        div {
-            -moz-columns: 4 auto;
-            -webkit-columns: 4 auto;
-            columns: 4 auto;
-            -moz-column-gap: 50px;
-            -webkit-column-gap: 50px;
-            column-gap: 50px;
+        form {
             margin-top: 1em;
         }
 
-        img {
-            height: 100%;
-            width: 100%;
+        .images {
+            -moz-columns: 200px auto;
+            -webkit-columns: 200px auto;
+            columns: 200px auto;
+            -moz-column-gap: 50px;
+            -webkit-column-gap: 50px;
+            column-gap: 50px;
+            margin-top: 3em;
         }
+
 
         span {
             position: relative;
             display: block;
-            /*text-align: center;*/
+            text-align: center;
             margin-bottom: 1em;
             -webkit-column-break-inside: avoid;
             overflow: hidden;
@@ -44,28 +38,29 @@
                 font-size: 12px;
                 position: absolute;
                 bottom: 5px;
-                right: 0;
-                display: block;
+                text-align: center;
                 z-index: 3;
             }
-    </style>
-</head>
-<body>
 
-    <h1>Image optimization</h1>
+        img {
+            max-width: 100%;
+        }
+    </style>
+</asp:Content>
+
+<asp:Content ContentPlaceHolderID="body" runat="server">
+    <header>
+        <h1>Image optimization</h1>
+        <p>Upload an image, look at the file size, then refresh the browser</p>
+    </header>
 
     <form id="form1" runat="server">
-        <fieldset>
-            <legend>Upload an image</legend>
-            <asp:FileUpload runat="server" ID="files" AllowMultiple="true" />
+        <asp:FileUpload runat="server" ID="files" AllowMultiple="true" />
 
-            <br />
-            <br />
-            <asp:Button Text="Upload" runat="server" ID="btnUpload" OnClick="Upload_Click" />
-            <asp:Button Text="Delete all images" OnClientClick="return confirm('Are you sure?')" runat="server" ID="btnClear" OnClick="btnClear_Click" />
-        </fieldset>
+        <asp:Button Text="Upload" runat="server" ID="btnUpload" OnClick="Upload_Click" />
+        <asp:Button Text="Delete all images" OnClientClick="return confirm('Are you sure?')" runat="server" ID="btnClear" OnClick="btnClear_Click" />
     </form>
 
-    <div runat="server" id="divImages"></div>
-</body>
-</html>
+    <div runat="server" class="images" id="divImages"></div>
+
+</asp:Content>

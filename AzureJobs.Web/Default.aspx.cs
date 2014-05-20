@@ -27,15 +27,16 @@ namespace AzureJobs.Web
 
         protected void Upload_Click(object sender, EventArgs e)
         {
-            if (!files.HasFiles)
-                return;
-
-            foreach (var file in files.PostedFiles)
+            if (files.HasFiles)
             {
-                string path = Path.Combine(folder, DateTime.Now.Ticks + Path.GetExtension(file.FileName));
-                file.SaveAs(path);
-                Response.Redirect(Request.Path, true);
+                foreach (var file in files.PostedFiles)
+                {
+                    string path = Path.Combine(folder, DateTime.Now.Ticks + Path.GetExtension(file.FileName));
+                    file.SaveAs(path);
+                }
             }
+
+            Response.Redirect(Request.Path, true);
         }
 
         protected void btnClear_Click(object sender, EventArgs e)
