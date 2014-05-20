@@ -15,7 +15,10 @@ namespace ImageCompressor.Job
         {
             StartListener();
 
-            System.Threading.Thread.Sleep(int.MaxValue);
+            while (true)
+            {
+                System.Threading.Thread.Sleep(int.MaxValue);
+            }
         }
 
         public static void StartListener()
@@ -23,7 +26,7 @@ namespace ImageCompressor.Job
             // Path to the website
             string folder = @"D:\home\site\wwwroot\";
 
-            //folder = @"C:\Users\madsk\Documents\visual studio 2013\Projects\ImageCompressor\ImageCompressor.Web\img";
+            //folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\ImageOptimization\img";
 
             foreach (string filter in filters)
             {
@@ -50,7 +53,7 @@ namespace ImageCompressor.Job
                 await Task.Delay(TimeSpan.FromMilliseconds(500));
 
                 var result = _compressor.CompressFile(e.FullPath);
-                
+
                 // Wait to exit so events on the FileSystemWatcher aren't firing.
                 await Task.Delay(TimeSpan.FromMilliseconds(100));
             }

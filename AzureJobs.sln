@@ -7,6 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureJobs.Web", "Azurejobs.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageCompressor.Job", "ImageCompressor.Job\ImageCompressor.Job.csproj", "{2047DF15-7DB3-4798-8367-A2618DF75C38}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextMinifier.Job", "TextMinifier.Job\TextMinifier.Job.csproj", "{968E2065-6F3D-4BD8-B5ED-150EC7B91BC7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{95895DDD-9D49-4C33-B21A-70A6EA022E69}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +28,10 @@ Global
 		{2047DF15-7DB3-4798-8367-A2618DF75C38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2047DF15-7DB3-4798-8367-A2618DF75C38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2047DF15-7DB3-4798-8367-A2618DF75C38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{968E2065-6F3D-4BD8-B5ED-150EC7B91BC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{968E2065-6F3D-4BD8-B5ED-150EC7B91BC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{968E2065-6F3D-4BD8-B5ED-150EC7B91BC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{968E2065-6F3D-4BD8-B5ED-150EC7B91BC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

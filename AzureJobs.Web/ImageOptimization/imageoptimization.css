@@ -1,0 +1,36 @@
+﻿
+.images {
+    -moz-columns: 200px auto;
+    -webkit-columns: 200px auto;
+    columns: 200px auto;
+    -moz-column-gap: 50px;
+    -webkit-column-gap: 50px;
+    column-gap: 50px;
+    margin-top: 3em;
+}
+
+
+span {
+    position: relative;
+    display: block;
+    text-align: center;
+    margin-bottom: 1em;
+    -webkit-column-break-inside: avoid;
+    overflow: hidden;
+}
+
+    span:before {
+        content: attr(title);
+        background: rgba(0, 0, 0, 0.46);
+        color: white;
+        padding: 5px;
+        font-size: 12px;
+        position: absolute;
+        bottom: 5px;
+        text-align: center;
+        z-index: 3;
+    }
+
+img {
+    max-width: 100%;
+}

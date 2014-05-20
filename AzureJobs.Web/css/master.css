@@ -1,0 +1,60 @@
+﻿body {
+    max-width: 960px;
+    margin: 4em auto 2em auto;
+    padding: 0 1em;
+    font: 20px 'century gothic';
+}
+
+header h1, header p {
+    margin: 0;
+}
+
+form {
+    margin-top: 1em;
+}
+
+#menu {
+    width: 100%;
+    font-size: 20px;
+    background: #f0f0f0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 13px 0;
+    text-indent: 1em;
+}
+
+    #menu a {
+        text-decoration: none;
+        font-weight: bold;
+        color: darkslategray;
+    }
+
+    #menu ul {
+        list-style: none;
+        display: inline;
+        margin-left: 2em;
+    }
+
+        #menu ul li {
+            padding: 0;
+            display: inline-block;
+            font-size: .8em;
+        }
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: darkslategray;
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    line-height: 30px;
+    z-index: 999;
+}
+
+    footer a {
+        color: white;
+    }
