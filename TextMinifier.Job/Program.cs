@@ -9,7 +9,8 @@ namespace TextMinifier.Job
 {
     class Program
     {
-        private static string[] filters = { "*.css", "*.js" };
+        private static string _folder = @"D:\home\site\wwwroot\";
+        private static string[] _filters = { "*.css", "*.js" };
         private static List<string> _cache = new List<string>();
         private static Minifier _minifier = new Minifier();
 
@@ -27,6 +28,8 @@ namespace TextMinifier.Job
 
         static void Main(string[] args)
         {
+            //_folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\Minification\files";
+            Initialize();
             StartListener();
 
             while (true)
@@ -35,16 +38,28 @@ namespace TextMinifier.Job
             }
         }
 
+        private static async void Initialize()
+        {
+            var parent = Directory.GetParent(_folder);
+            string logfile = Path.Combine(parent.FullName, "minificationlog.txt");
+
+            if (File.Exists(logfile))
+                return;
+
+            File.WriteAllText(logfile, "Started");
+
+            foreach (string filter in _filters)
+            {
+                foreach (string file in Directory.EnumerateFiles(_folder, filter, SearchOption.AllDirectories))
+                    await ProcessFile(file);
+            }
+        }
+
         public static void StartListener()
         {
-            // Path to the website
-            string folder = @"D:\home\site\wwwroot\";
-
-            //folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\Minification\files";
-
-            foreach (string filter in filters)
+            foreach (string filter in _filters)
             {
-                FileSystemWatcher w = new FileSystemWatcher(folder);
+                FileSystemWatcher w = new FileSystemWatcher(_folder);
                 w.Filter = filter;
                 w.IncludeSubdirectories = true;
                 w.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime;
@@ -56,29 +71,34 @@ namespace TextMinifier.Job
 
         private async static void w_Changed(object sender, FileSystemEventArgs e)
         {
-            string ext = Path.GetExtension(e.FullPath).ToLowerInvariant();
+            await ProcessFile(e.FullPath);
+        }
 
-            if (e.FullPath.EndsWith(".min" + ext, StringComparison.OrdinalIgnoreCase) ||
-                e.FullPath.EndsWith(".intellisense" + ext, StringComparison.OrdinalIgnoreCase) ||
-                e.FullPath.EndsWith(".debug" + ext, StringComparison.OrdinalIgnoreCase) ||
-                _cache.Contains(e.FullPath))
+        private static async Task ProcessFile(string file)
+        {
+            string ext = Path.GetExtension(file).ToLowerInvariant();
+
+            if (file.EndsWith(".min" + ext, StringComparison.OrdinalIgnoreCase) ||
+                file.EndsWith(".intellisense" + ext, StringComparison.OrdinalIgnoreCase) ||
+                file.EndsWith(".debug" + ext, StringComparison.OrdinalIgnoreCase) ||
+                _cache.Contains(file))
                 return;
 
             try
             {
-                _cache.Add(e.FullPath);
+                _cache.Add(file);
 
                 // Wait a bit before kicking off compression to avoid file locks
                 await Task.Delay(TimeSpan.FromMilliseconds(500));
 
-                Minify(e.FullPath, ext);
+                Minify(file, ext);
 
                 // Wait to exit so events on the FileSystemWatcher aren't firing.
                 await Task.Delay(TimeSpan.FromMilliseconds(100));
             }
             finally
             {
-                _cache.Remove(e.FullPath);
+                _cache.Remove(file);
             }
         }
 
@@ -86,6 +106,8 @@ namespace TextMinifier.Job
         {
             string content = File.ReadAllText(sourcePath);
             string result;
+
+            Console.WriteLine("Minifying " + Path.GetFileName(sourcePath));
 
             if (ext == ".js")
                 result = _minifier.MinifyJavaScript(content, _jsSettings);
@@ -95,7 +117,12 @@ namespace TextMinifier.Job
                 return;
 
             if (content != result)
+            {
                 File.WriteAllText(sourcePath, result, Encoding.UTF8);
+                Console.WriteLine("Minification done. Old size: " + content.Length + " bytes. New size: " + result.Length + " bytes");
+            }
+            else
+                Console.WriteLine("Couldn't minify any further" + Environment.NewLine);
         }
     }
 }

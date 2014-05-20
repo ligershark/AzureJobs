@@ -11,7 +11,7 @@
     </header>
 
     <form id="form1" runat="server">
-        <asp:FileUpload runat="server" ID="files" AllowMultiple="true" />
+        <asp:FileUpload runat="server" ID="files" AllowMultiple="true" accept=".js, .css" />
 
         <asp:Button Text="Upload" runat="server" ID="btnUpload" OnClick="Upload_Click" />
         <asp:Button Text="Delete all files" OnClientClick="return confirm('Are you sure?')" runat="server" OnClick="btnClear_Click" />

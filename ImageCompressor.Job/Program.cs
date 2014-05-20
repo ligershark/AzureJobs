@@ -7,12 +7,15 @@ namespace ImageCompressor.Job
 {
     class Program
     {
-        private static string[] filters = { "*.png", "*.jpg", "*.jpeg", "*.gif" };
+        private static string _folder = @"D:\home\site\wwwroot\";
+        private static string[] _filters = { "*.png", "*.jpg", "*.jpeg", "*.gif" };
         private static ImageCompressor _compressor = new ImageCompressor();
         private static List<string> _cache = new List<string>();
 
         static void Main(string[] args)
         {
+            //_folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\ImageOptimization\img";
+            Initialize();
             StartListener();
 
             while (true)
@@ -21,16 +24,28 @@ namespace ImageCompressor.Job
             }
         }
 
+        private static async void Initialize()
+        {
+            var parent = Directory.GetParent(_folder);
+            string logfile = Path.Combine(parent.FullName, "imagecompressionlog.txt");
+
+            if (File.Exists(logfile))
+                return;
+
+            File.WriteAllText(logfile, "Started");
+
+            foreach (string filter in _filters)
+            {
+                foreach (string file in Directory.EnumerateFiles(_folder, filter, SearchOption.AllDirectories))
+                    await ProcessFile(file);
+            }
+        }
+
         public static void StartListener()
         {
-            // Path to the website
-            string folder = @"D:\home\site\wwwroot\";
-
-            //folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\ImageOptimization\img";
-
-            foreach (string filter in filters)
+            foreach (string filter in _filters)
             {
-                FileSystemWatcher w = new FileSystemWatcher(folder);
+                FileSystemWatcher w = new FileSystemWatcher(_folder);
                 w.Filter = filter;
                 w.IncludeSubdirectories = true;
                 w.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime;
@@ -42,24 +57,29 @@ namespace ImageCompressor.Job
 
         private async static void w_Changed(object sender, FileSystemEventArgs e)
         {
-            if (_cache.Contains(e.FullPath))
+            await ProcessFile(e.FullPath);
+        }
+
+        private static async Task ProcessFile(string file)
+        {
+            if (_cache.Contains(file))
                 return;
 
             try
             {
-                _cache.Add(e.FullPath);
+                _cache.Add(file);
 
                 // Wait a bit before kicking off compression to avoid file locks
                 await Task.Delay(TimeSpan.FromMilliseconds(500));
 
-                var result = _compressor.CompressFile(e.FullPath);
+                var result = _compressor.CompressFile(file);
 
                 // Wait to exit so events on the FileSystemWatcher aren't firing.
                 await Task.Delay(TimeSpan.FromMilliseconds(100));
             }
             finally
             {
-                _cache.Remove(e.FullPath);
+                _cache.Remove(file);
             }
         }
     }
