@@ -3,7 +3,7 @@
 <!doctype html>
 <html>
 <head runat="server">
-    <title></title>
+    <title><%= Page.Title %> - LigerShark Azure Jobs</title>
     <style>
         body {
             max-width: 960px;
