@@ -20,5 +20,5 @@
     <br /><br />
 
     <asp:HyperLink runat="server" ID="aFile" />
-    <pre runat="server" class="images" id="divImages"></pre>
+    <pre runat="server" class="images" id="preResult"></pre>
 </asp:Content>

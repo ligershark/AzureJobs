@@ -40,7 +40,7 @@ namespace TextMinifier.Job
             // Path to the website
             string folder = @"D:\home\site\wwwroot\";
 
-            folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\Minification\files";
+            //folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\Minification\files";
 
             foreach (string filter in filters)
             {

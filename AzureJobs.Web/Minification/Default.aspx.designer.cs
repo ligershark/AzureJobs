@@ -49,12 +49,12 @@ namespace AzureJobs.Web.Minification {
         protected global::System.Web.UI.WebControls.HyperLink aFile;
         
         /// <summary>
-        /// divImages control.
+        /// preResult control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divImages;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl preResult;
     }
 }

@@ -29,7 +29,7 @@ namespace AzureJobs.Web.Minification
                 FileInfo info = new FileInfo(folder + file);
                 string src = "/minification/files/" + file;
                 long size = info.Length;
-                divImages.InnerHtml = File.ReadAllText(info.FullName);
+                preResult.InnerHtml = File.ReadAllText(info.FullName);
                 aFile.Text = file + " (" + size + " bytes)";
                 aFile.NavigateUrl = src;
             }
