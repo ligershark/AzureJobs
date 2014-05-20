@@ -1,12 +1,22 @@
 ﻿body {
     max-width: 960px;
-    margin: 4em auto 2em auto;
+    margin: 4em auto;
     padding: 0 1em;
     font: 20px 'century gothic';
 }
 
+nav {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 1em;
+}
+
 header h1, header p {
     margin: 0;
+}
+
+h2 {
+    font-size: 1.3em;
 }
 
 form {
@@ -17,11 +27,12 @@ form {
     width: 100%;
     font-size: 20px;
     background: #f0f0f0;
+    border-bottom: 1px solid #d8d8d8;
     position: absolute;
     top: 0;
     left: 0;
     padding: 13px 0;
-    text-indent: 1em;
+
 }
 
     #menu a {
@@ -33,14 +44,32 @@ form {
     #menu ul {
         list-style: none;
         display: inline;
-        margin-left: 2em;
+        margin-left: 1em;
     }
 
         #menu ul li {
-            padding: 0;
+            padding: 0 1em;
             display: inline-block;
             font-size: .8em;
         }
+
+#default {
+    -moz-column-count: 3;
+    -webkit-column-count: 3;
+    column-count: 3;
+    -moz-column-width: 200px;
+    -webkit-column-width: 200px;
+    column-width: 200px;
+    -moz-column-gap: 1em;
+    -webkit-column-gap: 1em;
+    column-gap: 1em;
+    margin-top: 3em;
+}
+
+#default article {
+    -webkit-column-break-inside: avoid;
+    overflow: hidden;
+}
 
 footer {
     position: fixed;

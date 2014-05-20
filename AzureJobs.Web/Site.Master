@@ -10,12 +10,14 @@
 <body>
 
     <div id="menu" role="menu">
-        <a href="/">Home</a>
+        <nav>
+            <a href="/">Home</a>
 
-        <ul>
-            <li><a href="/imageoptimization/">Image Optimization</a></li>
-            <li><a href="/minification/">Minification</a></li>
-        </ul>
+            <ul>
+                <li><a href="/imageoptimization/">Image Optimization</a></li>
+                <li><a href="/minification/">Minification</a></li>
+            </ul>
+        </nav>
     </div>
 
     <asp:ContentPlaceHolder ID="body" runat="server" />
