@@ -24,20 +24,24 @@ namespace ImageCompressor.Job
             }
         }
 
+        private static string _logfile;
+
         private static async void Initialize()
         {
             var parent = Directory.GetParent(_folder);
-            string logfile = Path.Combine(parent.FullName, "imagecompressionlog.txt");
+            _logfile = Path.Combine(_folder, "imagecompressionlog.txt");
 
-            if (File.Exists(logfile))
+            if (File.Exists(_logfile))
                 return;
 
-            File.WriteAllText(logfile, "Started");
+            File.WriteAllText(_logfile, "Started" + Environment.NewLine);
 
             foreach (string filter in _filters)
             {
                 foreach (string file in Directory.EnumerateFiles(_folder, filter, SearchOption.AllDirectories))
+                {
                     await ProcessFile(file);
+                }
             }
         }
 
@@ -48,7 +52,7 @@ namespace ImageCompressor.Job
                 FileSystemWatcher w = new FileSystemWatcher(_folder);
                 w.Filter = filter;
                 w.IncludeSubdirectories = true;
-                w.NotifyFilter = NotifyFilters.LastWrite;
+                w.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime;
                 w.Changed += async (s, e) => await ProcessFile(e.FullPath);
                 w.EnableRaisingEvents = true;
             }
@@ -67,6 +71,9 @@ namespace ImageCompressor.Job
                 await Task.Delay(TimeSpan.FromMilliseconds(2000));
 
                 var result = _compressor.CompressFile(file);
+
+                // Wait a bit to avoid multiple runs on the same file due to FSW quirks
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
             }
             finally
             {
