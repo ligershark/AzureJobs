@@ -1,5 +1,8 @@
 ﻿[cmdletbinding()]
-param()
+param(
+    [switch]
+    $CleanOutputFolder
+)
  
  function Get-ScriptDirectory
 {
@@ -40,6 +43,24 @@ function Get-NugetExe{
     process{
         return (get-item (Join-Path $scriptDir '\BuildTools\NuGet.exe'))
     }
+}
+
+function Clean-OutputFolder{
+    [cmdletbinding()]
+    param()
+    process{
+        $outputFolder = (Join-Path $scriptDir '\OutputRoot\')
+
+        if(Test-Path $outputFolder){
+            'Deleting output folder [{0}]' -f $outputFolder | Write-Host
+            Remove-Item $outputFolder -Recurse
+        }
+
+    }
+}
+
+if($CleanOutputFolder){
+    Clean-OutputFolder
 }
 
 'Restoring nuget packages' | Write-Host

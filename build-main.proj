@@ -1,8 +1,11 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="FullBuild">
 
   <!-- Import the shared properties -->
-  <Import Project="$(SharedProps)" Condition=" '$(SharedProps)'!='' "/>
-  <Import Project="$(MSBuildThisFileDirectory)shared.props" Condition=" '$(SharedProps)'=='' " />
+  <PropertyGroup>
+    <SharedProps Condition=" '$(SharedProps)'=='' ">$(MSBuildThisFileDirectory)shared.props</SharedProps>
+  </PropertyGroup>
+
+  <Import Project="$(SharedProps)"/>
   
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)'=='' ">Release</Configuration>
@@ -39,76 +42,29 @@
   <PropertyGroup>
     <CreateNugetPackagesDependsOn>
       BuildProjects;
-      PrepareAndPopulateNugetFolder;
       CoreCreateNugetPackages;
     </CreateNugetPackagesDependsOn>
   </PropertyGroup>
   <Target Name="CreateNugetPackages" DependsOnTargets="$(CreateNugetPackagesDependsOn)" />
 
   <Target Name="CoreCreateNugetPackages">
-    <!-- nuget pack "C:\...\<filename>.nuspec" -NoPackageAnalysis -OutputDirectory "C:\...\Output\" -->
     <PropertyGroup>
-      <_NugetSpecFile>%(_NugetSpecOutputFile.FullPath)</_NugetSpecFile>
-      <_Cmd>"$(NugetExe)" pack "$(_NugetSpecFile)" -NoPackageAnalysis -OutputDirectory "$(OutputRootNoTrailingSlash)" </_Cmd>
+      <_spfull>$([System.IO.Path]::GetFullPath(`$(SharedProps)`))</_spfull>
     </PropertyGroup>
-
-    <!--<Message Text="_Cmd: $(_Cmd)" Importance="low" />
-    <Exec Command="$(_Cmd)"/>
-
     <ItemGroup>
-      <_CreatedPackage Include="$(OutputRoot)*.nupkg"/>
+      <NugetBuildFiles Include="$(OutputPathImgComp)imgcomp.proj">
+        <AdditionalProperties>SharedProps=$(_spfull)</AdditionalProperties>        
+      </NugetBuildFiles>
     </ItemGroup>
-
-    <Copy SourceFiles="@(_CreatedPackage)"
-          DestinationFiles="@(_CreatedPackage->'$(NugetLocalRepo)%(Filename)%(Extension)')"
-          Condition="Exists('$(NugetLocalRepo)')"/>-->
+    
+    <MSBuild Projects="@(NugetBuildFiles)"/>    
   </Target>
-
-  <!--<ItemGroup>
-    <NuSpecFiles Include=""></NuSpecFiles>
-  </ItemGroup>-->
   
-  <Target Name="PrepareAndPopulateNugetFolder">   
-    <ItemGroup>
-      <!-- imgcomp -->
-      <!--<NuGetPkgSourceFiles Include="$(ImgCompSourceRoot)imgcomp.nuspec">
-        <Dest>$(OutputPathImgComp)imgcomp.nuspec</Dest>
-      </NuGetPkgSourceFiles>
-      <NuGetPkgSourceFiles Include="$(ImgCompSourceRoot)imgcomp.proj">
-        <Dest>$(OutputPathImgComp)imgcomp.proj</Dest>
-      </NuGetPkgSourceFiles>-->
-
-      <!-- textminifier -->
-      <!--<NuGetPkgSourceFiles Include="$(TextMinSourceRoot)textmin.nuspec"/>
-      <NuGetPkgSourceFiles Include="$(TextMinSourceRoot)textmin.proj"/>--> 
-    </ItemGroup>
-    
-    <!--<Copy SourceFiles="@(NuGetPkgSourceFiles)"
-          DestinationFiles="@(NuGetPkgSourceFiles->'%(Dest)')"/>-->
-    
-    <!--<Copy SourceFiles="@(_NugetSpecFile)"
-          DestinationFiles="@(_NugetSpecFile->'$(PackageRoot)%(Filename)%(Extension)')">
-      <Output ItemName="_NugetSpecOutputFile" TaskParameter="DestinationFiles"/>
-    </Copy>
-
-    <Copy SourceFiles="@(ToolsItems)"
-          DestinationFiles="@(ToolsItems->'$(PackageRoot)tools\%(Filename)%(Extension)')"/>
-
-    <Copy SourceFiles="@(ContentItems)"
-          DestinationFiles="@(ContentItems->'$(PackageRoot)content\%(DestDir)%(Filename)%(Extension)')"/>
-    <Copy SourceFiles="@(LibItems)"
-          DestinationFiles="@(LibItems->'$(PackageRoot)lib\%(DestDir)%(Filename)%(Extension)')"/>
-    
-    <Copy SourceFiles="@(NuGetRootItems)"
-          DestinationFiles="@(NuGetRootItems->'$(PackageRoot)%(DestDir)%(Filename)%(Extension)')" />-->
-
-  </Target> 
-
   <Target Name="CleanAndInitalize">
-    <!--<MakeDir Directories="$(OutputRoot)"/>
+    <MakeDir Directories="$(OutputRoot)"/>
     <MakeDir Directories="$(PackageRoot)"/>
     
-    <ItemGroup>
+    <!--<ItemGroup>
       <_FilesToDelete Remove="@(_FilesToDelete)"/>
       <_FilesToDelete Include="$(OutputRoot)**\*"/>
     </ItemGroup>
