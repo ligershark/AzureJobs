@@ -86,6 +86,9 @@ namespace TextMinifier.Job
                 await Task.Delay(TimeSpan.FromMilliseconds(1000));
 
                 Minify(file, ext);
+
+                // Wait a bit to avoid multiple runs on the same file due to FSW quirks
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
             }
             finally
             {
