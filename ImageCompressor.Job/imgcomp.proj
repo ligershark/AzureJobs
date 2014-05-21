@@ -2,37 +2,13 @@
 
   <!-- This file is designed to be executed from the OutputRoot\ directory not the source directory -->
 
-  <PropertyGroup>
-    <SharedProps></SharedProps>
-  </PropertyGroup>
-
   <Import Project="$(SharedProps)" Condition=" '$(SharedProps)'!='' "/>
   <Import Project="$(MSBuildThisFileDirectory)..\shared.props" Condition=" '$(SharedProps)'=='' " />
-
-
-  <!--<PropertyGroup>
-    <Root Condition=" '$(Root)'=='' ">$(MSBuildProjectDirectory)\</Root>
-    <SourceRoot Condition=" '$(SourceRoot)'=='' ">$(Root)</SourceRoot>
-    <ToolsRoot Condition=" '$(ToolsRoot)'=='' ">$(Root)Tools\</ToolsRoot>
-    <OutputRootNoTrailingSlash Condition=" '$(OutputRoot)'=='' ">$(Root)_OutputRoot</OutputRootNoTrailingSlash>
-    <OutputRoot Condition=" '$(OutputRoot)'=='' ">$(OutputRootNoTrailingSlash)\</OutputRoot>
-    <PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)Nugetpkg\</PackageRoot>
-    <NugetExe Condition=" '$(NugetExe)'=='' ">$(ToolsRoot).nuget\NuGet.exe</NugetExe>    
-    <PackageDirectory Condition=" '$(PackageDirectory)'=='' ">_Package</PackageDirectory>
-    <CopyOutputToDevFolder Condition=" '$(CopyOutputToDevFolder)'=='' ">true</CopyOutputToDevFolder>
-    <RestorePackages Condition=" '$(RestorePackages)'=='' ">true</RestorePackages>
-
-    <NugetSourceRoot Condition=" ''=='' ">$(SourceRoot)nuget\</NugetSourceRoot>
-    
-        
-    <DevFolder Condition=" '$(DevFolder)'=='' ">c:\temp\msbuild\</DevFolder>
-    <NugetLocalRepo Condition=" '$(NugetLocalRepo)'=='' ">C:\Temp\Nuget\LocalRepo\</NugetLocalRepo>
-  </PropertyGroup>-->
 
   <PropertyGroup>
     <NuspecFile Condition=" '$(NuspecFile)'=='' ">$(MSBuildThisProjectDirectory)imgcomp.nuspec</NuspecFile>
     <NugetSourceRoot Condition=" ''=='' ">$(ImgCompSourceRoot)</NugetSourceRoot>
-    <PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)ImgCompNuGet\</PackageRoot>
+    <PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)_ImgCompNuGet\</PackageRoot>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,11 +17,14 @@
 
     <!-- Standard declarations -->
     <LibItems Include="$(NugetSourceRoot)lib\**\*" />
-    <ToolsItems Include="$(NugetSourceRoot)tools\**\*" />
+    <ToolsItems Include="$(OutputPathImgComp)tools\**\*">
+      <DestDir>tools\</DestDir>
+    </ToolsItems>
     <ContentItems Include="$(NugetSourceRoot)content\**\*"/>
 
     <!-- custom -->
-    <ToolItems Include="$(OutputRoot)"/>
+    <ToolsItems Include="$(OutputRoot)ImageCompressor.Job\ImageCompressor.Job.exe"/>
+    <ToolsItems Include="$(OutputRoot)ImageCompressor.Job\ImageCompressor.Job.exe.config"/>
   </ItemGroup>
 
   <PropertyGroup>
@@ -57,6 +36,7 @@
   <Target Name="CreateNugetPackage" DependsOnTargets="$(CreateNugetPackageDependsOn)" />
 
   <Target Name="CoreCreateNugetPackage">
+    <Message Text="OutputRoot: $(OutputRoot)" Importance="low"/>
     <!-- nuget pack "C:\...\<filename>.nuspec" -NoPackageAnalysis -OutputDirectory "C:\...\Output\" -->
     <PropertyGroup>
       <_NugetSpecFile>%(_NugetSpecOutputFile.FullPath)</_NugetSpecFile>
@@ -73,7 +53,6 @@
     <Copy SourceFiles="@(_CreatedPackage)"
           DestinationFiles="@(_CreatedPackage->'$(NugetLocalRepo)%(Filename)%(Extension)')"
           Condition="Exists('$(NugetLocalRepo)')"/>
-    <!---->
   </Target>
 
   <Target Name="PrepareAndPopulateNugetFolder">
@@ -81,9 +60,14 @@
           DestinationFiles="@(_NugetSpecFile->'$(PackageRoot)%(Filename)%(Extension)')">
       <Output ItemName="_NugetSpecOutputFile" TaskParameter="DestinationFiles"/>
     </Copy>
-
+    <Message Text="ToolsItems: [@(ToolsItems)]
+ToolsItems :[@(ContentItems)]
+ContentItems : [@(ContentItems)]
+LibItems : [@(LibItems)]
+NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
+    
     <Copy SourceFiles="@(ToolsItems)"
-          DestinationFiles="@(ToolsItems->'$(PackageRoot)tools\%(Filename)%(Extension)')"/>
+          DestinationFiles="@(ToolsItems->'$(PackageRoot)tools\%(DestDir)%(Filename)%(Extension)')"/>
 
     <Copy SourceFiles="@(ContentItems)"
           DestinationFiles="@(ContentItems->'$(PackageRoot)content\%(DestDir)%(Filename)%(Extension)')"/>

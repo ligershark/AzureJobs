@@ -1,7 +1,8 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="FullBuild">
 
   <!-- Import the shared properties -->
-  <Import Project="$(MSBuildThisFileDirectory)shared.props"/>
+  <Import Project="$(SharedProps)" Condition=" '$(SharedProps)'!='' "/>
+  <Import Project="$(MSBuildThisFileDirectory)shared.props" Condition=" '$(SharedProps)'=='' " />
   
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)'=='' ">Release</Configuration>
