@@ -88,7 +88,7 @@ namespace TextMinifier.Job
                 _cache.Add(file);
 
                 // Wait a bit before kicking off compression to avoid file locks
-                await Task.Delay(TimeSpan.FromMilliseconds(500));
+                await Task.Delay(TimeSpan.FromMilliseconds(1000));
 
                 Minify(file, ext);
             }

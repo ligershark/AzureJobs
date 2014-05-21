@@ -64,7 +64,7 @@ namespace ImageCompressor.Job
                 _cache.Add(file);
 
                 // Wait a bit before kicking off compression to avoid file locks
-                await Task.Delay(TimeSpan.FromMilliseconds(500));
+                await Task.Delay(TimeSpan.FromMilliseconds(2000));
 
                 var result = _compressor.CompressFile(file);
             }
