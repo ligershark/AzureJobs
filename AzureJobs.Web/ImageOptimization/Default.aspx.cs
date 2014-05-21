@@ -22,6 +22,7 @@ namespace AzureJobs.Web
                 string src = "/imageoptimization/img/" + Path.GetFileName(file);
                 long size = new FileInfo(file).Length;
                 divImages.InnerHtml += string.Format("<span title='{1} bytes'><img src='{0}' /></span>", src, size);
+                btnClear.Enabled = true;
             }
         }
 

@@ -14,7 +14,7 @@
         <asp:FileUpload runat="server" ID="files" AllowMultiple="true" accept="image/png, image/jpeg, image/gif" />
 
         <asp:Button Text="Upload" runat="server" ID="btnUpload" OnClick="Upload_Click" />
-        <asp:Button Text="Delete all images" OnClientClick="return confirm('Are you sure?')" runat="server" ID="btnClear" OnClick="btnClear_Click" />
+        <asp:Button Text="Delete all images" OnClientClick="return confirm('Are you sure?')" runat="server" ID="btnClear" Enabled="false" OnClick="btnClear_Click" />
     </form>
 
     <div runat="server" class="images" id="divImages"></div>
