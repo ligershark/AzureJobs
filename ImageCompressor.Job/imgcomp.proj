@@ -16,13 +16,14 @@
     <_NugetSpecFile Include="$(NuspecFile)" />
 
     <!-- Standard declarations -->
-    <LibItems Include="$(NugetSourceRoot)lib\**\*" />
+    <LibItems Include="$(NugetSourceRoot)NuGet\lib\**\*" />
+    <ContentItems Include="$(NugetSourceRoot)NuGet\content\**\*"/>
+    <ToolsItems Include="$(OutputPathImgComp)NuGet\tools\**\*" />
+    
     <ToolsItems Include="$(OutputPathImgComp)tools\**\*">
       <DestDir>tools\</DestDir>
     </ToolsItems>
-    <ContentItems Include="$(NugetSourceRoot)content\**\*"/>
-
-    <!-- custom -->
+    
     <ToolsItems Include="$(OutputRoot)ImageCompressor.Job\ImageCompressor.Job.exe"/>
     <ToolsItems Include="$(OutputRoot)ImageCompressor.Job\ImageCompressor.Job.exe.config"/>
   </ItemGroup>
@@ -65,7 +66,7 @@ ToolsItems :[@(ContentItems)]
 ContentItems : [@(ContentItems)]
 LibItems : [@(LibItems)]
 NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
-    
+
     <Copy SourceFiles="@(ToolsItems)"
           DestinationFiles="@(ToolsItems->'$(PackageRoot)tools\%(DestDir)%(Filename)%(Extension)')"/>
 
