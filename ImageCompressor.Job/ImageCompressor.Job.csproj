@@ -58,7 +58,6 @@
   <ItemGroup>
     <Compile Include="CompressionResult.cs" />
     <Compile Include="ImageCompressor.cs" />
-    <Compile Include="Logger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -113,6 +112,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AzureJobs.Common\AzureJobs.Common.csproj">
+      <Project>{f5911198-57b8-4597-bef3-14bb95869791}</Project>
+      <Name>AzureJobs.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Hosting;
@@ -8,6 +9,7 @@ namespace AzureJobs.Web.Minification
     public partial class Default : System.Web.UI.Page
     {
         private static string folder = HostingEnvironment.MapPath("~/Minification/files/");
+        private static List<string> _extensions = new List<string>() { ".css", ".js" };
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -23,6 +25,9 @@ namespace AzureJobs.Web.Minification
         private void BindFile()
         {
             string file = Request.QueryString.ToString();
+
+            if (!_extensions.Contains(Path.GetExtension(file).ToLowerInvariant()))
+                return;
 
             if (!string.IsNullOrEmpty(file))
             {
@@ -48,8 +53,14 @@ namespace AzureJobs.Web.Minification
 
         protected void btnClear_Click(object sender, EventArgs e)
         {
-            Directory.Delete(folder, true);
-            Directory.CreateDirectory(folder);
+            foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
+            {
+                string ext = Path.GetExtension(file).ToLowerInvariant();
+
+                if (_extensions.Contains(ext))
+                    File.Delete(file);
+            }
+
             Response.Redirect(Request.Path, true);
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using AzureJobs.Common;
 using Microsoft.Ajax.Utilities;
 
 namespace TextMinifier.Job
@@ -13,6 +14,7 @@ namespace TextMinifier.Job
         private static string[] _filters = { "*.css", "*.js" };
         private static List<string> _cache = new List<string>();
         private static Minifier _minifier = new Minifier();
+        private static Logger _log;
 
         private static CssSettings _cssSettings = new CssSettings
         {
@@ -28,7 +30,8 @@ namespace TextMinifier.Job
 
         static void Main(string[] args)
         {
-            //_folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\Minification\files";
+            _folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\Minification\files";
+            _log = new Logger(_folder);
             Initialize();
             StartListener();
 
@@ -40,13 +43,10 @@ namespace TextMinifier.Job
 
         private static async void Initialize()
         {
-            var parent = Directory.GetParent(_folder);
-            string logfile = Path.Combine(parent.FullName, "minificationlog.txt");
-
-            if (File.Exists(logfile))
+            if (_log.Exist())
                 return;
 
-            File.WriteAllText(logfile, "Started");
+            _log.Write("Installed");
 
             foreach (string filter in _filters)
             {
@@ -101,7 +101,7 @@ namespace TextMinifier.Job
             string content = File.ReadAllText(sourcePath);
             string result;
 
-            Console.WriteLine("Minifying " + Path.GetFileName(sourcePath));
+            _log.Write("Minifying " + Path.GetFileName(sourcePath));
 
             if (ext == ".js")
                 result = _minifier.MinifyJavaScript(content, _jsSettings);
@@ -113,10 +113,10 @@ namespace TextMinifier.Job
             if (content != result)
             {
                 File.WriteAllText(sourcePath, result, Encoding.UTF8);
-                Console.WriteLine("Minification done. Old size: " + content.Length + " bytes. New size: " + result.Length + " bytes");
+                _log.Write("Minification done. Old size: " + content.Length + " bytes. New size: " + result.Length + " bytes");
             }
             else
-                Console.WriteLine("Couldn't minify any further" + Environment.NewLine);
+                _log.Write("Couldn't minify any further" + Environment.NewLine);
         }
     }
 }

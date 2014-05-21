@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using AzureJobs.Common;
 
 namespace ImageCompressor.Job
 {
@@ -9,12 +10,16 @@ namespace ImageCompressor.Job
     {
         private static string _folder = @"D:\home\site\wwwroot\";
         private static string[] _filters = { "*.png", "*.jpg", "*.jpeg", "*.gif" };
-        private static ImageCompressor _compressor = new ImageCompressor();
+        private static ImageCompressor _compressor;
         private static List<string> _cache = new List<string>();
+        private static Logger _log;
 
         static void Main(string[] args)
         {
-            //_folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\ImageOptimization\img";
+            _folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\ImageOptimization\img";
+            _log = new Logger(_folder);
+            _compressor = new ImageCompressor(_log);
+
             Initialize();
             StartListener();
 
@@ -23,18 +28,13 @@ namespace ImageCompressor.Job
                 System.Threading.Thread.Sleep(int.MaxValue);
             }
         }
-
-        private static string _logfile;
-
+        
         private static async void Initialize()
         {
-            var parent = Directory.GetParent(_folder);
-            _logfile = Path.Combine(_folder, "imagecompressionlog.txt");
-
-            if (File.Exists(_logfile))
+            if (_log.Exist())
                 return;
 
-            File.WriteAllText(_logfile, "Started" + Environment.NewLine);
+            _log.Write("Installed");
 
             foreach (string filter in _filters)
             {
