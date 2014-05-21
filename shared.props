@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  
+  <PropertyGroup> 
+    <Root>$(MSBuildThisFileDirectory)</Root>
+    <SourceRoot Condition=" '$(SourceRoot)'=='' ">$(Root)</SourceRoot>
+    <OutputRootNoTrailingSlash Condition=" '$(OutputRoot)'=='' ">$(SourceRoot)OutputRoot</OutputRootNoTrailingSlash>
+    <OutputRoot Condition=" '$(OutputRoot)'=='' ">$(OutputRootNoTrailingSlash)\</OutputRoot>
+    <!--<PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)Nugetpkg\</PackageRoot>-->
+    <ToolsRoot Condition=" ''=='' ">$(Root)BuildTools\</ToolsRoot>
+    <NugetExe Condition=" '$(NugetExe)'=='' ">$(ToolsRoot)NuGet.exe</NugetExe>
+    <NugetLocalRepo Condition=" '$(NugetLocalRepo)'=='' ">C:\Temp\Nuget\LocalRepo\</NugetLocalRepo>
+    <RestorePackages Condition=" '$(RestorePackages)'=='' ">true</RestorePackages>
+    <Configuration Condition=" '$(Configuration)'=='' ">Release</Configuration>
+    
+    <ImgCompSourceRoot Condition=" '$(ImgCompSourceRoot)'=='' ">$(SourceRoot)ImageCompressor.Job\</ImgCompSourceRoot>
+    <TextMinSourceRoot Condition=" '$(TextMinSourceRoot)'=='' ">$(SourceRoot)TextMinifier.Job\</TextMinSourceRoot>
+    
+    <OutputPathImgComp Condition=" '$(OutputPathImgComp)'=='' ">$(OutputRoot)ImageCompressor.Job\</OutputPathImgComp>
+    <OutputPathTextMin Condition=" '$(OutputPathTextMin)'=='' ">$(OutputRoot)TextMinifier.Job\</OutputPathTextMin>
+  </PropertyGroup>
+  
+</Project>

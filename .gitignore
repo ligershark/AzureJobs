@@ -1,5 +1,7 @@
 azurejobs.web/imageoptimization/img/
 azurejobs.web/minification/files/
+OutputRoot/
+build.*.log
 
 #################
 ## Visual Studio

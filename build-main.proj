@@ -1,0 +1,122 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="FullBuild">
+
+  <!-- Import the shared properties -->
+  <Import Project="$(MSBuildThisFileDirectory)shared.props"/>
+  
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)'=='' ">Release</Configuration>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectsToBuild Include="$(SourceRoot)ImageCompressor.Job\ImageCompressor.Job.csproj">
+      <AdditionalProperties>OutputPath=$(OutputPathImgComp)</AdditionalProperties>
+    </ProjectsToBuild>
+    <ProjectsToBuild Include="$(SourceRoot)TextMinifier.Job\TextMinifier.Job.csproj">
+      <AdditionalProperties>OutputPath=$(OutputPathTextMin)</AdditionalProperties>
+    </ProjectsToBuild>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <FullBuildDependsOn>
+      CleanAndInitalize;
+      BuildProjects;
+      CreateNugetPackages;
+    </FullBuildDependsOn>
+    <BuildProjectsDependsOn>
+      CoreBuildProjects;
+    </BuildProjectsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="FullBuild" DependsOnTargets="$(FullBuildDependsOn)" />
+
+  <Target Name="BuildProjects" DependsOnTargets="CoreBuildProjects"/>
+  <Target Name="CoreBuildProjects">
+    <Message Text="Building projects now [@(ProjectsToBuild)]" Importance="high"/>
+    <MSBuild Projects="@(ProjectsToBuild)" Properties="Configuration=$(Configuration);OutputPath=$(OutputRoot)"/>
+  </Target>
+  
+  <PropertyGroup>
+    <CreateNugetPackagesDependsOn>
+      BuildProjects;
+      PrepareAndPopulateNugetFolder;
+      CoreCreateNugetPackages;
+    </CreateNugetPackagesDependsOn>
+  </PropertyGroup>
+  <Target Name="CreateNugetPackages" DependsOnTargets="$(CreateNugetPackagesDependsOn)" />
+
+  <Target Name="CoreCreateNugetPackages">
+    <!-- nuget pack "C:\...\<filename>.nuspec" -NoPackageAnalysis -OutputDirectory "C:\...\Output\" -->
+    <PropertyGroup>
+      <_NugetSpecFile>%(_NugetSpecOutputFile.FullPath)</_NugetSpecFile>
+      <_Cmd>"$(NugetExe)" pack "$(_NugetSpecFile)" -NoPackageAnalysis -OutputDirectory "$(OutputRootNoTrailingSlash)" </_Cmd>
+    </PropertyGroup>
+
+    <!--<Message Text="_Cmd: $(_Cmd)" Importance="low" />
+    <Exec Command="$(_Cmd)"/>
+
+    <ItemGroup>
+      <_CreatedPackage Include="$(OutputRoot)*.nupkg"/>
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_CreatedPackage)"
+          DestinationFiles="@(_CreatedPackage->'$(NugetLocalRepo)%(Filename)%(Extension)')"
+          Condition="Exists('$(NugetLocalRepo)')"/>-->
+  </Target>
+
+  <!--<ItemGroup>
+    <NuSpecFiles Include=""></NuSpecFiles>
+  </ItemGroup>-->
+  
+  <Target Name="PrepareAndPopulateNugetFolder">   
+    <ItemGroup>
+      <!-- imgcomp -->
+      <!--<NuGetPkgSourceFiles Include="$(ImgCompSourceRoot)imgcomp.nuspec">
+        <Dest>$(OutputPathImgComp)imgcomp.nuspec</Dest>
+      </NuGetPkgSourceFiles>
+      <NuGetPkgSourceFiles Include="$(ImgCompSourceRoot)imgcomp.proj">
+        <Dest>$(OutputPathImgComp)imgcomp.proj</Dest>
+      </NuGetPkgSourceFiles>-->
+
+      <!-- textminifier -->
+      <!--<NuGetPkgSourceFiles Include="$(TextMinSourceRoot)textmin.nuspec"/>
+      <NuGetPkgSourceFiles Include="$(TextMinSourceRoot)textmin.proj"/>--> 
+    </ItemGroup>
+    
+    <!--<Copy SourceFiles="@(NuGetPkgSourceFiles)"
+          DestinationFiles="@(NuGetPkgSourceFiles->'%(Dest)')"/>-->
+    
+    <!--<Copy SourceFiles="@(_NugetSpecFile)"
+          DestinationFiles="@(_NugetSpecFile->'$(PackageRoot)%(Filename)%(Extension)')">
+      <Output ItemName="_NugetSpecOutputFile" TaskParameter="DestinationFiles"/>
+    </Copy>
+
+    <Copy SourceFiles="@(ToolsItems)"
+          DestinationFiles="@(ToolsItems->'$(PackageRoot)tools\%(Filename)%(Extension)')"/>
+
+    <Copy SourceFiles="@(ContentItems)"
+          DestinationFiles="@(ContentItems->'$(PackageRoot)content\%(DestDir)%(Filename)%(Extension)')"/>
+    <Copy SourceFiles="@(LibItems)"
+          DestinationFiles="@(LibItems->'$(PackageRoot)lib\%(DestDir)%(Filename)%(Extension)')"/>
+    
+    <Copy SourceFiles="@(NuGetRootItems)"
+          DestinationFiles="@(NuGetRootItems->'$(PackageRoot)%(DestDir)%(Filename)%(Extension)')" />-->
+
+  </Target> 
+
+  <Target Name="CleanAndInitalize">
+    <!--<MakeDir Directories="$(OutputRoot)"/>
+    <MakeDir Directories="$(PackageRoot)"/>
+    
+    <ItemGroup>
+      <_FilesToDelete Remove="@(_FilesToDelete)"/>
+      <_FilesToDelete Include="$(OutputRoot)**\*"/>
+    </ItemGroup>
+    <Delete Files="@(_FilesToDelete)"/>
+
+    <ItemGroup>
+      <_FilesToDelete Remove="@(_FilesToDelete)"/>
+      <_FilesToDelete Include="$(PackageRoot)**\*"/>
+    </ItemGroup>
+    <Delete Files="@(_FilesToDelete)"/>-->
+  </Target>
+</Project>
