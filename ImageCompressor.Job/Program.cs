@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
+using System.Linq;
 using AzureJobs.Common;
 
 namespace ImageCompressor.Job
@@ -11,25 +11,27 @@ namespace ImageCompressor.Job
         private static string _folder = @"D:\home\site\wwwroot\";
         private static string[] _filters = { "*.png", "*.jpg", "*.jpeg", "*.gif" };
         private static ImageCompressor _compressor;
-        private static List<string> _cache = new List<string>();
+        private static Dictionary<string, DateTime> _cache = new Dictionary<string, DateTime>();
         private static Logger _log;
 
         static void Main(string[] args)
         {
-            //_folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\ImageOptimization\img";
+            _folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\ImageOptimization\img";
             _log = new Logger(_folder);
             _compressor = new ImageCompressor(_log);
 
             Initialize();
+            ProcessQueue();
             StartListener();
 
             while (true)
             {
-                System.Threading.Thread.Sleep(int.MaxValue);
+                System.Threading.Thread.Sleep(1000);
+                ProcessQueue();
             }
         }
-        
-        private static async void Initialize()
+
+        private static void Initialize()
         {
             if (_log.Exist())
                 return;
@@ -40,7 +42,7 @@ namespace ImageCompressor.Job
             {
                 foreach (string file in Directory.EnumerateFiles(_folder, filter, SearchOption.AllDirectories))
                 {
-                    await ProcessFile(file);
+                    _cache[file] = DateTime.Now;
                 }
             }
         }
@@ -53,31 +55,35 @@ namespace ImageCompressor.Job
                 w.Filter = filter;
                 w.IncludeSubdirectories = true;
                 w.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime;
-                w.Changed += async (s, e) => await ProcessFile(e.FullPath);
+                w.Changed += (s, e) => _cache[e.FullPath] = DateTime.Now;
                 w.EnableRaisingEvents = true;
             }
         }
 
-        private static async Task ProcessFile(string file)
+        private static void ProcessQueue()
         {
-            if (_cache.Contains(file))
-                return;
-
-            try
+            for (int i = _cache.Count - 1; i >= 0; i--)
             {
-                _cache.Add(file);
+                var entry = _cache.ElementAt(i);
 
-                // Wait a bit before kicking off compression to avoid file locks
-                await Task.Delay(TimeSpan.FromMilliseconds(2000));
+                // The file should be 1 second old before we start processing
+                if (entry.Value > DateTime.Now.AddSeconds(1))
+                    continue;
 
-                var result = _compressor.CompressFile(file);
+                try
+                {
+                    var result = _compressor.CompressFile(entry.Key);
 
-                // Wait a bit to avoid multiple runs on the same file due to FSW quirks
-                await Task.Delay(TimeSpan.FromMilliseconds(100));
-            }
-            finally
-            {
-                _cache.Remove(file);
+                    _cache.Remove(entry.Key);
+                }
+                catch (IOException)
+                {
+                    // do nothing. We'll try again
+                }
+                catch
+                {
+                    _cache.Remove(entry.Key);
+                }
             }
         }
     }
