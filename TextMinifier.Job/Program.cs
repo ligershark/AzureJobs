@@ -63,14 +63,9 @@ namespace TextMinifier.Job
                 w.Filter = filter;
                 w.IncludeSubdirectories = true;
                 w.NotifyFilter = NotifyFilters.LastWrite;
-                w.Changed += w_Changed;
+                w.Changed += async (s, e) => await ProcessFile(e.FullPath);
                 w.EnableRaisingEvents = true;
             }
-        }
-
-        private async static void w_Changed(object sender, FileSystemEventArgs e)
-        {
-            await ProcessFile(e.FullPath);
         }
 
         private static async Task ProcessFile(string file)
