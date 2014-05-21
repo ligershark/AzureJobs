@@ -30,7 +30,7 @@ namespace TextMinifier.Job
 
         static void Main(string[] args)
         {
-            _folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\Minification\files";
+            //_folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\Minification\files";
             _log = new Logger(_folder);
             Initialize();
             StartListener();

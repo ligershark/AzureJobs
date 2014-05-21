@@ -16,7 +16,7 @@ namespace ImageCompressor.Job
 
         static void Main(string[] args)
         {
-            _folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\ImageOptimization\img";
+            //_folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\ImageOptimization\img";
             _log = new Logger(_folder);
             _compressor = new ImageCompressor(_log);
 
