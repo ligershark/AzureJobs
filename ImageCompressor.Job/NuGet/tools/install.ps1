@@ -1,22 +1,10 @@
 ﻿param($rootPath, $toolsPath, $package, $project)
 
-function Get-ScriptDirectory
-{
-    $Invocation = (Get-Variable MyInvocation -Scope 1).Value
-    Split-Path $Invocation.MyCommand.Path
-}
-
-$scriptDir = (Get-ScriptDirectory)
-$importLabel = "TemplateBuilder"
-$targetsPropertyName = "TemplateBuilderTargets"
-$targetsFileToAddImport = "ligershark.templates.targets";
 
 if((Get-Module image-compress)){
     Remove-Module image-compress
 }
-# $VerbosePreference = "Continue"
-# import the helper functions we've created
-Import-Module (Join-Path -Path ($scriptDir) -ChildPath 'image-compress.psm1')
+Import-Module (Join-Path -Path ($toolsPath) -ChildPath 'image-compress.psm1')
 
 #########################
 # Start of script here
@@ -29,8 +17,6 @@ if(!(Test-Path $projFile)){
     throw ("Project file not found at [{0}]" -f $projFile)
 }
 
-
-
 # use MSBuild to load the project and add the property
 
 # This is what we want to add to the project
@@ -41,10 +27,20 @@ if(!(Test-Path $projFile)){
 # Before modifying the project save everything so that nothing is lost
 $DTE.ExecuteCommand("File.SaveAll")
 
-<#
+
 CheckoutProjFileIfUnderScc -project $project
 EnsureProjectFileIsWriteable -project $project
 
+$projectMSBuild = [Microsoft.Build.Construction.ProjectRootElement]::Open($project.FullName)
+# add the ls-AzureImageCompressToolsPath property to the project
+$relPathToToolsFolder = ComputeRelativePathToTargetsFile -startPath (Get-Item $project.FullName) -targetPath (Get-Item ("{0}\tools\" -f $rootPath))
+
+$propertyGroup = $projectMSBuild.AddPropertyGroup()
+$propertyGroup.Label = "ls-AzureImageCompress"
+$propertyGroup.AddProperty('ls-AzureImageCompressToolsPath', ('$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\{0}\))') -f $relPathToToolsFolder);
+
+$projectMSBuild.Save()
+<#
 # Update the Project file to import the .targets file
 $relPathToTargets = ComputeRelativePathToTargetsFile -startPath ($projItem = Get-Item $project.FullName) -targetPath (Get-Item ("{0}\tools\{1}" -f $rootPath, $targetsFileToAddImport))
 
