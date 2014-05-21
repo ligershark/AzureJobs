@@ -62,9 +62,8 @@ namespace TextMinifier.Job
                 FileSystemWatcher w = new FileSystemWatcher(_folder);
                 w.Filter = filter;
                 w.IncludeSubdirectories = true;
-                w.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.CreationTime;
+                w.NotifyFilter = NotifyFilters.LastWrite;
                 w.Changed += w_Changed;
-                w.Created += w_Changed;
                 w.EnableRaisingEvents = true;
             }
         }
@@ -92,9 +91,6 @@ namespace TextMinifier.Job
                 await Task.Delay(TimeSpan.FromMilliseconds(500));
 
                 Minify(file, ext);
-
-                // Wait to exit so events on the FileSystemWatcher aren't firing.
-                await Task.Delay(TimeSpan.FromMilliseconds(100));
             }
             finally
             {
