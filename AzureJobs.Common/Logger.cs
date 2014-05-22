@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -27,12 +28,16 @@ namespace AzureJobs.Common
 
             string file = GetLogFilePath();
 
+            string dir = Path.GetDirectoryName(file);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
             if (!File.Exists(file))
                 File.WriteAllLines(file, new[] { "Log file created" });
 
             lock (_syncRoot)
             {
-                File.AppendAllLines(file, messages);
+                File.AppendAllLines(file, messages.Select(m => DateTime.Now + " " + m).ToArray());
             }
         }
 
