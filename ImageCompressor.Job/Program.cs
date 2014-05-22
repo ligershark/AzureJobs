@@ -11,7 +11,7 @@ namespace ImageCompressor.Job
     {
         private static string _folder = @"D:\home\site\wwwroot\";
         private static string[] _filters = { "*.png", "*.jpg", "*.jpeg", "*.gif" };
-        private static ImageCompressor _compressor;
+        private static ImageCompressor _compressor = new ImageCompressor();
         private static Dictionary<string, DateTime> _cache = new Dictionary<string, DateTime>();
         private static Logger _log;
         private static FileHashStore _store;
@@ -19,9 +19,8 @@ namespace ImageCompressor.Job
 
         static void Main(string[] args)
         {
-            //_folder = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\ImageOptimization\img";
+            _folder = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\ImageOptimization\img";
             _log = new Logger(Path.Combine(_folder, "app_data"));
-            _compressor = new ImageCompressor(_log);
             _store = new FileHashStore(Path.Combine(_folder, "app_data\\ImageOptimizerHashTable.xml"), _log);
 
             QueueExistingFiles();
@@ -82,8 +81,10 @@ namespace ImageCompressor.Job
                     }
 
                     try
-                    {                        
-                        _compressor.CompressFile(entry.Key);
+                    {
+                        var result = _compressor.CompressFile(entry.Key);
+
+                        WriteToLog(result);
 
                         _store.Save(entry.Key);
                         _cache.Remove(entry.Key);
@@ -98,6 +99,16 @@ namespace ImageCompressor.Job
                     }
                 }
             }
+        }
+
+        private static void WriteToLog(CompressionResult result)
+        {
+            if (result.Saving <= 0)
+                return;
+
+            string name = new Uri(_folder).MakeRelativeUri(new Uri(result.OriginalFileName)).ToString();
+            _log.Write(DateTime.Now, name, result.OriginalFileSize, result.ResultFileSize);
+
         }
     }
 }

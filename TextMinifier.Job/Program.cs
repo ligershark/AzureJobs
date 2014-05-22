@@ -31,7 +31,7 @@ namespace TextMinifier.Job
 
         static void Main(string[] args)
         {
-            //_folder = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\Minification\files";
+            _folder = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\Minification\files";
             _log = new Logger(Path.Combine(_folder, "app_data"));
             _store = new FileHashStore(Path.Combine(_folder, "app_data\\TextMinifierHashTable.xml"), _log);
 
@@ -118,8 +118,6 @@ namespace TextMinifier.Job
             string content = File.ReadAllText(sourcePath);
             string result;
 
-            _log.Write("Minifying " + Path.GetFileName(sourcePath));
-
             if (ext == ".js")
                 result = _minifier.MinifyJavaScript(content, _jsSettings);
             else if (ext == ".css")
@@ -130,10 +128,9 @@ namespace TextMinifier.Job
             if (content != result)
             {
                 File.WriteAllText(sourcePath, result, Encoding.UTF8);
-                _log.Write("Minification done. Old size: " + content.Length + " bytes. New size: " + result.Length + " bytes");
+                string name = new Uri(_folder).MakeRelativeUri(new Uri(sourcePath)).ToString();
+                _log.Write(DateTime.Now, name, content.Length, result.Length);
             }
-            else
-                _log.Write("Couldn't minify any further" + Environment.NewLine);
         }
     }
 }

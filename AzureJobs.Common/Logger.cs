@@ -21,10 +21,11 @@ namespace AzureJobs.Common
             return File.Exists(GetLogFilePath());
         }
 
-        public void Write(params string[] messages)
+        public void Write(params object[] messages)
         {
-            Trace.WriteLine(string.Join(", ", messages));
-            Console.WriteLine(string.Join(", ", messages));
+            string messageString = string.Join(", ", messages);
+            Trace.WriteLine(messageString);
+            Console.WriteLine(messageString);
 
             string file = GetLogFilePath();
 
@@ -33,11 +34,11 @@ namespace AzureJobs.Common
                 Directory.CreateDirectory(dir);
 
             if (!File.Exists(file))
-                File.WriteAllLines(file, new[] { "Log file created" });
+                File.WriteAllText(file, "Date, Filename, Original, Optimized");
 
             lock (_syncRoot)
             {
-                File.AppendAllLines(file, messages.Select(m => DateTime.Now + " " + m).ToArray());
+                File.AppendAllText(file, Environment.NewLine + messageString);
             }
         }
 
@@ -45,7 +46,7 @@ namespace AzureJobs.Common
         {
             var ass = Assembly.GetEntryAssembly();
             string name = ass.ManifestModule.Name;
-            return Path.Combine(_path, name + ".txt");
+            return Path.Combine(_path, name + ".csv");
         }
     }
 }

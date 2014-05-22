@@ -2,20 +2,11 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using AzureJobs.Common;
 
 namespace ImageCompressor.Job
 {
     internal class ImageCompressor
     {
-        private const string _dataUriPrefix = "base64-";
-        private Logger _log;
-
-        public ImageCompressor(Logger log)
-        {
-            _log = log;
-        }
-
         public static bool IsFileSupported(string fileName)
         {
             return GetArguments(fileName, string.Empty) != null;
@@ -23,7 +14,6 @@ namespace ImageCompressor.Job
 
         public CompressionResult CompressFile(string fileName)
         {
-            _log.Write("Optimizing " + fileName + "...");
             string targetFile = Path.ChangeExtension(Path.GetTempFileName(), Path.GetExtension(fileName));
 
             ProcessStartInfo start = new ProcessStartInfo("cmd")
@@ -55,19 +45,10 @@ namespace ImageCompressor.Job
 
         private void HandleResult(string file, CompressionResult result)
         {
-            string name = file.Contains(_dataUriPrefix) ? "the dataUri" : Path.GetFileName(file);
+            string name = Path.GetFileName(file);
 
             if (result.Saving > 0)
-            {
                 File.Copy(result.ResultFileName, result.OriginalFileName, true);
-
-                string text = "Compressed " + name + " by " + result.Saving + " bytes / " + result.Percent + "%";
-                _log.Write(text);
-            }
-            else
-            {
-                _log.Write(name + " is already optimized");
-            }
         }
 
         private static string GetArguments(string sourceFile, string targetFile)
