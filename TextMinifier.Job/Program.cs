@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using AzureJobs.Common;
 using Microsoft.Ajax.Utilities;
 
@@ -16,6 +15,7 @@ namespace TextMinifier.Job
         private static Dictionary<string, DateTime> _cache = new Dictionary<string, DateTime>();
         private static Minifier _minifier = new Minifier();
         private static Logger _log;
+        private static FileHashStore _store;
 
         private static CssSettings _cssSettings = new CssSettings
         {
@@ -32,9 +32,11 @@ namespace TextMinifier.Job
         static void Main(string[] args)
         {
             //_folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\Minification\files";
-            _log = new Logger(_folder);
+            _log = new Logger(Path.Combine(_folder, "app_data"));
+            _store = new FileHashStore(Path.Combine(_folder, "app_data\\TextMinifierHashTable.xml"), _log);
 
-            Initialize();
+            QueueExistingFiles();
+            ProcessQueue();
             StartListener();
 
             while (true)
@@ -44,21 +46,14 @@ namespace TextMinifier.Job
             }
         }
 
-        private static void Initialize()
+        private static void QueueExistingFiles()
         {
-            if (_log.Exist())
-                return;
-
-            _log.Write("Installed");
-
             foreach (string filter in _filters)
-            {
                 foreach (string file in Directory.EnumerateFiles(_folder, filter, SearchOption.AllDirectories))
-                    AddToQueue(file);
-            }
+                    AddToQueue(file, DateTime.MinValue);
         }
 
-        private static void AddToQueue(string file)
+        private static void AddToQueue(string file, DateTime date)
         {
             string ext = Path.GetExtension(file).ToLowerInvariant();
 
@@ -67,7 +62,7 @@ namespace TextMinifier.Job
                 file.EndsWith(".debug" + ext, StringComparison.OrdinalIgnoreCase))
                 return;
 
-            _cache[file] = DateTime.Now;
+            _cache[file] = date;
         }
 
         public static void StartListener()
@@ -78,7 +73,7 @@ namespace TextMinifier.Job
                 w.Filter = filter;
                 w.IncludeSubdirectories = true;
                 w.NotifyFilter = NotifyFilters.LastWrite;
-                w.Changed += (s, e) => AddToQueue(e.FullPath);
+                w.Changed += (s, e) => AddToQueue(e.FullPath, DateTime.Now);
                 w.EnableRaisingEvents = true;
             }
         }
@@ -90,12 +85,20 @@ namespace TextMinifier.Job
                 var entry = _cache.ElementAt(i);
 
                 // The file should be 1 second old before we start processing
-                if (entry.Value > DateTime.Now.AddSeconds(1))
+                if (entry.Value > DateTime.Now.AddSeconds(-1))
                     continue;
+
+                if (!_store.HasChangedOrIsNew(entry.Key))
+                {
+                    _cache.Remove(entry.Key);
+                    continue;
+                }
 
                 try
                 {
                     Minify(entry.Key);
+                    
+                    _store.Save(entry.Key);
                     _cache.Remove(entry.Key);
                 }
                 catch (IOException)

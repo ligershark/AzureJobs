@@ -13,14 +13,16 @@ namespace ImageCompressor.Job
         private static ImageCompressor _compressor;
         private static Dictionary<string, DateTime> _cache = new Dictionary<string, DateTime>();
         private static Logger _log;
+        private static FileHashStore _store;
 
         static void Main(string[] args)
         {
             //_folder = @"C:\Users\madsk\Documents\Visual Studio 2013\Projects\AzureJobs\Azurejobs.Web\ImageOptimization\img";
-            _log = new Logger(_folder);
+            _log = new Logger(Path.Combine(_folder, "app_data"));
             _compressor = new ImageCompressor(_log);
+            _store = new FileHashStore(Path.Combine(_folder, "app_data\\ImageOptimizerHashTable.xml"), _log);
 
-            Initialize();
+            QueueExistingFiles();
             ProcessQueue();
             StartListener();
 
@@ -31,21 +33,15 @@ namespace ImageCompressor.Job
             }
         }
 
-        private static void Initialize()
+        private static void QueueExistingFiles()
         {
-            if (_log.Exist())
-                return;
-
-            _log.Write("Installed");
-
             foreach (string filter in _filters)
-            {
                 foreach (string file in Directory.EnumerateFiles(_folder, filter, SearchOption.AllDirectories))
                 {
-                    _cache[file] = DateTime.Now;
+                    _cache[file] = DateTime.MinValue;
                 }
-            }
         }
+
 
         public static void StartListener()
         {
@@ -67,13 +63,20 @@ namespace ImageCompressor.Job
                 var entry = _cache.ElementAt(i);
 
                 // The file should be 1 second old before we start processing
-                if (entry.Value > DateTime.Now.AddSeconds(1))
+                if (entry.Value > DateTime.Now.AddSeconds(-1))
                     continue;
+
+                if (!_store.HasChangedOrIsNew(entry.Key))
+                {
+                    _cache.Remove(entry.Key);
+                    continue;
+                }
 
                 try
                 {
-                    var result = _compressor.CompressFile(entry.Key);
-
+                    _compressor.CompressFile(entry.Key);
+                    
+                    _store.Save(entry.Key);
                     _cache.Remove(entry.Key);
                 }
                 catch (IOException)
