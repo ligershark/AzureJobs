@@ -4,10 +4,10 @@
 -->
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">  
   <metadata>
-    <id>AzureImageCompress</id>
+    <id>AzureTextMin</id>
     <version>0.0.3-beta</version>
     <authors>Sayed Ibrahim Hashimi, Mads Kristensen</authors>
-    <description>This will compress images on your website when running in Azure Web Sites.</description>
+    <description>This will minify your .css and .js files on your website when running in Azure Web Sites.</description>
     
     <language>en-US</language>
     <!--<projectUrl>http://xunit.codeplex.com/</projectUrl>

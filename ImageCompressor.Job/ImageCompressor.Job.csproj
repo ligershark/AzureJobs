@@ -75,7 +75,7 @@
     <None Include="imgcomp.proj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="NuGet\tools\image-compress.psm1">
+    <None Include="NuGet\tools\azure-jobs.psm1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="NuGet\tools\install.ps1">

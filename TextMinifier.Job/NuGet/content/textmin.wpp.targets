@@ -17,69 +17,61 @@ Copyright (C) 2014. All rights reserved.
     <WebPublishExtensionsToExclude>$(WebPublishExtensionsToExclude);.tt;.settings;.targets</WebPublishExtensionsToExclude>
     <!-- TODO: We should be able to remove some of these -->
     <CopyAllFilesToSingleFolderForPackageDependsOn>
-      ls-AddAzureJobsToPublish;
+      ls-AddTextMinToPublish;
       $(CopyAllFilesToSingleFolderForPackageDependsOn);
     </CopyAllFilesToSingleFolderForPackageDependsOn>
 
     <OnAfterPipelinePreDeployCopyAllFilesToOneFolder>
-      ls-AddAzureJobsToPublish;
+      ls-AddTextMinToPublish;
       $(OnAfterPipelinePreDeployCopyAllFilesToOneFolder);
     </OnAfterPipelinePreDeployCopyAllFilesToOneFolder>
 
     <CopyAllFilesToSingleFolderForMsdeploy>
-      ls-AddAzureJobsToPublish;
+      ls-AddTextMinToPublish;
       $(CopyAllFilesToSingleFolderForMsdeploy);
     </CopyAllFilesToSingleFolderForMsdeploy>
 
     <!-- For VS2012 -->
     <PipelineCopyAllFilesToOneFolderForMsdeployDependsOn>
-      ls-AddAzureJobsToPublish;
+      ls-AddTextMinToPublish;
       $(PipelineCopyAllFilesToOneFolderForMsdeployDependsOn);
     </PipelineCopyAllFilesToOneFolderForMsdeployDependsOn>
 
     <!-- Required for File System -->
     <PipelinePreDeployCopyAllFilesToOneFolderDependsOn>
-      ls-AddAzureJobsToPublish;
+      ls-AddTextMinToPublish;
       $(PipelinePreDeployCopyAllFilesToOneFolderDependsOn);
     </PipelinePreDeployCopyAllFilesToOneFolderDependsOn>
     <!-- required for FS support from the VS publish dialog -->
     <OnAfterCopyAllFilesToSingleFolderForPackage>
-      ls-AddAzureJobsToPublish;
+      ls-AddTextMinToPublish;
       $(OnAfterCopyAllFilesToSingleFolderForPackage);
     </OnAfterCopyAllFilesToSingleFolderForPackage>
 
     <!-- for preview -->
     <PostTransformWebConfigDependsOn>
-      ls-AddAzureJobsToPublish;
+      ls-AddTextMinToPublish;
       $(PostTransformWebConfigDependsOn)
     </PostTransformWebConfigDependsOn>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <ls-AddAzureJobsToPublishDependsOn>
-      ls-AddImageCompToPublish;
-    </ls-AddAzureJobsToPublishDependsOn>
-  </PropertyGroup>
-
-  <Target Name="ls-AddAzureJobsToPublish" 
-          DependsOnTargets="$(ls-AddAzureJobsToPublishDependsOn)" />
-
-  <Target Name="ls-AddImageCompToPublish" 
-          Condition=" '$(ls-AzureImageCompressToolsPath)'!='' ">
+  <Target Name="ls-AddTextMinToPublish"
+          Condition=" '$(ls-AzureTextMinToolsPath)'!='' ">
 
     <ItemGroup>
-      <_ls-imgcompfiles Include="$(ls-AzureImageCompressToolsPath)**\*" 
-                        Exclude="$(ls-AzureImageCompressToolsPath)*.ps*1"/>
+      <_ls-textminfiles Include="$(ls-AzureTextMinToolsPath)**\*"
+                        Exclude="$(ls-AzureTextMinToolsPath)*.ps*1"/>
     </ItemGroup>
     <PropertyGroup>
       <_ls-schedule>continuous</_ls-schedule>
-      <_ls-projName>ImageCompressor.Job</_ls-projName>
+      <_ls-projName>TextMinifier.Job</_ls-projName>
     </PropertyGroup>
     <ItemGroup>
-      <FilesForPackagingFromProject 
-        Include="%(_ls-imgcompfiles.Identity)" Condition=" '%(_ls-imgcompfiles.Identity)'!='' ">
+      <FilesForPackagingFromProject
+        Include="%(_ls-textminfiles.Identity)" Condition=" '%(_ls-textminfiles.Identity)'!='' ">
         <DestinationRelativePath>app_data\jobs\$(_ls-schedule)\$(_ls-projName)\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
       </FilesForPackagingFromProject>
     </ItemGroup>
   </Target>
+
 </Project>

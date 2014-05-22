@@ -55,6 +55,9 @@
       <NugetBuildFiles Include="$(OutputPathImgComp)imgcomp.proj">
         <AdditionalProperties>SharedProps=$(_spfull)</AdditionalProperties>        
       </NugetBuildFiles>
+      <NugetBuildFiles Include="$(OutputPathTextMin)textmin.proj">
+        <AdditionalProperties>SharedProps=$(_spfull)</AdditionalProperties>
+      </NugetBuildFiles>
     </ItemGroup>
     
     <MSBuild Projects="@(NugetBuildFiles)"/>    

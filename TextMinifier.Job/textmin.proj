@@ -1,0 +1,100 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0" DefaultTargets="CreateNugetPackage">
+
+  <!-- This file is designed to be executed from the OutputRoot\ directory not the source directory -->
+
+  <Import Project="$(SharedProps)" Condition=" '$(SharedProps)'!='' "/>
+  <Import Project="$(MSBuildThisFileDirectory)..\shared.props" Condition=" '$(SharedProps)'=='' " />
+
+  <PropertyGroup>
+    <NuspecFile Condition=" '$(NuspecFile)'=='' ">$(MSBuildThisProjectDirectory)textmin.nuspec</NuspecFile>
+    <NugetSourceRoot Condition=" ''=='' ">$(TextMinSourceRoot)</NugetSourceRoot>
+    <PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)_TextMinNuGet\</PackageRoot>
+    <_ls-textminoutfolder Condition=" '$(_ls-textminoutfolder)'=='' ">$(OutputRoot)TextMinifier.Job\</_ls-textminoutfolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- This item should never have more than 1 value -->
+    <_NugetSpecFile Include="$(NuspecFile)" />
+
+    <!-- Standard declarations -->
+    <LibItems Include="$(NugetSourceRoot)NuGet\lib\**\*" />
+    <ContentItems Include="$(NugetSourceRoot)NuGet\content\**\*"/>
+    <ToolsItems Include="$(TextMinSourceRoot)NuGet\tools\**\*" />
+           
+    <ToolsItems Include="$(_ls-textminoutfolder)*.*"
+                Exclude="$(_ls-textminoutfolder)*.pdb;$(_ls-textminoutfolder)*.nuspec;$(_ls-textminoutfolder)*.proj"/>
+    
+    <!-- copy the same file as ImageCompressor -->
+    <ToolsItems Include="$(OutputPathImgComp)NuGet\tools\azure-jobs.psm1" />
+    <!--<ContentItems Include="$(OutputPathImgComp)NuGet\content\azurejobs.wpp.targets" />-->
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <CreateNugetPackageDependsOn>
+      PrepareAndPopulateNugetFolder;
+      CoreCreateNugetPackage;
+    </CreateNugetPackageDependsOn>
+  </PropertyGroup>
+  <Target Name="CreateNugetPackage" DependsOnTargets="$(CreateNugetPackageDependsOn)" />
+
+  <Target Name="CoreCreateNugetPackage">
+    <Message Text="OutputRoot: $(OutputRoot)" Importance="low"/>
+    <!-- nuget pack "C:\...\<filename>.nuspec" -NoPackageAnalysis -OutputDirectory "C:\...\Output\" -->
+    <PropertyGroup>
+      <_NugetSpecFile>%(_NugetSpecOutputFile.FullPath)</_NugetSpecFile>
+      <_Cmd>"$(NugetExe)" pack "$(_NugetSpecFile)" -NoPackageAnalysis -OutputDirectory "$(OutputRootNoTrailingSlash)" </_Cmd>
+    </PropertyGroup>
+
+    <Message Text="_Cmd: $(_Cmd)" Importance="low" />
+    <Exec Command="$(_Cmd)"/>
+
+    <ItemGroup>
+      <_CreatedPackage Include="$(OutputRoot)*.nupkg"/>
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_CreatedPackage)"
+          DestinationFiles="@(_CreatedPackage->'$(NugetLocalRepo)%(Filename)%(Extension)')"
+          Condition="Exists('$(NugetLocalRepo)')"/>
+  </Target>
+
+  <Target Name="PrepareAndPopulateNugetFolder">
+    <Copy SourceFiles="@(_NugetSpecFile)"
+          DestinationFiles="@(_NugetSpecFile->'$(PackageRoot)%(Filename)%(Extension)')">
+      <Output ItemName="_NugetSpecOutputFile" TaskParameter="DestinationFiles"/>
+    </Copy>
+    <Message Text="ToolsItems: [@(ToolsItems)]
+ToolsItems :[@(ContentItems)]
+ContentItems : [@(ContentItems)]
+LibItems : [@(LibItems)]
+NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
+
+    <Copy SourceFiles="@(ToolsItems)"
+          DestinationFiles="@(ToolsItems->'$(PackageRoot)tools\%(DestDir)%(Filename)%(Extension)')"/>
+
+    <Copy SourceFiles="@(ContentItems)"
+          DestinationFiles="@(ContentItems->'$(PackageRoot)content\%(DestDir)%(Filename)%(Extension)')"/>
+    <Copy SourceFiles="@(LibItems)"
+          DestinationFiles="@(LibItems->'$(PackageRoot)lib\%(DestDir)%(Filename)%(Extension)')"/>
+
+    <Copy SourceFiles="@(NuGetRootItems)"
+          DestinationFiles="@(NuGetRootItems->'$(PackageRoot)%(DestDir)%(Filename)%(Extension)')" />
+
+  </Target>
+
+  <Target Name="CleanAndInitalize">
+    <!--<MakeDir Directories="$(OutputRoot)"/>-->
+    <MakeDir Directories="$(PackageRoot)"/>
+
+    <!--<ItemGroup>
+      <_FilesToDelete Remove="@(_FilesToDelete)"/>
+      <_FilesToDelete Include="$(OutputRoot)**\*"/>
+    </ItemGroup>
+    <Delete Files="@(_FilesToDelete)"/>
+
+    <ItemGroup>
+      <_FilesToDelete Remove="@(_FilesToDelete)"/>
+      <_FilesToDelete Include="$(PackageRoot)**\*"/>
+    </ItemGroup>
+    <Delete Files="@(_FilesToDelete)"/>-->
+  </Target>
+</Project>

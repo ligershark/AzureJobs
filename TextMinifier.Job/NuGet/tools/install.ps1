@@ -31,7 +31,7 @@ $DTE.ExecuteCommand("File.SaveAll")
 CheckoutProjFileIfUnderScc -project $project
 EnsureProjectFileIsWriteable -project $project
 
-$pgLabel = 'ls-AzureImageCompress'
+$pgLabel = 'ls-AzureTextMin'
 $projectMSBuild = [Microsoft.Build.Construction.ProjectRootElement]::Open($project.FullName)
 
 RemoveExistingKnownPropertyGroups -projectRootElement $projectMSBuild -importLabel $pgLabel
@@ -40,7 +40,7 @@ $relPathToToolsFolder = ComputeRelativePathToTargetsFile -startPath (Get-Item $p
 
 $propertyGroup = $projectMSBuild.AddPropertyGroup()
 $propertyGroup.Label = $pgLabel
-$propertyGroup.AddProperty('ls-AzureImageCompressToolsPath', ('$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\{0}\))') -f $relPathToToolsFolder);
+$propertyGroup.AddProperty('ls-AzureTextMinToolsPath', ('$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\{0}\))') -f $relPathToToolsFolder);
 
 $projectMSBuild.Save()
 <#
