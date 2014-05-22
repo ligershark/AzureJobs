@@ -55,6 +55,9 @@
     <None Include="NuGet\tools\install.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="settings.job">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="textmin.nuspec">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
