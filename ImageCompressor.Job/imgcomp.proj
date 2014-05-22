@@ -9,6 +9,7 @@
     <NuspecFile Condition=" '$(NuspecFile)'=='' ">$(MSBuildThisProjectDirectory)imgcomp.nuspec</NuspecFile>
     <NugetSourceRoot Condition=" ''=='' ">$(ImgCompSourceRoot)</NugetSourceRoot>
     <PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)_ImgCompNuGet\</PackageRoot>
+    <_ls-imgcompoutfolder Condition=" '$(_ls-imgcompoutfolder)'=='' ">$(OutputRoot)ImageCompressor.Job\</_ls-imgcompoutfolder>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,10 +25,10 @@
       <DestDir>tools\</DestDir>
     </ToolsItems>
     
-    <ToolsItems Include="$(OutputRoot)ImageCompressor.Job\ImageCompressor.Job.exe"/>
-    <ToolsItems Include="$(OutputRoot)ImageCompressor.Job\ImageCompressor.Job.exe.config"/>
+    <ToolsItems Include="$(_ls-imgcompoutfolder)*.*"
+                Exclude="$(_ls-imgcompoutfolder)*.pdb;$(_ls-imgcompoutfolder)*.nuspec;$(_ls-imgcompoutfolder)*.proj"/>   
   </ItemGroup>
-
+  
   <PropertyGroup>
     <CreateNugetPackageDependsOn>
       PrepareAndPopulateNugetFolder;

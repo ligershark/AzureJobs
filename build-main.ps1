@@ -78,6 +78,7 @@ $msbuildArgs += 'build-main.proj'
 $msbuildArgs += '/p:Configuration=Release'
 $msbuildArgs += '/p:VisualStudioVersion=12.0'
 $msbuildArgs += '/p:RestorePackages=true'
-$msbuildArgs += '/flp1:v=d;logfile=build.d.log /flp2:v=diag;logfile=build.diag.log'
+$msbuildArgs += '/flp1:v=d;logfile=build.d.log'
+$msbuildArgs += '/flp2:v=diag;logfile=build.diag.log'
 
 & ((Get-MSBuild).FullName) $msbuildArgs
