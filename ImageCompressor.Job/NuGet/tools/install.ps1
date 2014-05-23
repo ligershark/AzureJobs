@@ -10,24 +10,37 @@ Import-Module (Join-Path -Path ($toolsPath) -ChildPath 'azure-jobs.psm1')
 # Start of script here
 #########################
 
-$projFile = $project.FullName
+$projDir = (Get-Item $project.FullName).Directory.FullName
+$jobsPropsFile = Join-Path $projDir 'azurejobs.props'
 
-# Make sure that the project file exists
-if(!(Test-Path $projFile)){
-    throw ("Project file not found at [{0}]" -f $projFile)
+$jobsProps = $null
+if(!(Test-Path $jobsPropsFile)){
+    # create the file since it is not there
+    $jobsProps = New-Project -filePath $jobsPropsFile
+    $project.ProjectItems.AddFromFile($jobsPropsFile) | Out-Null
 }
 
-# use MSBuild to load the project and add the property
-
-# This is what we want to add to the project
-#  <PropertyGroup Label="VsixCompress">
-#    <VsixCompressTargets Condition=" '$(VsixCompressTargets)'=='' ">$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\..\packages\VsixCompress.1.0.0.6\tools\vsix-compress.targets ))</VsixCompressTargets>
-#  </PropertyGroup>
+if(!$jobsProps){
+    $jobsProps = [Microsoft.Build.Construction.ProjectRootElement]::Open($jobsPropsFile)
+}
 
 # Before modifying the project save everything so that nothing is lost
 $DTE.ExecuteCommand("File.SaveAll")
 
+CheckoutIfUnderScc -filePath $jobsPropsFile -project $project
+EnsureFileIsWriteable -filePath $jobsPropsFile
 
+$pgLabel = 'ls-azurejobs-imageopt'
+RemoveExistingKnownPropertyGroups -projectRootElement $jobsProps -importLabel $pgLabel
+$relPathToToolsFolder = ComputeRelativePathToTargetsFile -startPath (Get-Item $project.FullName) -targetPath (Get-Item ("{0}\tools\" -f $rootPath))
+
+$propertyGroup = $jobsProps.AddPropertyGroup()
+$propertyGroup.Label = $pgLabel
+$propertyGroup.AddProperty('ls-AzureImageCompressToolsPath', ('$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\{0}\))') -f $relPathToToolsFolder);
+
+$jobsProps.Save()
+<#
+#####################
 CheckoutProjFileIfUnderScc -project $project
 EnsureProjectFileIsWriteable -project $project
 
@@ -43,6 +56,7 @@ $propertyGroup.Label = $pgLabel
 $propertyGroup.AddProperty('ls-AzureImageCompressToolsPath', ('$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\{0}\))') -f $relPathToToolsFolder);
 
 $projectMSBuild.Save()
+#>
 <#
 # Update the Project file to import the .targets file
 $relPathToTargets = ComputeRelativePathToTargetsFile -startPath ($projItem = Get-Item $project.FullName) -targetPath (Get-Item ("{0}\tools\{1}" -f $rootPath, $targetsFileToAddImport))

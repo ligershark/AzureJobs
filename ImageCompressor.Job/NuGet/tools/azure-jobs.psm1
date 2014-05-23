@@ -54,7 +54,7 @@ function CheckoutIfUnderScc(){
     "`tChecking if file is under source control, [{0}]" -f $filePath| Write-Verbose
     # http://daltskin.blogspot.com/2012/05/nuget-powershell-and-tfs.html
     $sourceControl = Get-Interface $project.DTE.SourceControl ([EnvDTE80.SourceControl2])
-    if($sourceControl.IsItemUnderSCC($filePath) -and $sourceControl.IsItemCheckedOut($filePath)){
+    if($sourceControl -and $sourceControl.IsItemUnderSCC($filePath) -and $sourceControl.IsItemCheckedOut($filePath)){
         "`tChecking out file [{0}]" -f $filePath | Write-Host
         $sourceControl.CheckOutItem($filePath)
     }
@@ -70,6 +70,20 @@ function EnsureProjectFileIsWriteable(){
         throw;
     }
 }
+
+function EnsureFileIsWriteable{
+    [cmdletbinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        $filePath
+    )
+    process{
+        if((Get-Item $filePath).IsReadOnly){
+            'The azure jobs file [{0}] is read-only. Please checkout and re-install this package' | Write-Error
+        }
+    }
+}
+
 
 function ComputeRelativePathToTargetsFile(){
     param($startPath,$targetPath)   
@@ -289,6 +303,36 @@ function MarkItemAsNone(){
     }
 }
 
+<#
+.SYNOPSIS
+	You can use this to create a new MSBuild project. If you specify a value for the
+    $filePath parameter then the project file will saved to the specificed location.
+    Otherwise an in-memory project file is created an returned to the caller.
+
+.PARAMETER filePath
+    An optional parameter. If passed in the project file will be saved to the given location.
+#>
+
+function New-Project{
+    [cmdletbinding()]
+    param(
+        [Parameter(
+            Mandatory=$true,
+            Position=1)]
+        $filePath
+    )
+    begin{
+        Add-Type -AssemblyName Microsoft.Build
+    }
+
+    process{
+        $newProj = [Microsoft.Build.Construction.ProjectRootElement]::Create()
+
+        $newProj.Save($filePath)
+
+        return $newProj
+    }
+}
 
 Export-ModuleMember -function UpdateProjectTemplateFilesToNone
 

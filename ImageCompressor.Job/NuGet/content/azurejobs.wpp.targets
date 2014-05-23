@@ -13,6 +13,13 @@ Copyright (C) 2014. All rights reserved.
 ***********************************************************************************************
 -->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <ls-AzureJobsPropsFilePath Condition=" '$(ls-AzureJobsPropsFilePath)'=='' ">$(MSBuildThisFileDirectory)azurejobs.props</ls-AzureJobsPropsFilePath>
+  </PropertyGroup>
+
+  <Import Project="$(ls-AzureJobsPropsFilePath)" Condition="Exists('$(ls-AzureJobsPropsFilePath)')"/>
+  
   <PropertyGroup>
     <WebPublishExtensionsToExclude>$(WebPublishExtensionsToExclude);.tt;.settings;.targets</WebPublishExtensionsToExclude>
     <!-- TODO: We should be able to remove some of these -->
