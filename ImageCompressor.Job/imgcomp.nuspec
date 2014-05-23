@@ -5,7 +5,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">  
   <metadata>
     <id>AzureImageOptimizer</id>
-    <version>0.0.3-beta</version>
+    <version>0.0.1-beta</version>
     <authors>Sayed Ibrahim Hashimi, Mads Kristensen</authors>
     <description>This will compress images on your website when running in Azure Web Sites.</description>
     
