@@ -62,11 +62,11 @@ Copyright (C) 2014. All rights reserved.
   </PropertyGroup>
 
   <Target Name="ls-AddTextMinToPublish"
-          Condition=" '$(ls-AzureTextMinToolsPath)'!='' ">
+          Condition=" '$(ls-AzureMinToolsPath)'!='' ">
 
     <ItemGroup>
-      <_ls-textminfiles Include="$(ls-AzureTextMinToolsPath)**\*"
-                        Exclude="$(ls-AzureTextMinToolsPath)*.ps*1"/>
+      <_ls-textminfiles Include="$(ls-AzureMinToolsPath)**\*"
+                        Exclude="$(ls-AzureMinToolsPath)*.ps*1"/>
     </ItemGroup>
     <PropertyGroup>
       <_ls-schedule>continuous</_ls-schedule>

@@ -36,6 +36,6 @@ $relPathToToolsFolder = ComputeRelativePathToTargetsFile -startPath (Get-Item $p
 
 $propertyGroup = $jobsProps.AddPropertyGroup()
 $propertyGroup.Label = $pgLabel
-$propertyGroup.AddProperty('ls-AzureImageCompressToolsPath', ('$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\{0}\))') -f $relPathToToolsFolder);
+$propertyGroup.AddProperty('ls-AzureImageOptimizerToolsPath', ('$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\{0}\))') -f $relPathToToolsFolder);
 
 $jobsProps.Save()

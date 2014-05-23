@@ -1,11 +1,4 @@
 ﻿
-"Adding image compress" | Write-Host
-
-# TODO: These should be passed in, not declared here
-#$importLabel = "ls-ImageCompress"
-
-$toolsPathPropertyName = "ls-AzureImageCompressToolsPath"
-$targetsFileToAddImport = "ligershark.templates.targets";
 
 # When this package is installed we need to add a property
 # to the current project, which points to the

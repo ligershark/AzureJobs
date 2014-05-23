@@ -72,11 +72,11 @@ Copyright (C) 2014. All rights reserved.
           DependsOnTargets="$(ls-AddAzureJobsToPublishDependsOn)" />
 
   <Target Name="ls-AddImageCompToPublish" 
-          Condition=" '$(ls-AzureImageCompressToolsPath)'!='' ">
+          Condition=" '$(ls-AzureImageOptimizerToolsPath)'!='' ">
 
     <ItemGroup>
-      <_ls-imgcompfiles Include="$(ls-AzureImageCompressToolsPath)**\*" 
-                        Exclude="$(ls-AzureImageCompressToolsPath)*.ps*1"/>
+      <_ls-imgcompfiles Include="$(ls-AzureImageOptimizerToolsPath)**\*" 
+                        Exclude="$(ls-AzureImageOptimizerToolsPath)*.ps*1"/>
     </ItemGroup>
     <PropertyGroup>
       <_ls-schedule>continuous</_ls-schedule>
