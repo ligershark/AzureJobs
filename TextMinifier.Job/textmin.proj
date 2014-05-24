@@ -26,7 +26,6 @@
     
     <!-- copy the same file as ImageCompressor -->
     <ToolsItems Include="$(OutputPathImgComp)NuGet\tools\azure-jobs.psm1" />
-    <!--<ContentItems Include="$(OutputPathImgComp)NuGet\content\azurejobs.wpp.targets" />-->
   </ItemGroup>
   
   <PropertyGroup>
