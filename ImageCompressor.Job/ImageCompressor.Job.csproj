@@ -66,9 +66,7 @@
     <Content Include="Tools\png.cmd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="NuGet\content\azurejobs.wpp.targets">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="NuGet\content\azurejobs.wpp.targets" />
     <None Include="imgcomp.nuspec">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -15,8 +15,11 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>Copyright 2013 Sayed Ibrahim Hashimi</copyright>
     <tags></tags>
-    <!--<dependencies>
-      <dependency id="SampleDependency" version="1.0" />
-    </dependencies>-->
+    <dependencies>
+      <dependency id="AzureJobsShared" version="0.0.2-beta" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System"  />
+    </frameworkAssemblies>
   </metadata>
 </package>

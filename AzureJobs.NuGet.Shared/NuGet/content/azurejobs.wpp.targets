@@ -65,17 +65,18 @@ Copyright (C) 2014. All rights reserved.
   <PropertyGroup>
     <ls-AddAzureJobsToPublishDependsOn>
       ls-AddImageCompToPublish;
+      ls-AddTextMinToPublish;
     </ls-AddAzureJobsToPublishDependsOn>
   </PropertyGroup>
 
-  <Target Name="ls-AddAzureJobsToPublish" 
+  <Target Name="ls-AddAzureJobsToPublish"
           DependsOnTargets="$(ls-AddAzureJobsToPublishDependsOn)" />
 
-  <Target Name="ls-AddImageCompToPublish" 
+  <Target Name="ls-AddImageCompToPublish"
           Condition=" '$(ls-AzureImageOptimizerToolsPath)'!='' ">
 
     <ItemGroup>
-      <_ls-imgcompfiles Include="$(ls-AzureImageOptimizerToolsPath)**\*" 
+      <_ls-imgcompfiles Include="$(ls-AzureImageOptimizerToolsPath)**\*"
                         Exclude="$(ls-AzureImageOptimizerToolsPath)*.ps*1"/>
     </ItemGroup>
     <PropertyGroup>
@@ -83,8 +84,27 @@ Copyright (C) 2014. All rights reserved.
       <_ls-projName>ImageCompressor.Job</_ls-projName>
     </PropertyGroup>
     <ItemGroup>
-      <FilesForPackagingFromProject 
+      <FilesForPackagingFromProject
         Include="%(_ls-imgcompfiles.Identity)" Condition=" '%(_ls-imgcompfiles.Identity)'!='' ">
+        <DestinationRelativePath>app_data\jobs\$(_ls-schedule)\$(_ls-projName)\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="ls-AddTextMinToPublish"
+        Condition=" '$(ls-AzureMinToolsPath)'!='' ">
+
+    <ItemGroup>
+      <_ls-textminfiles Include="$(ls-AzureMinToolsPath)**\*"
+                        Exclude="$(ls-AzureMinToolsPath)*.ps*1"/>
+    </ItemGroup>
+    <PropertyGroup>
+      <_ls-schedule>continuous</_ls-schedule>
+      <_ls-projName>TextMinifier.Job</_ls-projName>
+    </PropertyGroup>
+    <ItemGroup>
+      <FilesForPackagingFromProject
+        Include="%(_ls-textminfiles.Identity)" Condition=" '%(_ls-textminfiles.Identity)'!='' ">
         <DestinationRelativePath>app_data\jobs\$(_ls-schedule)\$(_ls-projName)\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
       </FilesForPackagingFromProject>
     </ItemGroup>

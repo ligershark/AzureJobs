@@ -53,7 +53,7 @@ function Clean-OutputFolder{
 
         if(Test-Path $outputFolder){
             'Deleting output folder [{0}]' -f $outputFolder | Write-Host
-            Remove-Item $outputFolder -Recurse
+            Remove-Item $outputFolder -Recurse -Force
         }
 
     }
@@ -80,5 +80,6 @@ $msbuildArgs += '/p:VisualStudioVersion=12.0'
 $msbuildArgs += '/p:RestorePackages=true'
 $msbuildArgs += '/flp1:v=d;logfile=build.d.log'
 $msbuildArgs += '/flp2:v=diag;logfile=build.diag.log'
+$msbuildArgs += '/m'
 
 & ((Get-MSBuild).FullName) $msbuildArgs
