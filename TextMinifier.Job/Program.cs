@@ -31,7 +31,7 @@ namespace TextMinifier.Job
 
         static void Main(string[] args)
         {
-            _folder = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\Minification\files";
+            //_folder = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\Minification\files";
             _log = new Logger(Path.Combine(_folder, "app_data"));
             _store = new FileHashStore(Path.Combine(_folder, "app_data\\TextMinifierHashTable.xml"), _log);
 
