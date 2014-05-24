@@ -6,10 +6,10 @@
   <Import Project="$(MSBuildThisFileDirectory)..\shared.props" Condition=" '$(SharedProps)'=='' " />
 
   <PropertyGroup>
-    <NuspecFile Condition=" '$(NuspecFile)'=='' ">$(MSBuildThisProjectDirectory)textmin.nuspec</NuspecFile>
-    <NugetSourceRoot Condition=" ''=='' ">$(TextMinSourceRoot)</NugetSourceRoot>
-    <PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)_TextMinNuGet\</PackageRoot>
-    <_ls-textminoutfolder Condition=" '$(_ls-textminoutfolder)'=='' ">$(OutputRoot)TextMinifier.Job\</_ls-textminoutfolder>
+    <NuspecFile Condition=" '$(NuspecFile)'=='' ">$(MSBuildThisProjectDirectory)shared.nuspec</NuspecFile>
+    <NugetSourceRoot Condition=" ''=='' ">$(SharedSourceRoot)</NugetSourceRoot>
+    <PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)_SharedNuGet\</PackageRoot>
+    <_ls-tempoutfolder Condition=" '$(_ls-tempoutfolder)'=='' ">$(OutputRoot)AzureJobs.NuGet.Shared\</_ls-tempoutfolder>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,14 +19,7 @@
     <!-- Standard declarations -->
     <LibItems Include="$(NugetSourceRoot)NuGet\lib\**\*" />
     <ContentItems Include="$(NugetSourceRoot)NuGet\content\**\*"/>
-    <ToolsItems Include="$(TextMinSourceRoot)NuGet\tools\**\*" />
-           
-    <ToolsItems Include="$(_ls-textminoutfolder)*.*"
-                Exclude="$(_ls-textminoutfolder)*.pdb;$(_ls-textminoutfolder)*.nuspec;$(_ls-textminoutfolder)*.proj"/>
-    
-    <!-- copy the same file as ImageCompressor -->
-    <ToolsItems Include="$(OutputPathImgComp)NuGet\tools\azure-jobs.psm1" />
-    <!--<ContentItems Include="$(OutputPathImgComp)NuGet\content\azurejobs.wpp.targets" />-->
+    <ToolsItems Include="$(NugetSourceRoot)NuGet\tools\**\*" />
   </ItemGroup>
   
   <PropertyGroup>
@@ -39,7 +32,7 @@
 
   <Target Name="CoreCreateNugetPackage">
     <Message Text="OutputRoot: $(OutputRoot)" Importance="low"/>
-    <!-- nuget pack "C:\...\<filename>.nuspec" -NoPackageAnalysis -OutputDirectory "C:\...\Output\" -->
+
     <PropertyGroup>
       <_NugetSpecFile>%(_NugetSpecOutputFile.FullPath)</_NugetSpecFile>
       <_Cmd>"$(NugetExe)" pack "$(_NugetSpecFile)" -NoPackageAnalysis -OutputDirectory "$(OutputRootNoTrailingSlash)" </_Cmd>

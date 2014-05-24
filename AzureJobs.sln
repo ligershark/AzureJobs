@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.30324.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureJobs.Web", "Azurejobs.Web\AzureJobs.Web.csproj", "{8F813B3C-519A-4324-B674-0070C73213A6}"
 EndProject
@@ -17,6 +17,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureJobs.Common", "AzureJobs.Common\AzureJobs.Common.csproj", "{F5911198-57B8-4597-BEF3-14BB95869791}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzureJobs.NuGet.Shared", "AzureJobs.NuGet.Shared", "{221DBEFD-EE51-4AED-BE71-2FCC95D3B995}"
+	ProjectSection(SolutionItems) = preProject
+		AzureJobs.NuGet.Shared\shared.nuspec = AzureJobs.NuGet.Shared\shared.nuspec
+		AzureJobs.NuGet.Shared\shared.proj = AzureJobs.NuGet.Shared\shared.proj
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{2AF19566-5EB8-4A91-A6BA-8BA09F37D28C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{D3F3F209-5FF8-4863-9215-7F506708108D}"
+	ProjectSection(SolutionItems) = preProject
+		AzureJobs.NuGet.Shared\NuGet\content\azurejobs.wpp.targets = AzureJobs.NuGet.Shared\NuGet\content\azurejobs.wpp.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{A44AB8CC-AE56-45CB-8B8A-3CFFBDE07D3E}"
+	ProjectSection(SolutionItems) = preProject
+		AzureJobs.NuGet.Shared\NuGet\tools\azure-jobs.psm1 = AzureJobs.NuGet.Shared\NuGet\tools\azure-jobs.psm1
+		AzureJobs.NuGet.Shared\NuGet\tools\install.ps1 = AzureJobs.NuGet.Shared\NuGet\tools\install.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,5 +62,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2AF19566-5EB8-4A91-A6BA-8BA09F37D28C} = {221DBEFD-EE51-4AED-BE71-2FCC95D3B995}
+		{D3F3F209-5FF8-4863-9215-7F506708108D} = {2AF19566-5EB8-4A91-A6BA-8BA09F37D28C}
+		{A44AB8CC-AE56-45CB-8B8A-3CFFBDE07D3E} = {2AF19566-5EB8-4A91-A6BA-8BA09F37D28C}
 	EndGlobalSection
 EndGlobal

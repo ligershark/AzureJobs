@@ -15,9 +15,12 @@
     <ProjectsToBuild Include="$(SourceRoot)ImageCompressor.Job\ImageCompressor.Job.csproj">
       <AdditionalProperties>OutputPath=$(OutputPathImgComp)</AdditionalProperties>
     </ProjectsToBuild>
+    
     <ProjectsToBuild Include="$(SourceRoot)TextMinifier.Job\TextMinifier.Job.csproj">
       <AdditionalProperties>OutputPath=$(OutputPathTextMin)</AdditionalProperties>
     </ProjectsToBuild>
+
+    <SharedFiles Include="$(SharedSourceRoot)**\*"/>
   </ItemGroup>
 
   <PropertyGroup>
@@ -26,7 +29,7 @@
       BuildProjects;
       CreateNugetPackages;
     </FullBuildDependsOn>
-    <BuildProjectsDependsOn>
+    <BuildProjectsDependsOn>      
       CoreBuildProjects;
     </BuildProjectsDependsOn>
   </PropertyGroup>
@@ -42,6 +45,7 @@
   <PropertyGroup>
     <CreateNugetPackagesDependsOn>
       BuildProjects;
+      CopySharedFilesToOutputDir;
       CoreCreateNugetPackages;
     </CreateNugetPackagesDependsOn>
   </PropertyGroup>
@@ -55,12 +59,32 @@
       <NugetBuildFiles Include="$(OutputPathImgComp)imgcomp.proj">
         <AdditionalProperties>SharedProps=$(_spfull)</AdditionalProperties>        
       </NugetBuildFiles>
+      
       <NugetBuildFiles Include="$(OutputPathTextMin)textmin.proj">
         <AdditionalProperties>SharedProps=$(_spfull)</AdditionalProperties>
       </NugetBuildFiles>
+      
+      <NugetBuildFiles Include="$(OutputPathShared)shared.proj">
+        <AdditionalProperties>SharedProps=$(_spfull)</AdditionalProperties>
+      </NugetBuildFiles>      
     </ItemGroup>
     
     <MSBuild Projects="@(NugetBuildFiles)"/>    
+  </Target>
+
+  <PropertyGroup>
+    <CopySharedFilesToOutputDirDependsOn>
+      $(CopySharedFilesToOutputDirDependsOn);
+    </CopySharedFilesToOutputDirDependsOn>
+  </PropertyGroup>
+  
+  <Target Name="CopySharedFilesToOutputDir" DependsOnTargets="$(CopySharedFilesToOutputDirDependsOn)">
+    <Message Text="Copying shared files to output directory." Importance="low" />
+    <Message Text="SharedFiles: [@(SharedFiles)]" Importance="low"/>
+
+    <MakeDir Directories="$(OutputPathShared)" />
+    <Copy SourceFiles="@(SharedFiles)"
+          DestinationFiles="@(SharedFiles->'$(OutputPathShared)%(RecursiveDir)%(Filename)%(Extension)')"/>
   </Target>
   
   <Target Name="CleanAndInitalize">

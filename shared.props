@@ -15,9 +15,11 @@
     
     <ImgCompSourceRoot Condition=" '$(ImgCompSourceRoot)'=='' ">$(SourceRoot)ImageCompressor.Job\</ImgCompSourceRoot>
     <TextMinSourceRoot Condition=" '$(TextMinSourceRoot)'=='' ">$(SourceRoot)TextMinifier.Job\</TextMinSourceRoot>
+    <SharedSourceRoot Condition=" '$(SharedSourceRoot)'=='' ">$(SourceRoot)AzureJobs.NuGet.Shared\</SharedSourceRoot>
     
     <OutputPathImgComp Condition=" '$(OutputPathImgComp)'=='' ">$(OutputRoot)ImageCompressor.Job\</OutputPathImgComp>
     <OutputPathTextMin Condition=" '$(OutputPathTextMin)'=='' ">$(OutputRoot)TextMinifier.Job\</OutputPathTextMin>
+    <OutputPathShared Condition=" '$(OutputPathShared)'=='' ">$(OutputRoot)AzureJobs.NuGet.Shared\</OutputPathShared>
   </PropertyGroup>
   
 </Project>

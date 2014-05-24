@@ -79,22 +79,5 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
     <Copy SourceFiles="@(NuGetRootItems)"
           DestinationFiles="@(NuGetRootItems->'$(PackageRoot)%(DestDir)%(Filename)%(Extension)')" />
 
-  </Target>
-
-  <Target Name="CleanAndInitalize">
-    <!--<MakeDir Directories="$(OutputRoot)"/>-->
-    <MakeDir Directories="$(PackageRoot)"/>
-
-    <!--<ItemGroup>
-      <_FilesToDelete Remove="@(_FilesToDelete)"/>
-      <_FilesToDelete Include="$(OutputRoot)**\*"/>
-    </ItemGroup>
-    <Delete Files="@(_FilesToDelete)"/>
-
-    <ItemGroup>
-      <_FilesToDelete Remove="@(_FilesToDelete)"/>
-      <_FilesToDelete Include="$(PackageRoot)**\*"/>
-    </ItemGroup>
-    <Delete Files="@(_FilesToDelete)"/>-->
-  </Target>
+  </Target>  
 </Project>
