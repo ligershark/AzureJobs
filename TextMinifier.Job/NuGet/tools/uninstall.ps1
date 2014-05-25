@@ -1,19 +1,12 @@
 ﻿param($rootPath, $toolsPath, $package, $project)
 
-
-if((Get-Module azure-jobs)){
-    Remove-Module azure-jobs
-}
-Import-Module (Join-Path -Path ($toolsPath) -ChildPath 'azure-jobs.psm1')
-
 #########################
 # Start of script here
 #########################
 
-
 'Uninstalling AzureImageOptimizer' | Write-Verbose
 
-$projDir = (Get-Item $project.FullName).Directory.FullName
+$projDir = GetProjectDirectory -project $project
 $jobsPropsFile = Join-Path $projDir 'azurejobs.props'
 
 $jobsProps = $null

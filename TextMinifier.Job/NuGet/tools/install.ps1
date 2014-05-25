@@ -1,16 +1,10 @@
 ﻿param($rootPath, $toolsPath, $package, $project)
 
-<#
-if((Get-Module azure-jobs)){
-    Remove-Module azure-jobs
-}
-Import-Module (Join-Path -Path ($toolsPath) -ChildPath 'azure-jobs.psm1')
-#>
 #########################
 # Start of script here
 #########################
 
-$projDir = (Get-Item $project.FullName).Directory.FullName
+$projDir = GetProjectDirectory -project $project
 $jobsPropsFile = Join-Path $projDir 'azurejobs.props'
 
 $jobsProps = $null
@@ -32,7 +26,7 @@ EnsureFileIsWriteable -filePath $jobsPropsFile
 
 $pgLabel = 'ls-AzureTextMin'
 RemoveExistingKnownPropertyGroups -projectRootElement $jobsProps -importLabel $pgLabel
-$relPathToToolsFolder = ComputeRelativePathToTargetsFile -startPath (Get-Item $project.FullName) -targetPath (Get-Item ("{0}\tools\" -f $rootPath))
+$relPathToToolsFolder = ComputeRelativePathToTargetsFile -startPath $projDir -targetPath (Get-Item ("{0}\tools\" -f $rootPath))
 
 $propertyGroup = $jobsProps.AddPropertyGroup()
 $propertyGroup.Label = $pgLabel
