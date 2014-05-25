@@ -5,7 +5,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">  
   <metadata>
     <id>AzureMinifier</id>
-    <version>0.0.2-beta</version>
+    <version>0.0.3-beta</version>
     <authors>Sayed Ibrahim Hashimi, Mads Kristensen</authors>
     <description>This will minify your .css and .js files on your website when running in Azure Web Sites.</description>
     
@@ -16,7 +16,7 @@
     <copyright>Copyright 2013 Sayed Ibrahim Hashimi</copyright>
     <tags></tags>
     <dependencies>
-      <dependency id="AzureJobsShared" version="0.0.2-beta" />
+      <dependency id="AzureJobsShared" version="0.0.3-beta" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System"  />

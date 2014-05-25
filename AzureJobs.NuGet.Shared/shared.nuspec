@@ -5,7 +5,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">  
   <metadata>
     <id>AzureJobsShared</id>
-    <version>0.0.2-beta</version>
+    <version>0.0.3-beta</version>
     <authors>Sayed Ibrahim Hashimi, Mads Kristensen</authors>
     <description>NuGet package used by AzureImageOptimizer and AzureMinifier packages.</description>
     

@@ -34,7 +34,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{A44AB8CC-AE56-45CB-8B8A-3CFFBDE07D3E}"
 	ProjectSection(SolutionItems) = preProject
 		AzureJobs.NuGet.Shared\NuGet\tools\azure-jobs.psm1 = AzureJobs.NuGet.Shared\NuGet\tools\azure-jobs.psm1
-		AzureJobs.NuGet.Shared\NuGet\tools\install.ps1 = AzureJobs.NuGet.Shared\NuGet\tools\install.ps1
+		AzureJobs.NuGet.Shared\NuGet\tools\init.ps1 = AzureJobs.NuGet.Shared\NuGet\tools\init.ps1
 	EndProjectSection
 EndProject
 Global
