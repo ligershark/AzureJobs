@@ -10,6 +10,7 @@ Import-Module (Join-Path -Path ($toolsPath) -ChildPath 'azure-jobs.psm1')
 # Start of script here
 #########################
 
+
 'Uninstalling AzureImageOptimizer' | Write-Verbose
 
 $projDir = (Get-Item $project.FullName).Directory.FullName

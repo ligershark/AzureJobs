@@ -25,7 +25,7 @@
                 Exclude="$(_ls-textminoutfolder)*.pdb;$(_ls-textminoutfolder)*.nuspec;$(_ls-textminoutfolder)*.proj"/>
     
     <!-- copy the same file as ImageCompressor -->
-    <ToolsItems Include="$(OutputPathImgComp)NuGet\tools\azure-jobs.psm1" />
+    <!--<ToolsItems Include="$(OutputPathImgComp)NuGet\tools\azure-jobs.psm1" />-->
   </ItemGroup>
   
   <PropertyGroup>

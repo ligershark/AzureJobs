@@ -1,11 +1,11 @@
 ﻿param($rootPath, $toolsPath, $package, $project)
 
-
+<#
 if((Get-Module azure-jobs)){
     Remove-Module azure-jobs
 }
 Import-Module (Join-Path -Path ($toolsPath) -ChildPath 'azure-jobs.psm1')
-
+#>
 #########################
 # Start of script here
 #########################

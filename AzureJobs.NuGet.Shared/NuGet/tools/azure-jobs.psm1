@@ -53,6 +53,28 @@ function CheckoutIfUnderScc(){
     }
 }
 
+function GetProjectDirectory{
+    [cmdletbinding()]
+    param(
+        [Parameter(Mandatory=$true,
+            Position=0,
+            ValueFromPipeline=$true)]
+        [ValidateNotNull()]
+        $project
+    )
+    process{
+        $private:result = $null
+        if($project.Type -eq 'Web Site'){
+            $private:result = ($project.Properties | Where-Object {$_.Name -eq 'FullPath'}).Value
+        }
+        else{
+            $private:result = (Get-Item $project.FullName).Directory.FullName
+        }
+
+        return $private:result
+    }
+}
+
 function EnsureProjectFileIsWriteable(){
     param(
         $project = (Get-Project)
@@ -84,7 +106,13 @@ function ComputeRelativePathToTargetsFile(){
     # we need to compute the relative path
     $startLocation = Get-Location
 
-    Set-Location $startPath.Directory | Out-Null
+    if(Test-Path $startPath -PathType Container){
+        $startDir = $startPath
+    }
+    else {
+        $startDir = $startPath.Directory
+    }
+    Set-Location $startDir | Out-Null
     $relativePath = Resolve-Path -Relative $targetPath.FullName
 
     # reset the location
