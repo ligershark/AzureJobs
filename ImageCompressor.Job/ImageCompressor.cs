@@ -26,10 +26,10 @@ namespace ImageCompressor.Job
             if (start.Arguments == null)
                 return;
 
-            ThreadPool.QueueUserWorkItem((o) =>
-            {
+            //ThreadPool.QueueUserWorkItem((o) =>
+            //{
                 RunProcess(sourceFile, targetFile, start);
-            });
+            //});
         }
 
         private void RunProcess(string sourceFile, string targetFile, ProcessStartInfo start)
@@ -38,7 +38,7 @@ namespace ImageCompressor.Job
             {
                 using (var process = Process.Start(start))
                 {
-                    process.WaitForExit();
+                    process.WaitForExit(5000);
                     var result = new CompressionResult(sourceFile, targetFile);
                     HandleResult(result);
                 }

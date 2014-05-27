@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Xml.Serialization;
 
 namespace AzureJobs.Common
@@ -11,7 +12,6 @@ namespace AzureJobs.Common
     {
         private string _filePath;
         private Dictionary<string, string> _store = new Dictionary<string, string>();
-        private XmlSerializer serializer = new XmlSerializer(typeof(Item[]), new XmlRootAttribute() { ElementName = "items" });
         private static object _syncRoot = new object();
 
         public FileHashStore(string fileName)
@@ -34,9 +34,12 @@ namespace AzureJobs.Common
                 if (!File.Exists(_filePath))
                     return;
 
-                using (var stream = File.OpenRead(_filePath))
+                foreach (string line in File.ReadAllLines(_filePath))
                 {
-                    _store = ((Item[])serializer.Deserialize(stream)).ToDictionary(i => i.File, i => i.Hash);
+                    string[] args = line.Split('|');
+
+                    if (args.Length == 2 && !_store.ContainsKey(args[0]))
+                        _store.Add(args[0], args[1]);
                 }
             }
             catch
@@ -47,15 +50,30 @@ namespace AzureJobs.Common
 
         public void Save(string file)
         {
-            _store[file] = GetHash(file);
-
+            bool exist = _store.ContainsKey(file);
+            
             try
             {
                 lock (_syncRoot)
                 {
-                    using (var stream = File.OpenWrite(_filePath))
+                    _store[file] = GetHash(file);
+
+                    if (!exist)
                     {
-                        serializer.Serialize(stream, _store.Select(kv => new Item() { File = kv.Key, Hash = kv.Value }).ToArray());
+                        // If the file is new to the azure job, just append it to the existing file
+                        File.AppendAllLines(_filePath, new[] { file + "|" + _store[file] });
+                    }
+                    else
+                    {
+                        // If the file is known we must avoid duplicates, so this just writes the entire store
+                        StringBuilder sb = new StringBuilder();
+
+                        foreach (string key in _store.Keys)
+                        {
+                            sb.AppendLine(key + "|" + _store[key]);
+                        }
+
+                        File.WriteAllText(_filePath, sb.ToString());
                     }
                 }
             }

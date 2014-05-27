@@ -25,7 +25,7 @@ namespace ImageCompressor.Job
             _log = new Logger(Path.Combine(_folder, "app_data"));
             _store = new FileHashStore(Path.Combine(_folder, "app_data\\ImageOptimizerHashTable.xml"));
             _compressor.Finished += WriteToLog;
-          
+
             QueueExistingFiles();
             ProcessQueue();
             StartListener();
@@ -111,13 +111,16 @@ namespace ImageCompressor.Job
 
         private static void WriteToLog(object sender, CompressionResult e)
         {
-            _store.Save(e.OriginalFileName);
+            ThreadPool.QueueUserWorkItem((o) =>
+            {
+                _store.Save(e.OriginalFileName);
 
-            if (e == null || e.ResultFileSize == 0)
-                return;
+                if (e == null || e.ResultFileSize == 0)
+                    return;
 
-            string name = new Uri(_folder).MakeRelativeUri(new Uri(e.OriginalFileName)).ToString();
-            _log.Write(DateTime.Now, name, e.OriginalFileSize, Math.Min(e.ResultFileSize, e.OriginalFileSize));
+                string name = new Uri(_folder).MakeRelativeUri(new Uri(e.OriginalFileName)).ToString();
+                _log.Write(DateTime.Now, name, e.OriginalFileSize, Math.Min(e.ResultFileSize, e.OriginalFileSize));
+            });
         }
     }
 }
