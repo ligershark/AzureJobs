@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AzureJobs.Common;
 
@@ -16,21 +17,25 @@ namespace ImageCompressor.Job
         private static Logger _log;
         private static FileHashStore _store;
         private static object _syncRoot = new object();
+        private static bool _isProcessing;
 
         static void Main(string[] args)
         {
             //_folder = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\ImageOptimization\img";
             _log = new Logger(Path.Combine(_folder, "app_data"));
             _store = new FileHashStore(Path.Combine(_folder, "app_data\\ImageOptimizerHashTable.xml"), _log);
-
+            _compressor.Finished += WriteToLog;
+          
             QueueExistingFiles();
             ProcessQueue();
             StartListener();
 
+            Timer timer = new Timer((o) => ProcessQueue());
+            timer.Change(1000, 5000);
+
             while (true)
             {
-                System.Threading.Thread.Sleep(2000);
-                ProcessQueue();
+                Thread.Sleep(2000);
             }
         }
 
@@ -45,8 +50,7 @@ namespace ImageCompressor.Job
 
         private static void AddToQueue(string file, DateTime date)
         {
-            lock (_syncRoot)
-                _cache[file] = date;
+            _cache[file] = date;
         }
 
         public static void StartListener()
@@ -64,13 +68,22 @@ namespace ImageCompressor.Job
 
         private static void ProcessQueue()
         {
-            lock (_syncRoot)
-            {
-                for (int i = _cache.Count - 1; i >= 0; i--)
-                {
-                    var entry = _cache.ElementAt(i);
+            if (_isProcessing)
+                return;
 
-                    // The file should be 1 second old before we start processing
+            _isProcessing = true;
+            int length = _cache.Count - 1;
+
+            for (int i = length; i >= 0; i--)
+            {
+                if (_cache.Count < i)
+                    continue;
+
+                var entry = _cache.ElementAt(i);
+
+                try
+                {
+                    // The file should be a second old before we start processing
                     if (entry.Value > DateTime.Now.AddSeconds(-2))
                         continue;
 
@@ -80,35 +93,31 @@ namespace ImageCompressor.Job
                         continue;
                     }
 
-                    try
-                    {
-                        var result = _compressor.CompressFile(entry.Key);
-
-                        WriteToLog(result);
-
-                        _store.Save(entry.Key);
-                        _cache.Remove(entry.Key);
-                    }
-                    catch (IOException)
-                    {
-                        // do nothing. We'll try again
-                    }
-                    catch
-                    {
-                        _cache.Remove(entry.Key);
-                    }
+                    _compressor.CompressFile(entry.Key);
+                    _cache.Remove(entry.Key);
+                }
+                catch (IOException)
+                {
+                    // do nothing. We'll try again
+                }
+                catch
+                {
+                    _cache.Remove(entry.Key);
                 }
             }
+
+            _isProcessing = false;
         }
 
-        private static void WriteToLog(CompressionResult result)
+        private static void WriteToLog(object sender, CompressionResult e)
         {
-            if (result.Saving <= 0)
+            _store.Save(e.OriginalFileName);
+
+            if (e == null || e.ResultFileSize == 0)
                 return;
 
-            string name = new Uri(_folder).MakeRelativeUri(new Uri(result.OriginalFileName)).ToString();
-            _log.Write(DateTime.Now, name, result.OriginalFileSize, result.ResultFileSize);
-
+            string name = new Uri(_folder).MakeRelativeUri(new Uri(e.OriginalFileName)).ToString();
+            _log.Write(DateTime.Now, name, e.OriginalFileSize, Math.Min(e.ResultFileSize, e.OriginalFileSize));
         }
     }
 }

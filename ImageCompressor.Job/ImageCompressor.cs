@@ -2,53 +2,74 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 
 namespace ImageCompressor.Job
 {
     internal class ImageCompressor
     {
-        public static bool IsFileSupported(string fileName)
-        {
-            return GetArguments(fileName, string.Empty) != null;
-        }
+        public event EventHandler<CompressionResult> Finished;
 
-        public CompressionResult CompressFile(string fileName)
+        public void CompressFile(string sourceFile)
         {
-            string targetFile = Path.ChangeExtension(Path.GetTempFileName(), Path.GetExtension(fileName));
+            string targetFile = Path.ChangeExtension(Path.GetTempFileName(), Path.GetExtension(sourceFile));
 
             ProcessStartInfo start = new ProcessStartInfo("cmd")
             {
                 WindowStyle = ProcessWindowStyle.Hidden,
                 WorkingDirectory = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), @"Tools\"),
-                Arguments = GetArguments(fileName, targetFile),
+                Arguments = GetArguments(sourceFile, targetFile),
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
 
+            if (start.Arguments == null)
+                return;
+
+            ThreadPool.QueueUserWorkItem((o) =>
+            {
+                RunProcess(sourceFile, targetFile, start);
+            });
+        }
+
+        private void RunProcess(string sourceFile, string targetFile, ProcessStartInfo start)
+        {
             try
             {
-                var process = Process.Start(start);
+                using (var process = Process.Start(start))
                 {
-                    process.WaitForExit(5000);
-                    var result = new CompressionResult(fileName, targetFile);
-                    HandleResult(fileName, result);
-                    return result;
+                    process.WaitForExit();
+                    var result = new CompressionResult(sourceFile, targetFile);
+                    HandleResult(result);
                 }
             }
             catch
+            { }
+        }
+
+        private void HandleResult(CompressionResult result)
+        {
+            try
             {
-                CompressionResult result = new CompressionResult(fileName, targetFile);
-                File.Delete(targetFile);
-                return result;
+                if (result.Saving > 0 && result.ResultFileSize > 0)
+                {
+                    File.Copy(result.ResultFileName, result.OriginalFileName, true);
+                }
+
+                OnFinished(result);
+
+                File.Delete(result.ResultFileName);
+            }
+            catch
+            {
+                // 
             }
         }
 
-        private void HandleResult(string file, CompressionResult result)
+        private void OnFinished(CompressionResult result)
         {
-            string name = Path.GetFileName(file);
-
-            if (result.Saving > 0)
-                File.Copy(result.ResultFileName, result.OriginalFileName, true);
+            if (Finished != null)
+                Finished(this, result);
         }
 
         private static string GetArguments(string sourceFile, string targetFile)

@@ -13,11 +13,17 @@ namespace AzureJobs.Common
         private Dictionary<string, string> _store = new Dictionary<string, string>();
         private XmlSerializer serializer = new XmlSerializer(typeof(Item[]), new XmlRootAttribute() { ElementName = "items" });
         private Logger _log;
+        private static object _syncRoot = new object();
 
         public FileHashStore(string fileName, Logger log)
         {
             _filePath = fileName;
             _log = log;
+
+            var dir = Path.GetDirectoryName(_filePath);
+
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
 
             Load();
         }
@@ -45,16 +51,14 @@ namespace AzureJobs.Common
         {
             _store[file] = GetHash(file);
 
-            var dir = Path.GetDirectoryName(_filePath);
-
             try
             {
-                if (!Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
-
-                using (var stream = File.OpenWrite(_filePath))
+                lock (_syncRoot)
                 {
-                    serializer.Serialize(stream, _store.Select(kv => new Item() { File = kv.Key, Hash = kv.Value }).ToArray());
+                    using (var stream = File.OpenWrite(_filePath))
+                    {
+                        serializer.Serialize(stream, _store.Select(kv => new Item() { File = kv.Key, Hash = kv.Value }).ToArray());
+                    }
                 }
             }
             catch (Exception ex)
@@ -78,14 +82,21 @@ namespace AzureJobs.Common
 
         private string GetHash(string file)
         {
-            if (!File.Exists(file))
-                return null;
-
-            using (var md5 = MD5.Create())
-            using (var stream = File.OpenRead(file))
+            try
             {
-                byte[] hash = md5.ComputeHash(stream);
-                return BitConverter.ToString(hash);
+                if (!File.Exists(file))
+                    return null;
+
+                using (var md5 = MD5.Create())
+                using (var stream = File.OpenRead(file))
+                {
+                    byte[] hash = md5.ComputeHash(stream);
+                    return BitConverter.ToString(hash);
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
     }

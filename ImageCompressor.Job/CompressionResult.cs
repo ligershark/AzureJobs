@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ImageCompressor.Job
 {
-    class CompressionResult
+    class CompressionResult : EventArgs
     {
         public CompressionResult(string originalFileName, string resultFileName)
         {

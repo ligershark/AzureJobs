@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -8,17 +7,12 @@ namespace AzureJobs.Common
 {
     public class Logger
     {
-        private string _path;
+        private string _logFile;
         private static object _syncRoot = new object();
 
         public Logger(string path)
         {
-            _path = path;
-}
-
-        public bool Exist()
-        {
-            return File.Exists(GetLogFilePath());
+            _logFile = GetLogFilePath(path);
         }
 
         public void Write(params object[] messages)
@@ -27,26 +21,32 @@ namespace AzureJobs.Common
             Trace.WriteLine(messageString);
             Console.WriteLine(messageString);
 
-            string file = GetLogFilePath();
-
-            string dir = Path.GetDirectoryName(file);
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-
-            if (!File.Exists(file))
-                File.WriteAllText(file, "Date, Filename, Original, Optimized");
-
-            lock (_syncRoot)
+            try
             {
-                File.AppendAllText(file, Environment.NewLine + messageString);
+                lock (_syncRoot)
+                {
+                    File.AppendAllText(_logFile, Environment.NewLine + messageString);
+                }
+            }
+            catch
+            {
+                // Do nothing
             }
         }
 
-        private string GetLogFilePath()
+        private string GetLogFilePath(string path)
         {
-            var ass = Assembly.GetEntryAssembly();
-            string name = ass.ManifestModule.Name;
-            return Path.Combine(_path, name + ".csv");
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+
+            var entry = Assembly.GetEntryAssembly();
+            string name = entry.ManifestModule.Name;
+            string logFile = Path.Combine(path, name + ".csv");
+
+            if (!File.Exists(logFile))
+                File.WriteAllText(logFile, "Date, Filename, Original, Optimized");
+
+            return logFile;
         }
     }
 }
