@@ -23,7 +23,7 @@ namespace ImageCompressor.Job
         {
             //_folder = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\ImageOptimization\img";
             _log = new Logger(Path.Combine(_folder, "app_data"));
-            _store = new FileHashStore(Path.Combine(_folder, "app_data\\ImageOptimizerHashTable.xml"), _log);
+            _store = new FileHashStore(Path.Combine(_folder, "app_data\\ImageOptimizerHashTable.xml"));
             _compressor.Finished += WriteToLog;
           
             QueueExistingFiles();

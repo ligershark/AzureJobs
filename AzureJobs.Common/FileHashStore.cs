@@ -12,13 +12,11 @@ namespace AzureJobs.Common
         private string _filePath;
         private Dictionary<string, string> _store = new Dictionary<string, string>();
         private XmlSerializer serializer = new XmlSerializer(typeof(Item[]), new XmlRootAttribute() { ElementName = "items" });
-        private Logger _log;
         private static object _syncRoot = new object();
 
-        public FileHashStore(string fileName, Logger log)
+        public FileHashStore(string fileName)
         {
             _filePath = fileName;
-            _log = log;
 
             var dir = Path.GetDirectoryName(_filePath);
 
@@ -61,10 +59,8 @@ namespace AzureJobs.Common
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                _log.Write(ex.Message);
-            }
+            catch
+            { }
         }
 
         public bool HasChangedOrIsNew(string file)

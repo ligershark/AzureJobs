@@ -25,6 +25,9 @@ namespace AzureJobs.Common
             {
                 lock (_syncRoot)
                 {
+                    if (!File.Exists(_logFile))
+                        File.WriteAllText(_logFile, "Date, Filename, Original, Optimized");
+
                     File.AppendAllText(_logFile, Environment.NewLine + messageString);
                 }
             }
@@ -42,9 +45,6 @@ namespace AzureJobs.Common
             var entry = Assembly.GetEntryAssembly();
             string name = entry.ManifestModule.Name;
             string logFile = Path.Combine(path, name + ".csv");
-
-            if (!File.Exists(logFile))
-                File.WriteAllText(logFile, "Date, Filename, Original, Optimized");
 
             return logFile;
         }
