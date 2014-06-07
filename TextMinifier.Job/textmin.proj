@@ -8,8 +8,8 @@
   <PropertyGroup>
     <NuspecFile Condition=" '$(NuspecFile)'=='' ">$(MSBuildThisProjectDirectory)textmin.nuspec</NuspecFile>
     <NugetSourceRoot Condition=" ''=='' ">$(TextMinSourceRoot)</NugetSourceRoot>
-    <PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)_TextMinNuGet\</PackageRoot>
-    <_ls-textminoutfolder Condition=" '$(_ls-textminoutfolder)'=='' ">$(OutputRoot)TextMinifier.Job\</_ls-textminoutfolder>
+    <PackageRoot Condition=" '$(PackageRoot)'=='' ">$(ObjRoot)_TextMinNuGet\</PackageRoot>
+    <_ls-textminoutfolder Condition=" '$(_ls-textminoutfolder)'=='' ">$(ObjRoot)TextMinifier.Job\</_ls-textminoutfolder>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,18 +38,17 @@
   <Target Name="CreateNugetPackage" DependsOnTargets="$(CreateNugetPackageDependsOn)" />
 
   <Target Name="CoreCreateNugetPackage">
-    <Message Text="OutputRoot: $(OutputRoot)" Importance="low"/>
     <!-- nuget pack "C:\...\<filename>.nuspec" -NoPackageAnalysis -OutputDirectory "C:\...\Output\" -->
     <PropertyGroup>
       <!--<_NugetSpecFile>%(_NugetSpecOutputFile.FullPath)</_NugetSpecFile>-->
-      <_Cmd>"$(NugetExe)" pack "$(_NugetSpecFile)" -NoPackageAnalysis -OutputDirectory "$(OutputRootNoTrailingSlash)" </_Cmd>
+      <_Cmd>"$(NugetExe)" pack "$(_NugetSpecFile)" -NoPackageAnalysis -OutputDirectory "$(BinRootNoTrailingSlash)" </_Cmd>
     </PropertyGroup>
 
     <Message Text="_Cmd: $(_Cmd)" Importance="low" />
     <Exec Command="$(_Cmd)"/>
 
     <ItemGroup>
-      <_CreatedPackage Include="$(OutputRoot)*.nupkg"/>
+      <_CreatedPackage Include="$(BinRoot)*.nupkg"/>
     </ItemGroup>
 
     <Copy SourceFiles="@(_CreatedPackage)"

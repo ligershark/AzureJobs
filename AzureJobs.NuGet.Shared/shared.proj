@@ -8,8 +8,8 @@
   <PropertyGroup>
     <NuspecFile Condition=" '$(NuspecFile)'=='' ">$(MSBuildThisProjectDirectory)shared.nuspec</NuspecFile>
     <NugetSourceRoot Condition=" ''=='' ">$(SharedSourceRoot)</NugetSourceRoot>
-    <PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)_SharedNuGet\</PackageRoot>
-    <_ls-tempoutfolder Condition=" '$(_ls-tempoutfolder)'=='' ">$(OutputRoot)AzureJobs.NuGet.Shared\</_ls-tempoutfolder>
+    <PackageRoot Condition=" '$(PackageRoot)'=='' ">$(ObjRoot)_SharedNuGet\</PackageRoot>
+    <_ls-tempoutfolder Condition=" '$(_ls-tempoutfolder)'=='' ">$(ObjRoot)AzureJobs.NuGet.Shared\</_ls-tempoutfolder>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,18 +38,15 @@
     </CoreCreateNugetPackageDependsOn>
   </PropertyGroup>
   <Target Name="CoreCreateNugetPackage" DependsOnTargets="$(CoreCreateNugetPackageDependsOn)">
-    <Message Text="OutputRoot: $(OutputRoot)" Importance="low"/>
-
     <PropertyGroup>
-      <!--<_NugetSpecFile>%(_NugetSpecOutputFile.FullPath)</_NugetSpecFile>-->
-      <_Cmd>"$(NugetExe)" pack "$(_NugetSpecFile)" -NoPackageAnalysis -OutputDirectory "$(OutputRootNoTrailingSlash)" </_Cmd>
+      <_Cmd>"$(NugetExe)" pack "$(_NugetSpecFile)" -NoPackageAnalysis -OutputDirectory "$(BinRootNoTrailingSlash)" </_Cmd>
     </PropertyGroup>
 
     <Message Text="_Cmd: $(_Cmd)" Importance="low" />
     <Exec Command="$(_Cmd)"/>
 
     <ItemGroup>
-      <_CreatedPackage Include="$(OutputRoot)*.nupkg"/>
+      <_CreatedPackage Include="$(BinRoot)*.nupkg"/>
     </ItemGroup>
 
     <Copy SourceFiles="@(_CreatedPackage)"

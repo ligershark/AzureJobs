@@ -6,6 +6,16 @@
     <SourceRoot Condition=" '$(SourceRoot)'=='' ">$(Root)</SourceRoot>
     <OutputRootNoTrailingSlash Condition=" '$(OutputRoot)'=='' ">$(SourceRoot)OutputRoot</OutputRootNoTrailingSlash>
     <OutputRoot Condition=" '$(OutputRoot)'=='' ">$(OutputRootNoTrailingSlash)\</OutputRoot>
+
+    <ObjRootNoTrailingSlash Condition=" '$(ObjRootNoTrailingSlash)'=='' " >$(OutputRoot)\obj</ObjRootNoTrailingSlash>
+    <ObjRoot Condition=" '$(ObjRoot)'=='' ">$(ObjRootNoTrailingSlash)\</ObjRoot>
+
+    <BinRootNoTrailingSlash Condition=" '$(BinRootNoTrailingSlash)'=='' ">$(OutputRootNoTrailingSlash)</BinRootNoTrailingSlash>
+    <BinRoot Condition=" '$(BinRoot)'=='' ">$(BinRootNoTrailingSlash)</BinRoot>
+
+    <SiteExtOutputRootNoTrailingSlash Condition=" '$(SiteExtOutputRootNoTrailingSlash)'=='' ">$(BinRoot)\site-extensions</SiteExtOutputRootNoTrailingSlash>
+    <SiteExtOutputRoot Condition=" '$(SiteExtOutputRoot)'=='' ">$(SiteExtOutputRootNoTrailingSlash)\</SiteExtOutputRoot>
+    
     <!--<PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)Nugetpkg\</PackageRoot>-->
     <ToolsRoot Condition=" ''=='' ">$(Root)BuildTools\</ToolsRoot>
     
@@ -22,9 +32,9 @@
     <TextMinSourceRoot Condition=" '$(TextMinSourceRoot)'=='' ">$(SourceRoot)TextMinifier.Job\</TextMinSourceRoot>
     <SharedSourceRoot Condition=" '$(SharedSourceRoot)'=='' ">$(SourceRoot)AzureJobs.NuGet.Shared\</SharedSourceRoot>
     
-    <OutputPathImgComp Condition=" '$(OutputPathImgComp)'=='' ">$(OutputRoot)ImageCompressor.Job\</OutputPathImgComp>
-    <OutputPathTextMin Condition=" '$(OutputPathTextMin)'=='' ">$(OutputRoot)TextMinifier.Job\</OutputPathTextMin>
-    <OutputPathShared Condition=" '$(OutputPathShared)'=='' ">$(OutputRoot)AzureJobs.NuGet.Shared\</OutputPathShared>
+    <OutputPathImgComp Condition=" '$(OutputPathImgComp)'=='' ">$(ObjRoot)ImageCompressor.Job\</OutputPathImgComp>
+    <OutputPathTextMin Condition=" '$(OutputPathTextMin)'=='' ">$(ObjRoot)TextMinifier.Job\</OutputPathTextMin>
+    <OutputPathShared Condition=" '$(OutputPathShared)'=='' ">$(ObjRoot)AzureJobs.NuGet.Shared\</OutputPathShared>
   </PropertyGroup>
   
 </Project>

@@ -39,7 +39,7 @@
   <Target Name="BuildProjects" DependsOnTargets="CoreBuildProjects"/>
   <Target Name="CoreBuildProjects">
     <Message Text="Building projects now [@(ProjectsToBuild)]" Importance="high"/>
-    <MSBuild Projects="@(ProjectsToBuild)" Properties="Configuration=$(Configuration);OutputPath=$(OutputRoot)"/>
+    <MSBuild Projects="@(ProjectsToBuild)" Properties="Configuration=$(Configuration);OutputPath=$(ObjRoot)"/>
   </Target>
   
   <PropertyGroup>
@@ -88,19 +88,6 @@
   </Target>
   
   <Target Name="CleanAndInitalize">
-    <MakeDir Directories="$(OutputRoot)"/>
-    <MakeDir Directories="$(PackageRoot)"/>
-    
-    <!--<ItemGroup>
-      <_FilesToDelete Remove="@(_FilesToDelete)"/>
-      <_FilesToDelete Include="$(OutputRoot)**\*"/>
-    </ItemGroup>
-    <Delete Files="@(_FilesToDelete)"/>
-
-    <ItemGroup>
-      <_FilesToDelete Remove="@(_FilesToDelete)"/>
-      <_FilesToDelete Include="$(PackageRoot)**\*"/>
-    </ItemGroup>
-    <Delete Files="@(_FilesToDelete)"/>-->
+    <MakeDir Directories="$(OutputRoot);$(ObjRoot);$(BinRoot);$(PackageRoot)"/>
   </Target>
 </Project>
