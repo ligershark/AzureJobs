@@ -125,7 +125,13 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
      <!--This item should never have more than 1 value-->
     <_SiteExtNuSpecFile Include="$(SiteExtNuSpecFile)"/>
 
-    <_SiteExtContentFiles Include="$(MSBuildThisProjectDirectory)SiteExtension\**\*" Exclude="$(MSBuildThisProjectDirectory)SiteExtension\*.nuspec"/>    
+    <_SiteExtContentFiles Include="$(MSBuildThisProjectDirectory)SiteExtension\**\*" 
+                          Exclude="$(MSBuildThisProjectDirectory)SiteExtension\*.nuspec"/>
+
+    <_SiteExtContentFiles Include="$(SiteExtPubWebsitesContentPath)**\*"
+                          Exclude="$(SiteExtPubWebsitesContentPath)**\*.pdb">
+      <DestDir>%(RecursiveDir)</DestDir>
+    </_SiteExtContentFiles>
    </ItemGroup>
 
   <PropertyGroup>
@@ -167,7 +173,15 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
   This target populates the following dynamic properties:
     $(_SiteExtensionNugetSpecOutputFile)
   -->
-  <Target Name="SiteExtensionPrepareAndPopulateNugetFolder" DependsOnTargets="UpdateSiteExtensionNuSpecFile">
+  <PropertyGroup>
+    <SiteExtensionPrepareAndPopulateNugetFolderDependsOn>
+      $(SiteExtensionPrepareAndPopulateNugetFolderDependsOn);
+      UpdateSiteExtensionNuSpecFile;      
+    </SiteExtensionPrepareAndPopulateNugetFolderDependsOn>
+  </PropertyGroup>
+  
+  <Target Name="SiteExtensionPrepareAndPopulateNugetFolder" 
+          DependsOnTargets="$(SiteExtensionPrepareAndPopulateNugetFolderDependsOn)">
     <MakeDir Directories="$(SiteExtensionPackageRoot)"/>
     <Message Text="_SiteExtContentFiles: [@(_SiteExtContentFiles)]" Importance="low"/>
     
@@ -183,6 +197,4 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
       <_SiteExtensionNugetSpecOutputFile>%(_SiteExtensionNugetSpecOutputFile.FullPath)</_SiteExtensionNugetSpecOutputFile>
     </PropertyGroup>
   </Target>
-
-
 </Project>

@@ -7,7 +7,7 @@
     <OutputRootNoTrailingSlash Condition=" '$(OutputRoot)'=='' ">$(SourceRoot)OutputRoot</OutputRootNoTrailingSlash>
     <OutputRoot Condition=" '$(OutputRoot)'=='' ">$(OutputRootNoTrailingSlash)\</OutputRoot>
 
-    <ObjRootNoTrailingSlash Condition=" '$(ObjRootNoTrailingSlash)'=='' " >$(OutputRoot)\obj</ObjRootNoTrailingSlash>
+    <ObjRootNoTrailingSlash Condition=" '$(ObjRootNoTrailingSlash)'=='' " >$(OutputRoot)obj</ObjRootNoTrailingSlash>
     <ObjRoot Condition=" '$(ObjRoot)'=='' ">$(ObjRootNoTrailingSlash)\</ObjRoot>
 
     <BinRootNoTrailingSlash Condition=" '$(BinRootNoTrailingSlash)'=='' ">$(OutputRootNoTrailingSlash)</BinRootNoTrailingSlash>
@@ -35,7 +35,9 @@
     <OutputPathImgComp Condition=" '$(OutputPathImgComp)'=='' ">$(ObjRoot)ImageCompressor.Job\</OutputPathImgComp>
     <OutputPathTextMin Condition=" '$(OutputPathTextMin)'=='' ">$(ObjRoot)TextMinifier.Job\</OutputPathTextMin>
     <OutputPathShared Condition=" '$(OutputPathShared)'=='' ">$(ObjRoot)AzureJobs.NuGet.Shared\</OutputPathShared>
+    
     <OutputPathSiteExtWeb Condition=" '$(OutputPathSiteExtWeb)'=='' ">$(ObjRoot)AzureJobs.SiteExtension.Web\</OutputPathSiteExtWeb>
+    <SiteExtPubWebsitesContentPath Condition=" ''=='' ">$(OutputPathSiteExtWeb)_PublishedWebsites\AzureJobs.SiteExtension.Web\</SiteExtPubWebsitesContentPath>
   </PropertyGroup>
   
 </Project>
