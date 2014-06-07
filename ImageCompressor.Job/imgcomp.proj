@@ -1,4 +1,4 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0" DefaultTargets="CreateNugetPackage">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0" DefaultTargets="BuildAll">
 
   <!-- This file is designed to be executed from the OutputRoot\ directory not the source directory -->
 
@@ -28,6 +28,15 @@
     <ToolsItems Include="$(_ls-imgcompoutfolder)*.*"
                 Exclude="$(_ls-imgcompoutfolder)*.pdb;$(_ls-imgcompoutfolder)*.nuspec;$(_ls-imgcompoutfolder)*.proj"/>   
   </ItemGroup>
+
+  <PropertyGroup>
+    <BuildAllDependsOn>
+      $(BuildAllDependsOn);
+      CreateNugetPackage;
+      CreateSiteExtensionNuGetPkg;
+    </BuildAllDependsOn>
+  </PropertyGroup>
+  <Target Name="BuildAll" DependsOnTargets="$(BuildAllDependsOn)"/>
   
   <PropertyGroup>
     <CreateNugetPackageDependsOn>
@@ -103,4 +112,54 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
              Query="$(NuspecXpath)"
              Value="$(NuGetPkgVerNum)" />
   </Target>
+  
+  <!--
+  *************************************************************************
+  Elements related to creating the SiteExtension nuget package.
+  *************************************************************************
+  -->
+  
+  <PropertyGroup>
+    <SiteExtNuSpecFile Condition=" '$(SiteExtNuSpecFile)'=='' ">$(MSBuildThisProjectDirectory)SiteExtension\site-extension.nuspec</SiteExtNuSpecFile>
+  </PropertyGroup>
+  <ItemGroup>
+     <!--This item should never have more than 1 value-->
+    <_SiteExtNuSpecFile Include="$(SiteExtNuSpecFile)"/>
+
+    <_SiteExtContentFiles Include="$(MSBuildThisProjectDirectory)SiteExtension\*" Exclude="$(MSBuildThisProjectDirectory)SiteExtension\*.nuspec"/>
+    
+    <!--<_NugetSpecFile Include="$(NuspecFile)" />-->
+
+     <!--Standard declarations--> 
+    <!--<LibItems Include="$(NugetSourceRoot)NuGet\lib\**\*" />
+    <ContentItems Include="$(NugetSourceRoot)NuGet\content\**\*"/>
+    <ToolsItems Include="$(OutputPathImgComp)NuGet\tools\**\*" />
+
+    <ToolsItems Include="$(OutputPathImgComp)tools\**\*">
+      <DestDir>tools\</DestDir>
+    </ToolsItems>
+
+    <ToolsItems Include="$(_ls-imgcompoutfolder)*.*"
+                Exclude="$(_ls-imgcompoutfolder)*.pdb;$(_ls-imgcompoutfolder)*.nuspec;$(_ls-imgcompoutfolder)*.proj"/>-->
+  </ItemGroup>
+
+  <PropertyGroup>
+    <CreateSiteExtensionNuGetPkgDependsOn>
+      $(CreateSiteExtensionNuGetPkgDependsOn);
+      PrepareAndPopulateNugetFolder;
+      UpdateSiteExtensionNuSpecFile
+    </CreateSiteExtensionNuGetPkgDependsOn>
+  </PropertyGroup>
+  <Target Name="CreateSiteExtensionNuGetPkg" DependsOnTargets="$(CreateSiteExtensionNuGetPkgDependsOn)"/>
+  
+  <Target Name="UpdateSiteExtensionNuSpecFile">
+    <Message Text="Inside UpdateSiteExtensionNuSpecFile" Importance="high"/>
+    <Message Text="Updating site extension nuspec file to have version: [file='$(SiteExtNuSpecFile)',version='$(NuGetPkgVerNum)']" Importance="high"/>
+
+    <XmlPoke Namespaces="&lt;Namespace Prefix='dft' Uri='$(NuSpecXmlNs)'/&gt;"
+             XmlInputPath="$(SiteExtNuSpecFile)"
+             Query="$(NuspecXpath)"
+             Value="$(NuGetPkgVerNum)" />
+  </Target>
+  
 </Project>
