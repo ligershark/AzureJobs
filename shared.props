@@ -35,6 +35,7 @@
     <OutputPathImgComp Condition=" '$(OutputPathImgComp)'=='' ">$(ObjRoot)ImageCompressor.Job\</OutputPathImgComp>
     <OutputPathTextMin Condition=" '$(OutputPathTextMin)'=='' ">$(ObjRoot)TextMinifier.Job\</OutputPathTextMin>
     <OutputPathShared Condition=" '$(OutputPathShared)'=='' ">$(ObjRoot)AzureJobs.NuGet.Shared\</OutputPathShared>
+    <OutputPathSiteExtWeb Condition=" '$(OutputPathSiteExtWeb)'=='' ">$(ObjRoot)AzureJobs.SiteExtension.Web\</OutputPathSiteExtWeb>
   </PropertyGroup>
   
 </Project>

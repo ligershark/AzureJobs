@@ -13,11 +13,15 @@
   
   <ItemGroup>
     <ProjectsToBuild Include="$(SourceRoot)ImageCompressor.Job\ImageCompressor.Job.csproj">
-      <AdditionalProperties>OutputPath=$(OutputPathImgComp)</AdditionalProperties>
+      <AdditionalProperties>OutDir=$(OutputPathImgComp)</AdditionalProperties>
     </ProjectsToBuild>
     
     <ProjectsToBuild Include="$(SourceRoot)TextMinifier.Job\TextMinifier.Job.csproj">
-      <AdditionalProperties>OutputPath=$(OutputPathTextMin)</AdditionalProperties>
+      <AdditionalProperties>OutDir=$(OutputPathTextMin)</AdditionalProperties>
+    </ProjectsToBuild>
+
+    <ProjectsToBuild Include="$(SourceRoot)AzureJobs.SiteExtension.Web\AzureJobs.SiteExtension.Web.csproj">
+      <AdditionalProperties>OutDir=$(OutputPathSiteExtWeb)</AdditionalProperties>
     </ProjectsToBuild>
 
     <SharedFiles Include="$(SharedSourceRoot)**\*"/>
@@ -39,7 +43,7 @@
   <Target Name="BuildProjects" DependsOnTargets="CoreBuildProjects"/>
   <Target Name="CoreBuildProjects">
     <Message Text="Building projects now [@(ProjectsToBuild)]" Importance="high"/>
-    <MSBuild Projects="@(ProjectsToBuild)" Properties="Configuration=$(Configuration);OutputPath=$(ObjRoot)"/>
+    <MSBuild Projects="@(ProjectsToBuild)" Properties="Configuration=$(Configuration);OutDir=$(ObjRoot)"/>
   </Target>
   
   <PropertyGroup>
