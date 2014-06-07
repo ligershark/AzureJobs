@@ -25,16 +25,23 @@
   <PropertyGroup>
     <CreateNugetPackageDependsOn>
       PrepareAndPopulateNugetFolder;
+      UpdateNuspecFile;
       CoreCreateNugetPackage;
     </CreateNugetPackageDependsOn>
   </PropertyGroup>
   <Target Name="CreateNugetPackage" DependsOnTargets="$(CreateNugetPackageDependsOn)" />
 
-  <Target Name="CoreCreateNugetPackage">
+  <PropertyGroup>
+    <CoreCreateNugetPackageDependsOn>
+      $(CoreCreateNugetPackageDependsOn);
+      PrepareAndPopulateNugetFolder
+    </CoreCreateNugetPackageDependsOn>
+  </PropertyGroup>
+  <Target Name="CoreCreateNugetPackage" DependsOnTargets="$(CoreCreateNugetPackageDependsOn)">
     <Message Text="OutputRoot: $(OutputRoot)" Importance="low"/>
 
     <PropertyGroup>
-      <_NugetSpecFile>%(_NugetSpecOutputFile.FullPath)</_NugetSpecFile>
+      <!--<_NugetSpecFile>%(_NugetSpecOutputFile.FullPath)</_NugetSpecFile>-->
       <_Cmd>"$(NugetExe)" pack "$(_NugetSpecFile)" -NoPackageAnalysis -OutputDirectory "$(OutputRootNoTrailingSlash)" </_Cmd>
     </PropertyGroup>
 
@@ -50,6 +57,10 @@
           Condition="Exists('$(NugetLocalRepo)')"/>
   </Target>
 
+  <!--
+  This target populates the following dynamic properties:
+    $(_NugetSpecFile)
+  -->
   <Target Name="PrepareAndPopulateNugetFolder">
     <Copy SourceFiles="@(_NugetSpecFile)"
           DestinationFiles="@(_NugetSpecFile->'$(PackageRoot)%(Filename)%(Extension)')">
@@ -72,5 +83,23 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
     <Copy SourceFiles="@(NuGetRootItems)"
           DestinationFiles="@(NuGetRootItems->'$(PackageRoot)%(DestDir)%(Filename)%(Extension)')" />
 
+    <PropertyGroup>
+      <_NugetSpecFile>%(_NugetSpecOutputFile.FullPath)</_NugetSpecFile>
+    </PropertyGroup>    
+  </Target>
+
+  <PropertyGroup>
+    <UpdateNuspecFileDependsOn>
+      $(UpdateNuspecFileDependsOn);
+      PrepareAndPopulateNugetFolder
+    </UpdateNuspecFileDependsOn>
+  </PropertyGroup>
+  <Target Name="UpdateNuspecFile" DependsOnTargets="$(UpdateNuspecFileDependsOn)">
+    <Message Text="Updating nuspec file to have version: [file='$(_NugetSpecFile)',version='$(NuGetPkgVerNum)']" Importance="high"/>
+    
+    <XmlPoke Namespaces="&lt;Namespace Prefix='dft' Uri='$(NuSpecXmlNs)'/&gt;"
+             XmlInputPath="$(_NugetSpecFile)"
+             Query="$(NuspecXpath)"
+             Value="$(NuGetPkgVerNum)" />
   </Target>
 </Project>

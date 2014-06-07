@@ -8,8 +8,13 @@
     <OutputRoot Condition=" '$(OutputRoot)'=='' ">$(OutputRootNoTrailingSlash)\</OutputRoot>
     <!--<PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)Nugetpkg\</PackageRoot>-->
     <ToolsRoot Condition=" ''=='' ">$(Root)BuildTools\</ToolsRoot>
+    
     <NugetExe Condition=" '$(NugetExe)'=='' ">$(ToolsRoot)NuGet.exe</NugetExe>
     <NugetLocalRepo Condition=" '$(NugetLocalRepo)'=='' ">C:\Temp\Nuget\LocalRepo\</NugetLocalRepo>
+    <NuGetPkgVerNum Condition=" '$(NuGetPkgVerNum)'=='' ">0.0.4-beta</NuGetPkgVerNum>
+    <NuSpecXmlNs Condition=" '$(NuSpecXmlNs)'=='' ">http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd</NuSpecXmlNs>
+    <NuspecXpath Condition=" '$(NuspecXpath)'=='' ">/dft:package/dft:metadata/dft:version</NuspecXpath>
+    
     <RestorePackages Condition=" '$(RestorePackages)'=='' ">true</RestorePackages>
     <Configuration Condition=" '$(Configuration)'=='' ">Release</Configuration>
     
