@@ -21,7 +21,9 @@
     
     <NugetExe Condition=" '$(NugetExe)'=='' ">$(ToolsRoot)NuGet.exe</NugetExe>
     <NugetLocalRepo Condition=" '$(NugetLocalRepo)'=='' ">C:\Temp\Nuget\LocalRepo\</NugetLocalRepo>
-    <NuGetPkgVerNum Condition=" '$(NuGetPkgVerNum)'=='' ">0.0.4-beta</NuGetPkgVerNum>
+    <SiteExtNuGetPkgVerNum Condition=" '$(SiteExtNuGetPkgVerNum)'=='' ">0.0.4</SiteExtNuGetPkgVerNum>
+    <NuGetPkgVerNum Condition=" '$(NuGetPkgVerNum)'=='' ">$(SiteExtNuGetPkgVerNum)-beta</NuGetPkgVerNum>
+    
     <NuSpecXmlNs Condition=" '$(NuSpecXmlNs)'=='' ">http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd</NuSpecXmlNs>
     <NuspecXpath Condition=" '$(NuspecXpath)'=='' ">/dft:package/dft:metadata/dft:version</NuspecXpath>
     
@@ -38,6 +40,7 @@
     
     <OutputPathSiteExtWeb Condition=" '$(OutputPathSiteExtWeb)'=='' ">$(ObjRoot)AzureJobs.SiteExtension.Web\</OutputPathSiteExtWeb>
     <SiteExtPubWebsitesContentPath Condition=" ''=='' ">$(OutputPathSiteExtWeb)_PublishedWebsites\AzureJobs.SiteExtension.Web\</SiteExtPubWebsitesContentPath>
+    
   </PropertyGroup>
   
 </Project>

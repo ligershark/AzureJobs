@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>AzureMinifier</id>
+    <version>0.0.3</version>
+    <title>Azure Minifier</title>
+    <authors>Sayed Ibrahim Hashimi, Mads Kristensen</authors>
+    <owners>Sayed Ibrahim Hashimi, Mads Kristensen</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This will minify your .css and .js files on your website when running in Azure Web Sites.</description>
+  </metadata>
+</package>

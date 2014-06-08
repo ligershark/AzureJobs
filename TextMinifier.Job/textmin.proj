@@ -1,4 +1,4 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0" DefaultTargets="CreateNugetPackage">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0" DefaultTargets="BuildAll">
 
   <!-- This file is designed to be executed from the OutputRoot\ directory not the source directory -->
 
@@ -25,9 +25,18 @@
                 Exclude="$(_ls-textminoutfolder)*.pdb;$(_ls-textminoutfolder)*.nuspec;$(_ls-textminoutfolder)*.proj"/>
     
     <!-- copy the same file as ImageCompressor -->
-    <!--<ToolsItems Include="$(OutputPathImgComp)NuGet\tools\azure-jobs.psm1" />-->
+    <!--<ToolsItems Include="$(OutputPathImgComp)NuGet\tools\azure-jobs.psm1" />-->  
   </ItemGroup>
-  
+
+  <PropertyGroup>
+    <BuildAllDependsOn>
+      $(BuildAllDependsOn);
+      CreateNugetPackage;
+      CreateSiteExtensionNuGetPkg;
+    </BuildAllDependsOn>
+  </PropertyGroup>
+  <Target Name="BuildAll" DependsOnTargets="$(BuildAllDependsOn)"/>
+
   <PropertyGroup>
     <CreateNugetPackageDependsOn>
       PrepareAndPopulateNugetFolder;
@@ -100,5 +109,92 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
              XmlInputPath="$(_NugetSpecFile)"
              Query="$(NuspecXpath)"
              Value="$(NuGetPkgVerNum)" />
+  </Target>
+
+  <!--
+  *************************************************************************
+  Elements related to creating the SiteExtension nuget package.
+  *************************************************************************
+  -->
+
+  <PropertyGroup>
+    <SiteExtNuSpecFile Condition=" '$(SiteExtNuSpecFile)'=='' ">$(MSBuildThisProjectDirectory)SiteExtension\site-extension.nuspec</SiteExtNuSpecFile>
+    <SiteExtensionPackageRoot Condition=" '$(SiteExtensionPackageRoot)'=='' ">$(ObjRoot)_SiteExtension-Min\</SiteExtensionPackageRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <!--This item should never have more than 1 value-->
+    <_SiteExtNuSpecFile Include="$(SiteExtNuSpecFile)"/>
+
+    <_SiteExtContentFiles Include="$(MSBuildThisProjectDirectory)SiteExtension\**\*"
+                          Exclude="$(MSBuildThisProjectDirectory)SiteExtension\*.nuspec"/>
+
+    <_SiteExtContentFiles Include="$(SiteExtPubWebsitesContentPath)**\*"
+                          Exclude="$(SiteExtPubWebsitesContentPath)**\*.pdb">
+      <DestDir>%(RecursiveDir)</DestDir>
+    </_SiteExtContentFiles>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <CreateSiteExtensionNuGetPkgDependsOn>
+      $(CreateSiteExtensionNuGetPkgDependsOn);
+      SiteExtensionPrepareAndPopulateNugetFolder;
+      UpdateSiteExtensionNuSpecFile;
+      SiteExtensionCoreCreateNugetPackage;
+    </CreateSiteExtensionNuGetPkgDependsOn>
+  </PropertyGroup>
+  <Target Name="CreateSiteExtensionNuGetPkg" DependsOnTargets="$(CreateSiteExtensionNuGetPkgDependsOn)"/>
+
+  <Target Name="SiteExtensionCoreCreateNugetPackage">
+    <MakeDir Directories="$(SiteExtOutputRoot)"/>
+    <!-- nuget pack "C:\...\<filename>.nuspec" -NoPackageAnalysis -OutputDirectory "C:\...\Output\" -->
+    <PropertyGroup>
+      <!--<_NugetSpecFile>%(_NugetSpecOutputFile.FullPath)</_NugetSpecFile>-->
+      <_Cmd>"$(NugetExe)" pack "$(_SiteExtensionNugetSpecOutputFile)" -NoPackageAnalysis -OutputDirectory "$(SiteExtOutputRootNoTrailingSlash)" </_Cmd>
+    </PropertyGroup>
+
+    <Message Text="_Cmd: $(_Cmd)" Importance="low" />
+    <Exec Command="$(_Cmd)"/>
+  </Target>
+
+  <Target Name="UpdateSiteExtensionNuSpecFile">
+    <PropertyGroup>
+      <_tmp>$([System.IO.Path]::GetFullPath('$(SiteExtNuSpecFile)'))</_tmp>
+    </PropertyGroup>
+    <Message Text="Inside UpdateSiteExtensionNuSpecFile" Importance="high"/>
+    <Message Text="Updating site extension nuspec file to have version: [file='$(_tmp)',version='$(NuGetPkgVerNum)']" Importance="high"/>
+
+    <XmlPoke Namespaces="&lt;Namespace Prefix='dft' Uri='$(NuSpecXmlNs)'/&gt;"
+             XmlInputPath="$(SiteExtNuSpecFile)"
+             Query="$(NuspecXpath)"
+             Value="$(SiteExtNuGetPkgVerNum)" />
+  </Target>
+
+  <!--
+  This target populates the following dynamic properties:
+    $(_SiteExtensionNugetSpecOutputFile)
+  -->
+  <PropertyGroup>
+    <SiteExtensionPrepareAndPopulateNugetFolderDependsOn>
+      $(SiteExtensionPrepareAndPopulateNugetFolderDependsOn);
+      UpdateSiteExtensionNuSpecFile;
+    </SiteExtensionPrepareAndPopulateNugetFolderDependsOn>
+  </PropertyGroup>
+
+  <Target Name="SiteExtensionPrepareAndPopulateNugetFolder"
+          DependsOnTargets="$(SiteExtensionPrepareAndPopulateNugetFolderDependsOn)">
+    <MakeDir Directories="$(SiteExtensionPackageRoot)"/>
+    <Message Text="_SiteExtContentFiles: [@(_SiteExtContentFiles)]" Importance="low"/>
+
+    <Copy SourceFiles="@(_SiteExtNuSpecFile)"
+          DestinationFiles="@(_SiteExtNuSpecFile->'$(SiteExtensionPackageRoot)%(Filename)%(Extension)')">
+      <Output ItemName="_SiteExtensionNugetSpecOutputFile" TaskParameter="DestinationFiles"/>
+    </Copy>
+
+    <Copy SourceFiles="@(_SiteExtContentFiles)"
+          DestinationFiles="@(_SiteExtContentFiles->'$(SiteExtensionPackageRoot)content\%(DestDir)%(Filename)%(Extension)')"/>
+
+    <PropertyGroup>
+      <_SiteExtensionNugetSpecOutputFile>%(_SiteExtensionNugetSpecOutputFile.FullPath)</_SiteExtensionNugetSpecOutputFile>
+    </PropertyGroup>
   </Target>
 </Project>

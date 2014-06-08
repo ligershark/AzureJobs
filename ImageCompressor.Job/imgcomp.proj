@@ -166,7 +166,7 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
     <XmlPoke Namespaces="&lt;Namespace Prefix='dft' Uri='$(NuSpecXmlNs)'/&gt;"
              XmlInputPath="$(SiteExtNuSpecFile)"
              Query="$(NuspecXpath)"
-             Value="$(NuGetPkgVerNum)" />
+             Value="$(SiteExtNuGetPkgVerNum)" />
   </Target>
 
     <!--
