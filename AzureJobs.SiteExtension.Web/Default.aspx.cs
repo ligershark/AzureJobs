@@ -18,26 +18,29 @@ namespace AzureJobs.SiteExtension.Web
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Request.QueryString["download"] != null)
+                DownloadLogFile();
+
             _results = GetResults();
 
-            if (IsPostBack)
-                return;
-
-            if (Request.QueryString["download"] != null)
+            if (_results != null)
             {
-                Response.ContentType = "text/plain";
-                Response.WriteFile(_file);
-            }
-            else
-            {
-                filesProcessed.Text = _results.Count().ToString("#,#0");
+                filesProcessed.Text = _results.Count(r => r != null).ToString("#,#0");
                 filesOptmized.Text = _results.Where(r => r != null && r.Saving > 0).Count().ToString("#,#0");
-                totalSavings.Text = _results.Where(r => r!= null).Sum(r => r.Saving).ToString("#,#0");
-                
+                totalSavings.Text = _results.Where(r => r != null).Sum(r => r.Saving).ToString("#,#0");
+
                 name.Text = _name;
                 error.Visible = !File.Exists(_file);
                 success.Visible = !error.Visible;
             }
+        }
+
+        private void DownloadLogFile()
+        {
+            Response.ContentType = "application/csv";
+            Response.AddHeader("Content-Disposition", "attachment;filename=optimizations.csv");
+            Response.WriteFile(_file);
+            Response.End();
         }
 
         public IQueryable<AzureJobs.SiteExtension.Web.Result> grid_GetData()

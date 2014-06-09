@@ -5,9 +5,8 @@
 <head runat="server">
     <title>Dashboard</title>
     <link href="css/site.css" rel="stylesheet" />
-    <asp:ContentPlaceHolder ID="head" runat="server" />
 </head>
 <body>
-    <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server" />
+    <asp:ContentPlaceHolder ID="body" runat="server" />
 </body>
 </html>
