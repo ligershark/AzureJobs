@@ -12,48 +12,48 @@ namespace AzureJobs.SiteExtension.Web
 {
     public partial class Default : System.Web.UI.Page
     {
-        private const string _fileName = "ImageCompressor.Job.exe.csv";
-        private static string _folder = ConfigurationManager.AppSettings.Get("folder");
+        private static string _file = ConfigurationManager.AppSettings.Get("file");
+        private static string _name = ConfigurationManager.AppSettings.Get("name");
+        private IEnumerable<Result> _results;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Request.QueryString["file"] == null)
+            _results = GetResults();
+
+            if (IsPostBack)
+                return;
+
+            if (Request.QueryString["download"] != null)
             {
-                string first = Directory.EnumerateFiles(_folder, "*.csv", SearchOption.TopDirectoryOnly).FirstOrDefault();
-                if (!string.IsNullOrEmpty(first))
-                {
-                    Response.Redirect("?file=" + Path.GetFileName(first));
-                }
+                Response.ContentType = "text/plain";
+                Response.WriteFile(_file);
             }
-
-            foreach (string file in Directory.EnumerateFiles(_folder, "*.csv", SearchOption.TopDirectoryOnly))
+            else
             {
-                var li = new HtmlGenericControl("li");
-                var a = new HtmlAnchor();
-                a.InnerHtml = Path.GetFileName(file).Substring(0, Path.GetFileName(file).IndexOf('.'));
-                a.HRef = "?" + a.InnerHtml;
-
-                li.Controls.Add(a);
-                menu.Controls.Add(li);
+                filesProcessed.Text = _results.Count().ToString("#,#0");
+                filesOptmized.Text = _results.Where(r => r != null && r.Saving > 0).Count().ToString("#,#0");
+                totalSavings.Text = _results.Where(r => r!= null).Sum(r => r.Saving).ToString("#,#0");
+                
+                name.Text = _name;
+                error.Visible = !File.Exists(_file);
+                success.Visible = !error.Visible;
             }
         }
 
-        // The return type can be changed to IEnumerable, however to support
-        // paging and sorting, the following parameters must be added:
-        //     int maximumRows
-        //     int startRowIndex
-        //     out int totalRowCount
-        //     string sortByExpression
         public IQueryable<AzureJobs.SiteExtension.Web.Result> grid_GetData()
         {
-            return GetResults().Where(r => r != null && r.Saving > 0).AsQueryable();
+            if (_results == null)
+                return null;
+
+            return _results.Where(r => r != null && r.Saving > 0).AsQueryable();
         }
 
         private IEnumerable<Result> GetResults()
         {
-            string file = Path.Combine(_folder, Request.QueryString["file"]);
+            if (!File.Exists(_file))
+                yield break;
 
-            var lines = File.ReadAllLines(file).Reverse();
+            var lines = File.ReadAllLines(_file).Reverse();
 
             foreach (string line in lines)
             {
@@ -82,14 +82,24 @@ namespace AzureJobs.SiteExtension.Web
             if (!int.TryParse(args[2], out original))
                 return null;
 
-            result.OriginalSize = original;
+            result.Original = original;
 
             if (!int.TryParse(args[3], out optimized))
                 return null;
 
-            result.OptimizedSize = optimized;
+            result.Optimized = optimized;
 
             return result;
+        }
+
+        protected void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (File.Exists(_file))
+            {
+                File.Delete(_file);
+            }
+
+            Response.Redirect("/", true);
         }
     }
 }

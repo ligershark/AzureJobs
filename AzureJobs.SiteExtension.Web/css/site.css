@@ -4,20 +4,77 @@
     font: 1em/1.1 arial;
 }
 
-nav ul {
+header a{
+    color: black;
+    text-decoration: none;
+    font-size: 1.5em;
+}
+
+ul {
     list-style: none;
-    margin: 20px 0;
     padding: 0;
 }
 
-    nav ul li {
-        display: inline;
+ul li span{
+    font-weight: bold;
+    display: inline-block;
+    width: 150px;
+}
+
+.grid {
+    width: 100%;
+    border: none;
+    line-height: 20px;
+}
+
+    .grid tr:nth-child(even) {
+        background: #f1f1f1;
     }
 
-    nav ul li a{
-        color: black;
-        font-size: 1.3em;
-        font-weight: bold;
-        margin-right: 10px;
-        text-decoration: underline; 
+    .grid td,
+    .grid th {
+        border: none;
+        border-left-style: none;
+        border-right-style: none;
+        text-align: right;
     }
+
+    .grid th:nth-child(1),
+    .grid th:nth-child(2),
+    .grid td:nth-child(1),
+    .grid td:nth-child(2) {
+        text-align: left;
+    }
+
+    .grid a{
+        color: black;
+        text-decoration: none;
+    }
+
+    .grid a:hover{
+        text-decoration: underline;
+    }
+
+    .grid tr:last-child {
+        border-top: 1px solid gray;
+    }
+
+    .grid table a{
+        text-decoration: underline;
+    }
+
+mark {
+    color: red;
+    background-color: #ffa9a9;
+    border-radius: 4px;
+    padding: 13px;
+    margin: 5em auto;
+    display: block;
+    width: 250px;
+    text-align: center;
+}
+
+#buttons {
+    margin: 1em 0;
+    text-align: right;
+}
