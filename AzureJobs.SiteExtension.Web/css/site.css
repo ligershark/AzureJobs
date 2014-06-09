@@ -1,25 +1,53 @@
-﻿body {
+﻿@media only screen and (max-width: 768px) {
+
+    .grid tr:not(:last-child) td:first-child,
+    .grid tr:not(:last-child) th:first-child {
+        display: none;
+    }
+}
+
+body {
     max-width: 960px;
     margin: 0 auto;
+    padding: 0 20px;
     font: 1em/1.1 arial;
 }
 
-header a{
-    color: black;
-    text-decoration: none;
-    font-size: 1.5em;
+header {
+    position: relative;
+    margin-bottom: 5em;
+    padding-left: 170px;
+    height: 83px;
+    background: url(/img/logo-small.png) no-repeat;
 }
+
+    header h1 {
+        padding: 20px 0;
+    }
+
+        header h1 a {
+            color: black;
+            text-decoration: none;
+            font-size: 1.5em;
+        }
+
+    header img {
+        position: absolute;
+        top: -20px;
+        left: 0;
+        width: 150px;
+    }
 
 ul {
     list-style: none;
     padding: 0;
 }
 
-ul li span{
-    font-weight: bold;
-    display: inline-block;
-    width: 150px;
-}
+    ul li span {
+        font-weight: bold;
+        display: inline-block;
+        width: 150px;
+    }
 
 .grid {
     width: 100%;
@@ -39,27 +67,27 @@ ul li span{
         text-align: right;
     }
 
-    .grid th:nth-child(1),
-    .grid th:nth-child(2),
-    .grid td:nth-child(1),
-    .grid td:nth-child(2) {
-        text-align: left;
-    }
+        .grid th:nth-child(1),
+        .grid th:nth-child(2),
+        .grid td:nth-child(1),
+        .grid td:nth-child(2) {
+            text-align: left;
+        }
 
-    .grid a{
+    .grid a {
         color: black;
         text-decoration: none;
     }
 
-    .grid a:hover{
-        text-decoration: underline;
-    }
+        .grid a:hover {
+            text-decoration: underline;
+        }
 
     .grid tr:last-child {
         border-top: 1px solid gray;
     }
 
-    .grid table a{
+    .grid table a {
         text-decoration: underline;
     }
 

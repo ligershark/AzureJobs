@@ -2,7 +2,7 @@
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
 
-    <header>
+    <header>        
         <h1>
             <a href="/"><asp:Literal runat="server" ID="name" /></a>
         </h1>
