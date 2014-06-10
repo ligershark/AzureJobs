@@ -18,7 +18,6 @@ header {
     margin-bottom: 5em;
     padding-left: 170px;
     height: 83px;
-    background: url(/img/logo-small.png) no-repeat;
 }
 
     header h1 {
@@ -31,12 +30,21 @@ header {
             font-size: 1.5em;
         }
 
-    header img {
+    header svg {
         position: absolute;
-        top: -20px;
+        top: 0;
         left: 0;
         width: 150px;
+        height: 83px;
     }
+
+        header svg path {
+            fill: white;
+        }
+
+            header svg path.outline {
+                fill: #1c97d1;
+            }
 
 ul {
     list-style: none;

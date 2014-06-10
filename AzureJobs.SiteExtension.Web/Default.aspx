@@ -6,6 +6,7 @@
         <h1>
             <a href="/"><asp:Literal runat="server" ID="name" /></a>
         </h1>
+        <%= System.IO.File.ReadAllText(Server.MapPath("~/img/logo.svg")) %>
     </header>
 
     <asp:PlaceHolder runat="server" ID="error" Visible="false">
