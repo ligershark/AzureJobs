@@ -27,7 +27,7 @@
         <ul>
             <li><span>Files processed: </span><asp:Literal runat="server" ID="filesProcessed" /></li>
             <li><span>Files optimized: </span><asp:Literal runat="server" ID="filesOptmized" /></li>
-            <li><span>Total savings: </span><asp:Literal runat="server" ID="totalSavings" /> bytes</li>
+            <li><span>Total savings: </span><asp:Literal runat="server" ID="totalSavings" /> bytes / <asp:Literal runat="server" ID="totalPercent" />%</li>
         </ul>
 
         <div id="buttons">
@@ -43,7 +43,7 @@
             AutoGenerateColumns="false"
             AllowPaging="true"
             AllowSorting="true"
-            PageSize="10"
+            PageSize="20"
             SelectMethod="grid_GetData"
             ItemType="AzureJobs.SiteExtension.Web.Result"
             BorderStyle="None" >

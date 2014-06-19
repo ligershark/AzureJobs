@@ -8,7 +8,7 @@
 
 body {
     max-width: 960px;
-    margin: 0 auto;
+    margin: 0 auto 2em auto;
     padding: 0 20px;
     font: 1em/1.1 arial;
 }
@@ -89,10 +89,21 @@ ul {
 
     .grid tr:last-child {
         border-top: 1px solid gray;
+        background: none;
     }
 
-    .grid table a {
+        .grid tr:last-child table {
+            margin: 0 auto;
+            font-weight: bold;
+        }
+
+            .grid tr:last-child table a {
+                padding: 0 2px;
+            }
+
+    .grid table a:hover {
         text-decoration: underline;
+        color: darkslategray;
     }
 
 mark {

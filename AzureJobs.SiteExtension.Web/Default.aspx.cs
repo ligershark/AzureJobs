@@ -29,6 +29,9 @@ namespace AzureJobs.SiteExtension.Web
                 filesOptmized.Text = _results.Where(r => r != null && r.Saving > 0).Count().ToString("#,#0");
                 totalSavings.Text = _results.Where(r => r != null).Sum(r => r.Saving).ToString("#,#0");
 
+                double percent = double.Parse(totalSavings.Text) / (double)_results.Where(r => r != null).Sum(r => r.Original) * 100;
+                totalPercent.Text = percent.ToString("#0.0");
+
                 name.Text = _name;
                 error.Visible = !File.Exists(_file);
                 success.Visible = !error.Visible;
