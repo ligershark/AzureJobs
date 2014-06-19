@@ -118,8 +118,9 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
   -->
   
   <PropertyGroup>
-    <SiteExtNuSpecFile Condition=" '$(SiteExtNuSpecFile)'=='' ">$(MSBuildThisProjectDirectory)SiteExtension\site-extension.nuspec</SiteExtNuSpecFile>
     <SiteExtensionPackageRoot Condition=" '$(SiteExtensionPackageRoot)'=='' ">$(ObjRoot)_SiteExtension-ImgOpt\</SiteExtensionPackageRoot>
+    <SiteExtNuSpecFile Condition=" '$(SiteExtNuSpecFile)'=='' ">$(MSBuildThisProjectDirectory)SiteExtension\site-extension.nuspec</SiteExtNuSpecFile>
+    <SiteExtImgOptNuSpecOutputFile Condition=" ''=='' ">$(SiteExtensionPackageRoot)site-extension.nuspec</SiteExtImgOptNuSpecOutputFile>
   </PropertyGroup>
   <ItemGroup>
      <!--This item should never have more than 1 value-->
@@ -167,13 +168,14 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
 
   <Target Name="UpdateSiteExtensionNuSpecFile" DependsOnTargets="SiteExtensionPrepareAndPopulateNugetFolder">
     <PropertyGroup>
-      <_tmp>$([System.IO.Path]::GetFullPath('$(SiteExtNuSpecFile)'))</_tmp>
+      <_tmp>$([System.IO.Path]::GetFullPath('$(SiteExtImgOptNuSpecOutputFile)'))</_tmp>
+      
     </PropertyGroup>
     <Message Text="Inside UpdateSiteExtensionNuSpecFile" Importance="high"/>
     <Message Text="Updating site extension nuspec file to have version: [file='$(_tmp)',version='$(NuGetPkgVerNum)']" Importance="high"/>
 
     <XmlPoke Namespaces="&lt;Namespace Prefix='dft' Uri='$(NuSpecXmlNs)'/&gt;"
-             XmlInputPath="$(SiteExtNuSpecFile)"
+             XmlInputPath="$(SiteExtImgOptNuSpecOutputFile)"
              Query="$(NuspecXpath)"
              Value="$(SiteExtNuGetPkgVerNum)" />
   </Target>

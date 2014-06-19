@@ -120,6 +120,7 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
   <PropertyGroup>
     <SiteExtNuSpecFile Condition=" '$(SiteExtNuSpecFile)'=='' ">$(MSBuildThisProjectDirectory)SiteExtension\site-extension.nuspec</SiteExtNuSpecFile>
     <SiteExtensionPackageRoot Condition=" '$(SiteExtensionPackageRoot)'=='' ">$(ObjRoot)_SiteExtension-Min\</SiteExtensionPackageRoot>
+    <SiteExtTextMinNuSpecOutputFile Condition=" '$(SiteExtTextMinNuSpecOutputFile)'=='' ">$(SiteExtensionPackageRoot)site-extension.nuspec</SiteExtTextMinNuSpecOutputFile>
   </PropertyGroup>
   <ItemGroup>
     <!--This item should never have more than 1 value-->
@@ -172,7 +173,7 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
     <Message Text="Updating site extension nuspec file to have version: [file='$(_tmp)',version='$(NuGetPkgVerNum)']" />
 
     <XmlPoke Namespaces="&lt;Namespace Prefix='dft' Uri='$(NuSpecXmlNs)'/&gt;"
-             XmlInputPath="$(SiteExtNuSpecFile)"
+             XmlInputPath="$(SiteExtTextMinNuSpecOutputFile)"
              Query="$(NuspecXpath)"
              Value="$(SiteExtNuGetPkgVerNum)" />
   </Target>
