@@ -1,12 +1,20 @@
 ﻿<%@ Page Title="Dashboard" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="AzureJobs.SiteExtension.Web.Default" %>
 
+<asp:Content ContentPlaceHolderID="head" runat="server">
+    <style>
+        .outline {
+            fill: <%= _color %>;
+        }
+    </style>
+</asp:Content>
+
 <asp:Content ContentPlaceHolderID="body" runat="server">
 
     <header>        
         <h1>
             <a href="/"><asp:Literal runat="server" ID="name" /></a>
         </h1>
-        <%= System.IO.File.ReadAllText(Server.MapPath("~/img/logo.svg")) %>
+        <%= _logo %>
     </header>
 
     <asp:PlaceHolder runat="server" ID="error" Visible="false">

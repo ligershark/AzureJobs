@@ -4,14 +4,14 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Web;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
+using System.Web.Hosting;
 
 namespace AzureJobs.SiteExtension.Web
 {
     public partial class Default : System.Web.UI.Page
     {
+        protected static string _color = ConfigurationManager.AppSettings.Get("color");
+        protected static string _logo = File.ReadAllText(HostingEnvironment.MapPath("~/img/logo.svg"));
         private static string _file = ConfigurationManager.AppSettings.Get("file");
         private static string _name = ConfigurationManager.AppSettings.Get("name");
         private IEnumerable<Result> _results;

@@ -42,10 +42,6 @@ header {
             fill: white;
         }
 
-            header svg path.outline {
-                fill: #1c97d1;
-            }
-
 ul {
     list-style: none;
     padding: 0;
