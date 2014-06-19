@@ -52,6 +52,7 @@
     <None Include="NuGet\tools\install.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Content Include="NuGet\logo.png" />
     <Content Include="settings.job">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
