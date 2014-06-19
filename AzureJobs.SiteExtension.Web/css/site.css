@@ -63,6 +63,10 @@ ul {
         background: #f1f1f1;
     }
 
+    .grid tr:hover {
+        background-color: rgba(70, 130, 180, 0.2);
+    }
+
     .grid td,
     .grid th {
         border: none;
