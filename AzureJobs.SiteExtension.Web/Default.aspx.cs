@@ -12,8 +12,8 @@ namespace AzureJobs.SiteExtension.Web
     {
         protected static string _color = ConfigurationManager.AppSettings.Get("color");
         protected static string _logo = File.ReadAllText(HostingEnvironment.MapPath("~/img/logo.svg"));
+        protected static string _name = ConfigurationManager.AppSettings.Get("name");
         private static string _file = ConfigurationManager.AppSettings.Get("file");
-        private static string _name = ConfigurationManager.AppSettings.Get("name");
         private IEnumerable<Result> _results;
 
         protected void Page_Load(object sender, EventArgs e)

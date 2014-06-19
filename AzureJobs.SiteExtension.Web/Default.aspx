@@ -1,6 +1,7 @@
 ﻿<%@ Page Title="Dashboard" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="AzureJobs.SiteExtension.Web.Default" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
+    <meta name="description" content="The dashboard of <%= _name %>" />
     <style>
         .outline {
             fill: <%= _color %>;
