@@ -65,7 +65,6 @@
     <Content Include="Properties\ligershark.webjobs.targets" />
     <Content Include="Properties\ligershark.webjobs.ext.targets" />
     <Content Include="packages.config" />
-    <None Include="Properties\PublishProfiles\imagecompressor.pubxml" />
     <Content Include="Site.Master" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
