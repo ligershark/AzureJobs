@@ -138,7 +138,7 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
     <CreateSiteExtensionNuGetPkgDependsOn>
       $(CreateSiteExtensionNuGetPkgDependsOn);
       SiteExtensionPrepareAndPopulateNugetFolder;
-      UpdateSiteExtensionNuSpecFile;
+      TransformOutputFiles;
       SiteExtensionCoreCreateNugetPackage;
     </CreateSiteExtensionNuGetPkgDependsOn>
   </PropertyGroup>
@@ -156,19 +156,46 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
     <Exec Command="$(_Cmd)"/>
   </Target>
 
-  <Target Name="UpdateSiteExtensionNuSpecFile">
+  <PropertyGroup>
+    <TransformOutputFilesDependsOn>
+      $(TransformOutputFilesDependsOn);
+      UpdateSiteExtensionNuSpecFile;
+      UpdateSiteExtWebConfig;
+    </TransformOutputFilesDependsOn>
+  </PropertyGroup>
+  <Target Name="TransformOutputFiles" DependsOnTargets="$(TransformOutputFilesDependsOn)"/>
+  
+ <Target Name="UpdateSiteExtensionNuSpecFile" DependsOnTargets="SiteExtensionPrepareAndPopulateNugetFolder">
     <PropertyGroup>
       <_tmp>$([System.IO.Path]::GetFullPath('$(SiteExtNuSpecFile)'))</_tmp>
     </PropertyGroup>
-    <Message Text="Inside UpdateSiteExtensionNuSpecFile" Importance="high"/>
-    <Message Text="Updating site extension nuspec file to have version: [file='$(_tmp)',version='$(NuGetPkgVerNum)']" Importance="high"/>
+    <Message Text="Updating site extension nuspec file to have version: [file='$(_tmp)',version='$(NuGetPkgVerNum)']" />
 
     <XmlPoke Namespaces="&lt;Namespace Prefix='dft' Uri='$(NuSpecXmlNs)'/&gt;"
              XmlInputPath="$(SiteExtNuSpecFile)"
              Query="$(NuspecXpath)"
              Value="$(SiteExtNuGetPkgVerNum)" />
   </Target>
+  <PropertyGroup>
+    <UpdateSiteExtWebConfigDependsOn>
+      $(UpdateSiteExtWebConfigDependsOn);
+    </UpdateSiteExtWebConfigDependsOn>
+    <SiteExtWebConfigXPath Condition=" '$(SiteExtWebConfigXPath)'=='' ">configuration/appSettings/add[@key='file']/@value</SiteExtWebConfigXPath>
+    <SiteExtAppSettingFileTextMin Condition=" '$(SiteExtAppSettingFileTextMin)'=='' ">D:\home\site\wwwroot\app_data\TextMinifier.Job.exe.csv</SiteExtAppSettingFileTextMin>
+  </PropertyGroup>
+  <Target Name="UpdateSiteExtWebConfig" DependsOnTargets="$(UpdateSiteExtWebConfigDependsOn)">
+    <PropertyGroup>
+      <_fileToUpdate>$(SiteExtensionPackageRoot)\content\web.config</_fileToUpdate>
+    </PropertyGroup>
+    
+    <Message Text="Updating site extension web.config [$(_fileToUpdate)] app settings to [$(SiteExtAppSettingFileTextMin)]" Importance="high"/>
 
+    <XmlPoke 
+         XmlInputPath="$(_fileToUpdate)"
+         Query="$(SiteExtWebConfigXPath)"
+         Value="$(SiteExtAppSettingFileTextMin)" />
+  </Target>
+  
   <!--
   This target populates the following dynamic properties:
     $(_SiteExtensionNugetSpecOutputFile)
@@ -176,7 +203,6 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
   <PropertyGroup>
     <SiteExtensionPrepareAndPopulateNugetFolderDependsOn>
       $(SiteExtensionPrepareAndPopulateNugetFolderDependsOn);
-      UpdateSiteExtensionNuSpecFile;
     </SiteExtensionPrepareAndPopulateNugetFolderDependsOn>
   </PropertyGroup>
 
