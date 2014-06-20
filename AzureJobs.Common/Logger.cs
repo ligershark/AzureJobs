@@ -28,7 +28,11 @@ namespace AzureJobs.Common
                     if (!File.Exists(_logFile))
                         File.WriteAllText(_logFile, "Date, Filename, Original, Optimized");
 
-                    File.AppendAllText(_logFile, Environment.NewLine + messageString);
+                    using (FileStream fs = new FileStream(_logFile, FileMode.Open, FileAccess.Write, FileShare.ReadWrite))
+                    using (StreamWriter sw = new StreamWriter(fs))
+                    {
+                        sw.WriteLine(messageString);
+                    }
                 }
             }
             catch

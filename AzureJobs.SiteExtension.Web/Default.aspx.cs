@@ -23,7 +23,7 @@ namespace AzureJobs.SiteExtension.Web
 
             try
             {
-                _results = GetResults();
+                _results = GetResults().Reverse();
             }
             catch
             {
@@ -66,13 +66,15 @@ namespace AzureJobs.SiteExtension.Web
             if (!File.Exists(_file))
                 yield break;
 
-            var lines = File.ReadAllLines(_file).Reverse();
-
-            foreach (string line in lines)
+            using (FileStream fs = new FileStream(_file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (StreamReader sr = new StreamReader(fs))
             {
-                string[] args = line.Split(',');
-
-                yield return CreateResult(args);
+                while (!sr.EndOfStream)
+                {
+                    string line = sr.ReadLine();
+                    string[] args = line.Split(',');
+                    yield return CreateResult(args);
+                }
             }
         }
 
