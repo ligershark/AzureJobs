@@ -13,7 +13,8 @@
     <!--<projectUrl>http://xunit.codeplex.com/</projectUrl>
     <licenseUrl>http://xunit.codeplex.com/license</licenseUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <copyright>Copyright 2013 Sayed Ibrahim Hashimi</copyright>
+    <copyright>Copyright 2013 Sayed Ibrahim Hashimi, Mads Kristensen</copyright>
+    
     <tags></tags>
     <dependencies>
       <dependency id="AzureJobsShared" version="0.0.3-beta" />

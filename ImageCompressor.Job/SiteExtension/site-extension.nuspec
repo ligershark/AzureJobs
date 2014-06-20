@@ -8,5 +8,6 @@
     <owners>Sayed Ibrahim Hashimi, Mads Kristensen</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This will compress images on your website when running in Azure Web Sites.</description>
+    <iconUrl>https://dl.dropboxusercontent.com/u/40134810/azurejobs/images/logo-imgopt.png</iconUrl>
   </metadata>
 </package>
