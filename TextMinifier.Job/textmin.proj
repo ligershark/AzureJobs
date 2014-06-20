@@ -181,9 +181,12 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
     <UpdateSiteExtWebConfigDependsOn>
       $(UpdateSiteExtWebConfigDependsOn);
     </UpdateSiteExtWebConfigDependsOn>
+    
     <SiteExtWebConfigXPath Condition=" '$(SiteExtWebConfigXPath)'=='' ">configuration/appSettings/add[@key='file']/@value</SiteExtWebConfigXPath>
+    <SiteExtWebConfigColorXPath Condition=" '$(SiteExtWebConfigColorXPath)'=='' ">configuration/appSettings/add[@key='color']/@value</SiteExtWebConfigColorXPath>
     <SiteExtAppSettingFileTextMin Condition=" '$(SiteExtAppSettingFileTextMin)'=='' ">D:\home\site\wwwroot\app_data\TextMinifier.Job.exe.csv</SiteExtAppSettingFileTextMin>
-  </PropertyGroup>
+    <SiteExtAppSettingColorTextMin Condition=" '$(SiteExtAppSettingColorTextMin)'=='' ">darkorange</SiteExtAppSettingColorTextMin>
+</PropertyGroup>
   <Target Name="UpdateSiteExtWebConfig" DependsOnTargets="$(UpdateSiteExtWebConfigDependsOn)">
     <PropertyGroup>
       <_fileToUpdate>$(SiteExtensionPackageRoot)\content\web.config</_fileToUpdate>
@@ -195,6 +198,11 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
          XmlInputPath="$(_fileToUpdate)"
          Query="$(SiteExtWebConfigXPath)"
          Value="$(SiteExtAppSettingFileTextMin)" />
+
+    <XmlPoke
+     XmlInputPath="$(_fileToUpdate)"
+     Query="$(SiteExtWebConfigColorXPath)"
+     Value="$(SiteExtAppSettingColorTextMin)" />
   </Target>
   
   <!--

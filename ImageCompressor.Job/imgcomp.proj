@@ -184,8 +184,11 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
     <UpdateSiteExtWebConfigDependsOn>
       $(UpdateSiteExtWebConfigDependsOn);
     </UpdateSiteExtWebConfigDependsOn>
-    <SiteExtWebConfigXPath Condition=" '$(SiteExtWebConfigXPath)'=='' ">configuration/appSettings/add[@key='file']/@value</SiteExtWebConfigXPath>
+    <SiteExtWebConfigFileXPath Condition=" '$(SiteExtWebConfigFileXPath)'=='' ">configuration/appSettings/add[@key='file']/@value</SiteExtWebConfigFileXPath>
+    <SiteExtWebConfigColorXPath Condition=" '$(SiteExtWebConfigColorXPath)'=='' ">configuration/appSettings/add[@key='color']/@value</SiteExtWebConfigColorXPath>
+    
     <SiteExtAppSettingFileImgOpt Condition=" '$(SiteExtAppSettingFileImgOpt)'=='' ">D:\home\site\wwwroot\app_data\ImageCompressor.Job.exe.csv</SiteExtAppSettingFileImgOpt>
+    <SiteExtAppSettingColorImgOpt Condition=" '$(SiteExtAppSettingColorImgOpt)'=='' ">#1c97d1</SiteExtAppSettingColorImgOpt>
   </PropertyGroup>
   <Target Name="UpdateSiteExtWebConfig" DependsOnTargets="$(UpdateSiteExtWebConfigDependsOn)">
     <PropertyGroup>
@@ -196,8 +199,13 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
 
     <XmlPoke
          XmlInputPath="$(_fileToUpdate)"
-         Query="$(SiteExtWebConfigXPath)"
+         Query="$(SiteExtWebConfigFileXPath)"
          Value="$(SiteExtAppSettingFileImgOpt)" />
+
+    <XmlPoke
+         XmlInputPath="$(_fileToUpdate)"
+         Query="$(SiteExtWebConfigColorXPath)"
+         Value="$(SiteExtAppSettingColorImgOpt)" />
   </Target>
   
     <!--
