@@ -206,6 +206,11 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
          XmlInputPath="$(_fileToUpdate)"
          Query="$(SiteExtWebConfigColorXPath)"
          Value="$(SiteExtAppSettingColorImgOpt)" />
+
+    <XmlPoke
+         XmlInputPath="$(_fileToUpdate)"
+         Query="configuration/appSettings/add[@key='name']/@value"
+         Value="Azure Image Optimizer" />
   </Target>
   
     <!--
