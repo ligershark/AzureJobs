@@ -11,13 +11,11 @@
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
 
-    <header>        
+    <header onclick="location.href = location.href">        
         <h1>
-            <a href="/"><asp:Literal runat="server" ID="name" /></a>
+            <asp:Literal runat="server" ID="name" />
         </h1>
-        <a href="/">
-            <%= _logo %>
-        </a>
+        <%= _logo %>
     </header>
 
     <asp:PlaceHolder runat="server" ID="error" Visible="false">
@@ -34,7 +32,7 @@
 
         <div id="buttons">
             <asp:Button runat="server" ID="btnDelete" Text="Delete log" OnClick="btnDelete_Click" OnClientClick="return confirm('Are you sure?')" />
-            <button onclick="location.href='?download=1'" type="button" download>Download log</button>
+            <input value="Download log" onclick="location.href='?download=1'" type="button" download />
         </div>
 
         <asp:GridView
@@ -45,7 +43,8 @@
             AutoGenerateColumns="false"
             AllowPaging="true"
             AllowSorting="true"
-            PageSize="20"
+            PageSize="15"
+            PagerSettings-Mode="NumericFirstLast"
             SelectMethod="grid_GetData"
             ItemType="AzureJobs.SiteExtension.Web.Result"
             BorderStyle="None" >

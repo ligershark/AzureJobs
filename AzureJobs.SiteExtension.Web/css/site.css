@@ -15,9 +15,10 @@ body {
 
 header {
     position: relative;
-    margin-bottom: 5em;
+    margin-bottom: 4em;
     padding-left: 170px;
     height: 83px;
+    cursor: pointer;
 }
 
     header h1 {
