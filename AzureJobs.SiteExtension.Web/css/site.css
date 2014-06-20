@@ -106,10 +106,14 @@ ul {
                 padding: 0 2px;
             }
 
-    .grid table a:hover {
-        text-decoration: underline;
-        color: darkslategray;
+    .grid table tr {
+        border: none !important;
     }
+
+        .grid table a:hover {
+            text-decoration: underline;
+            color: darkslategray;
+        }
 
 mark {
     color: red;

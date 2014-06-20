@@ -14,14 +14,21 @@ namespace AzureJobs.SiteExtension.Web
         protected static string _logo = File.ReadAllText(HostingEnvironment.MapPath("~/img/logo.svg"));
         protected static string _name = ConfigurationManager.AppSettings.Get("name");
         private static string _file = ConfigurationManager.AppSettings.Get("file");
-        private IEnumerable<Result> _results;
+        private static IEnumerable<Result> _results;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["download"] != null)
                 DownloadLogFile();
 
-            _results = GetResults();
+            try
+            {
+                _results = GetResults();
+            }
+            catch
+            {
+                // File is locked because it's being written to. Ignore this and use the _results from last load (it's static).
+            }
 
             if (_results != null)
             {
@@ -103,6 +110,7 @@ namespace AzureJobs.SiteExtension.Web
             if (File.Exists(_file))
             {
                 File.Delete(_file);
+                _results = null;
             }
 
             Response.Redirect("/", true);

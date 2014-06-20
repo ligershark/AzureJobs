@@ -15,7 +15,9 @@
         <h1>
             <a href="/"><asp:Literal runat="server" ID="name" /></a>
         </h1>
-        <%= _logo %>
+        <a href="/">
+            <%= _logo %>
+        </a>
     </header>
 
     <asp:PlaceHolder runat="server" ID="error" Visible="false">
