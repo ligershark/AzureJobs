@@ -55,7 +55,7 @@ namespace ImageCompressor.Job
             string folder = options.Folder;
             string logFile = !string.IsNullOrEmpty(options.LogFile) ? 
                                 options.LogFile :
-                                Environment.ExpandEnvironmentVariables(@"%APPDATA%\LigerShark\AzureJobs\");
+                                Environment.ExpandEnvironmentVariables(@"%APPDATA%\LigerShark\AzureJobs\logs\imageoptimizer.xml");
 
             if (string.IsNullOrEmpty(folder)) {
                 ShowUsage();

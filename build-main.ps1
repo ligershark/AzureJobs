@@ -1,7 +1,12 @@
 ﻿[cmdletbinding()]
 param(
     [switch]
-    $CleanOutputFolder
+    $CleanOutputFolder,
+
+    [switch]
+    $CopyToDropbox,
+
+    $droopboxOutputFolder = ("$dropBoxHome\public\azurejobs\output")
 )
  
  function Get-ScriptDirectory
@@ -12,6 +17,9 @@ param(
 
 $scriptDir = ((Get-ScriptDirectory) + "\")
 
+$global:azurejobsbuild = New-Object psobject -Property @{    
+    OutputPath = ('{0}OutputRoot\' -f $scriptDir)
+}
 <#
 .SYNOPSIS  
 	This will return the path to msbuild.exe. If the path has not yet been set
@@ -59,6 +67,24 @@ function Clean-OutputFolder{
     }
 }
 
+function Copy-OutputToDropbox{
+    [cmdletbinding()]
+    param()
+    process{
+        'Copying files to dropbox' | Write-Host -ForegroundColor Green
+
+        $objFolder = Resolve-Path (Join-Path $global:azurejobsbuild.OutputPath 'obj')
+
+        $filesToCopy = @()
+        Copy-Item "$objFolder\ImageCompressor.Job\*.exe" -Destination $droopboxOutputFolder
+        Copy-Item "$objFolder\ImageCompressor.Job\*.dll" -Destination $droopboxOutputFolder
+        Copy-Item "$objFolder\ImageCompressor.Job\*.pdb" -Destination $droopboxOutputFolder
+        Copy-Item "$objFolder\TextMinifier.Job\*.exe" -Destination $droopboxOutputFolder
+        Copy-Item "$objFolder\TextMinifier.Job\*.dll" -Destination $droopboxOutputFolder
+        Copy-Item "$objFolder\TextMinifier.Job\*.pdb" -Destination $droopboxOutputFolder
+    }
+}
+
 if($CleanOutputFolder){
     Clean-OutputFolder
 }
@@ -83,3 +109,13 @@ $msbuildArgs += '/flp2:v=diag;logfile=build.diag.log'
 $msbuildArgs += '/m'
 
 & ((Get-MSBuild).FullName) $msbuildArgs
+
+if($CopyToDropbox){
+    if(!(Test-Path $droopboxOutputFolder)){
+        $msg = ('dropbox folder not found at [{0}]' -f $droopboxOutputFolder)
+        throw $msg
+    }
+
+    Copy-OutputToDropbox
+
+}
