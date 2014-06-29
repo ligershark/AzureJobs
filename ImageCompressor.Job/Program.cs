@@ -21,6 +21,17 @@ namespace ImageCompressor.Job
 
         static void Main(string[] args)
         {
+            // TODO: This is not the best way to differentiat cmd line versus azure will need updating
+            if (args == null || args.Length == 0) {
+                StartAsAzureJob();
+            }
+            else {
+                // invoked from the command line. Print out the args to begin with
+                StartAsConsole(args);
+            }
+        }
+
+        private static void StartAsAzureJob() {
             //_folder = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\ImageOptimization\img";
             _log = new Logger(Path.Combine(_folder, "app_data"));
             _store = new FileHashStore(Path.Combine(_folder, "app_data\\ImageOptimizerHashTable.xml"));
@@ -33,11 +44,60 @@ namespace ImageCompressor.Job
             Timer timer = new Timer((o) => ProcessQueue());
             timer.Change(1000, 5000);
 
-            while (true)
-            {
+            while (true) {
                 Thread.Sleep(2000);
             }
         }
+
+        private static void StartAsConsole(string[] args) {
+            var options = new CommandArgsParser().BuildCommandLineOptions(args);
+
+            string folder = options.Folder;
+            string logFile = !string.IsNullOrEmpty(options.LogFile) ? 
+                                options.LogFile :
+                                Environment.ExpandEnvironmentVariables(@"%APPDATA%\LigerShark\AzureJobs\");
+
+            if (string.IsNullOrEmpty(folder)) {
+                ShowUsage();
+                return;
+            }
+
+            _folder = options.Folder;
+            _log = new Logger(options.Folder);
+            _store = new FileHashStore(logFile);
+            _compressor.Finished += WriteToLog;
+
+            FileInfo logfileInfo = new FileInfo(logFile);
+
+            if (!logfileInfo.Directory.Exists) {
+                logfileInfo.Directory.Create();
+            }
+
+            QueueExistingFiles();
+            ProcessQueue();
+
+            if (options.StartListener.HasValue && options.StartListener.Value) {
+                Timer timer = new Timer((o) => ProcessQueue());
+                timer.Change(1000, 5000);
+
+                while (true) {
+                    Thread.Sleep(2000);
+                }
+            }
+
+        }
+        private static void ShowUsage() {
+            string usage = @"ImageCompressor.Job.exe --folder <folder-path> [options]
+
+Options
+    /? --help : To display help
+       --logfile <logfile> : Location of the log file, if none passed it will be stored under App_Data
+       --startlistener : To start the listern on that directory
+";
+
+            Console.WriteLine(usage);
+        }
+        
 
         private static void QueueExistingFiles()
         {
