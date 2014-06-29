@@ -24,6 +24,10 @@
       <AdditionalProperties>OutDir=$(OutputPathSiteExtWeb)</AdditionalProperties>
     </ProjectsToBuild>
 
+    <ProjectsToBuild Include="$(SourceRoot)AzureJobsTests\AzureJobsTests.csproj">
+      <AdditionalProperties>OutDir=$(ObjRoot)AzureJobsTests\</AdditionalProperties>
+    </ProjectsToBuild>
+    
     <SharedFiles Include="$(SharedSourceRoot)**\*"/>
   </ItemGroup>
 
@@ -31,6 +35,7 @@
     <FullBuildDependsOn>
       CleanAndInitalize;
       BuildProjects;
+      ExecuteTests;
       CreateNugetPackages;
     </FullBuildDependsOn>
     <BuildProjectsDependsOn>      
@@ -93,5 +98,41 @@
   
   <Target Name="CleanAndInitalize">
     <MakeDir Directories="$(OutputRoot);$(ObjRoot);$(BinRoot);$(PackageRoot)"/>
+  </Target>
+
+  <PropertyGroup>
+    <ExecuteTestsDependsOn>
+      $(ExecuteTestsDependsOn);
+      CoreBuildProjects;
+      FindTests;
+      CoreExecuteTests;
+    </ExecuteTestsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="ExecuteTests" DependsOnTargets="$(ExecuteTestsDependsOn)" />
+
+  <Target Name="CoreExecuteTests" Outputs="%(AssembliesToTest.FullPath)">
+    <PropertyGroup>
+      <_assmtotest>%(AssembliesToTest.FullPath)</_assmtotest>
+      <_cmd>"$(MstestPath)" /testcontainer:$(_assmtotest)</_cmd>
+    </PropertyGroup>
+    <!-- call mstest -->
+    <Message Text="Execute tests for [$(_assmtotest)], with command [$(_cmd)]" />
+
+    <Exec  Command="$(_cmd)"
+           Condition="Exists('$(MstestPath)')"/>
+    
+    <Warning Text="Unable to execute tests because mstest was not found at [$(MstestPath)]"
+             Condition="!Exists('$(MstestPath)')" />
+  </Target>
+
+  <Target Name="FindTests" DependsOnTargets="CoreBuildProjects">
+    <!-- search through output folder for assemblies ending with Tests -->
+    <ItemGroup>
+      <AssembliesToTest Include="$(ObjRoot)**\*Tests.dll"/>
+    </ItemGroup>
+
+    <Message Text="Found the following assemblies to execute tests on [@(AssembliesToTest)]"/>
+    
   </Target>
 </Project>
