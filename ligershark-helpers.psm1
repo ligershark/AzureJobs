@@ -1,11 +1,4 @@
-﻿[cmdletbinding()]
-param(
-    
-    $installPath = ("$env:APPDATA\ligershark\AzureJobs\ImageOptimizer\v0\")
-    
-)
-
-function Get-ScriptDirectory
+﻿function Get-ScriptDirectory
 {
     $Invocation = (Get-Variable MyInvocation -Scope 1).Value
     Split-Path $Invocation.MyCommand.Path
@@ -14,13 +7,7 @@ function Get-ScriptDirectory
 $script:scriptDir = ((Get-ScriptDirectory) + "\")
 
 $global:azurejobssettings = New-Object psobject -Property @{
-<#
-    MessagePrefix = '  '
-    TemplateRoot = (Join-Path ($script:scriptDir) -ChildPath 'templates-v1\Add Project')
-    IndentLevel = 1
-    WhatIf = $true
-    QuitResultKey = 'rps-quit'
-#>
+    InstallPath = ("$env:APPDATA\ligershark\AzureJobs\v0\")
 }
 
 function Optimize-Images{
@@ -30,7 +17,6 @@ function Optimize-Images{
         $folder,
 
         $logfile
-
     )
     process{
         
@@ -55,6 +41,6 @@ function Get-ImageOptimizerExe{
     [cmdletbinding()]
     param()
     process{
-        (resolve-path ('{0}ImageCompressor.Job.exe' -f $installPath)).ToString()
+        (resolve-path ('{0}ImageCompressor.Job.exe' -f $global:azurejobssettings.installPath)).ToString()
     }
 }

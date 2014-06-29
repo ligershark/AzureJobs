@@ -4,9 +4,11 @@ param(
     $CleanOutputFolder,
 
     [switch]
-    $CopyToDropbox,
+    $LocalDeploy,
 
-    $droopboxOutputFolder = ("$dropBoxHome\public\azurejobs\output")
+    $dropboxOutputFolder = ("$dropBoxHome\public\azurejobs\output"),
+
+    $LocalDeployFolder = ("$env:APPDATA\ligershark\AzureJobs\v0\")
 )
  
  function Get-ScriptDirectory
@@ -19,6 +21,7 @@ $scriptDir = ((Get-ScriptDirectory) + "\")
 
 $global:azurejobsbuild = New-Object psobject -Property @{    
     OutputPath = ('{0}OutputRoot\' -f $scriptDir)
+    Configuration = 'Release'
 }
 <#
 .SYNOPSIS  
@@ -67,21 +70,33 @@ function Clean-OutputFolder{
     }
 }
 
-function Copy-OutputToDropbox{
+function CopyOutput-ToFolder{
     [cmdletbinding()]
-    param()
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateScript({Test-Path $_ -PathType Container})]
+        $destFolder
+    )
     process{
-        'Copying files to dropbox' | Write-Host -ForegroundColor Green
+        'Copying files to local folder [{0}]' -f $destFolder | Write-Verbose
 
         $objFolder = Resolve-Path (Join-Path $global:azurejobsbuild.OutputPath 'obj')
 
+        $toolsDestFolder = ('{0}\Tools' -f $destFolder)
+        if(!(Test-Path $toolsDestFolder)){
+            md $toolsDestFolder
+        }
+
         $filesToCopy = @()
-        Copy-Item "$objFolder\ImageCompressor.Job\*.exe" -Destination $droopboxOutputFolder
-        Copy-Item "$objFolder\ImageCompressor.Job\*.dll" -Destination $droopboxOutputFolder
-        Copy-Item "$objFolder\ImageCompressor.Job\*.pdb" -Destination $droopboxOutputFolder
-        Copy-Item "$objFolder\TextMinifier.Job\*.exe" -Destination $droopboxOutputFolder
-        Copy-Item "$objFolder\TextMinifier.Job\*.dll" -Destination $droopboxOutputFolder
-        Copy-Item "$objFolder\TextMinifier.Job\*.pdb" -Destination $droopboxOutputFolder
+        Copy-Item "$objFolder\ImageCompressor.Job\*.exe" -Destination $destFolder
+        Copy-Item "$objFolder\ImageCompressor.Job\*.dll" -Destination $destFolder
+        Copy-Item "$objFolder\ImageCompressor.Job\*.pdb" -Destination $destFolder
+        Copy-Item "$objFolder\ImageCompressor.Job\*.config" -Destination $destFolder
+        Copy-Item "$objFolder\ImageCompressor.Job\Tools\*.*" -Destination $toolsDestFolder
+        Copy-Item "$objFolder\TextMinifier.Job\*.exe" -Destination $destFolder
+        Copy-Item "$objFolder\TextMinifier.Job\*.dll" -Destination $destFolder
+        Copy-Item "$objFolder\TextMinifier.Job\*.pdb" -Destination $destFolder
+        Copy-Item "$objFolder\TextMinifier.Job\*.config" -Destination $destFolder
     }
 }
 
@@ -101,7 +116,7 @@ $nugetArgs += $slnFile.FullName
 
 $msbuildArgs = @()
 $msbuildArgs += 'build-main.proj'
-$msbuildArgs += '/p:Configuration=Release'
+$msbuildArgs += ('/p:Configuration={0}' -f $global:azurejobsbuild.Configuration)
 $msbuildArgs += '/p:VisualStudioVersion=12.0'
 $msbuildArgs += '/p:RestorePackages=true'
 $msbuildArgs += '/flp1:v=d;logfile=build.d.log'
@@ -110,12 +125,21 @@ $msbuildArgs += '/m'
 
 & ((Get-MSBuild).FullName) $msbuildArgs
 
-if($CopyToDropbox){
-    if(!(Test-Path $droopboxOutputFolder)){
-        $msg = ('dropbox folder not found at [{0}]' -f $droopboxOutputFolder)
-        throw $msg
+if($LocalDeploy){
+    'Copying files to local app data folder [{0}]' -f $LocalDeployFolder | Write-Output
+    if(!(Test-Path $LocalDeployFolder)){
+        md $LocalDeployFolder
     }
 
-    Copy-OutputToDropbox
+    CopyOutput-ToFolder -destFolder $LocalDeployFolder
+
+    # dropbox deploy
+    if(!(Test-Path $dropboxOutputFolder)){
+        'dropbox folder not found at [{0}]' -f $dropboxOutputFolder | Write-Warning
+    }
+    else {
+        'Copying files to local dropbox folder [{0}]' -f $dropboxOutputFolder | Write-Output
+        CopyOutput-ToFolder -destFolder $dropboxOutputFolder
+    }
 
 }

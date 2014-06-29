@@ -55,7 +55,7 @@ namespace ImageCompressor.Job
             string folder = options.Folder;
             string logFile = !string.IsNullOrEmpty(options.LogFile) ? 
                                 options.LogFile :
-                                Environment.ExpandEnvironmentVariables(@"%APPDATA%\LigerShark\AzureJobs\logs\imageoptimizer.xml");
+                                Environment.ExpandEnvironmentVariables(@"%APPDATA%\LigerShark\AzureJobs\imageoptimizer-cache.xml");
 
             if (string.IsNullOrEmpty(folder)) {
                 ShowUsage();
@@ -76,7 +76,12 @@ namespace ImageCompressor.Job
             QueueExistingFiles();
             ProcessQueue();
 
-            if (options.StartListener.HasValue && options.StartListener.Value) {
+            Console.Write("Running now. Press enter to quit.");
+            Console.ReadLine();
+
+            if (options != null && 
+                options.StartListener.HasValue && 
+                options.StartListener.Value) {
                 Timer timer = new Timer((o) => ProcessQueue());
                 timer.Change(1000, 5000);
 
