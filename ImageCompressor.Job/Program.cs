@@ -76,18 +76,13 @@ namespace ImageCompressor.Job
             QueueExistingFiles();
             ProcessQueue();
 
-            Console.Write("Running now. Press enter to quit.");
-            Console.ReadLine();
 
             if (options != null && 
                 options.StartListener.HasValue && 
                 options.StartListener.Value) {
-                Timer timer = new Timer((o) => ProcessQueue());
-                timer.Change(1000, 5000);
 
-                while (true) {
-                    Thread.Sleep(2000);
-                }
+                Console.Write("Listner started, press Enter to quit.");
+                Console.ReadLine();
             }
 
         }
