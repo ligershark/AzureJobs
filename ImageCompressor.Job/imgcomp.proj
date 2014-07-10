@@ -59,10 +59,11 @@
     <ItemGroup>
       <_CreatedPackage Include="$(BinRoot)*.nupkg"/>
     </ItemGroup>
-
+        
     <Copy SourceFiles="@(_CreatedPackage)"
           DestinationFiles="@(_CreatedPackage->'$(NugetLocalRepo)%(Filename)%(Extension)')"
           Condition="Exists('$(NugetLocalRepo)')"/>
+    <Message Text="_CreatedPackage: @(_CreatedPackage)" Importance="low"/>
   </Target>
   
   <!--

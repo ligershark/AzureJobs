@@ -15,7 +15,7 @@
     <ObjRoot Condition=" '$(ObjRoot)'=='' ">$(ObjRootNoTrailingSlash)\</ObjRoot>
 
     <BinRootNoTrailingSlash Condition=" '$(BinRootNoTrailingSlash)'=='' ">$(OutputRootNoTrailingSlash)</BinRootNoTrailingSlash>
-    <BinRoot Condition=" '$(BinRoot)'=='' ">$(BinRootNoTrailingSlash)</BinRoot>
+    <BinRoot Condition=" '$(BinRoot)'=='' ">$(BinRootNoTrailingSlash)\</BinRoot>
 
     <SiteExtOutputRootNoTrailingSlash Condition=" '$(SiteExtOutputRootNoTrailingSlash)'=='' ">$(BinRoot)\site-extensions</SiteExtOutputRootNoTrailingSlash>
     <SiteExtOutputRoot Condition=" '$(SiteExtOutputRoot)'=='' ">$(SiteExtOutputRootNoTrailingSlash)\</SiteExtOutputRoot>
@@ -30,7 +30,9 @@
         
     <NuSpecXmlNs Condition=" '$(NuSpecXmlNs)'=='' ">http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd</NuSpecXmlNs>
     <NuspecXpath Condition=" '$(NuspecXpath)'=='' ">/dft:package/dft:metadata/dft:version</NuspecXpath>
-    
+
+    <NugetLocalRepo Condition=" '$(NugetLocalRepo)'=='' ">C:\Temp\Nuget\LocalRepo\</NugetLocalRepo>
+
     <RestorePackages Condition=" '$(RestorePackages)'=='' ">true</RestorePackages>
     <Configuration Condition=" '$(Configuration)'=='' ">Release</Configuration>
     
