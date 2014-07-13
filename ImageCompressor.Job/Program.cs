@@ -21,8 +21,7 @@ namespace ImageCompressor.Job
 
         static void Main(string[] args)
         {
-            // TODO: This is not the best way to differentiat cmd line versus azure will need updating
-            if (args == null || args.Length == 0) {
+            if (new AzureHelper().IsRunningAsWebJob()) {
                 StartAsAzureJob();
             }
             else {
