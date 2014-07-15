@@ -178,7 +178,7 @@ Options
                     return;
 
                 string name = new Uri(_folder).MakeRelativeUri(new Uri(e.OriginalFileName)).ToString();
-                _log.Write(DateTime.Now, name, e.OriginalFileSize, Math.Min(e.ResultFileSize, e.OriginalFileSize));
+                _log.Write(DateTime.Now, name, e.OriginalFileSize, Math.Min(e.ResultFileSize, e.OriginalFileSize), e.Percent);
             });
         }
     }
