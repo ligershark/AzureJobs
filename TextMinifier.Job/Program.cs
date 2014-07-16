@@ -129,8 +129,15 @@ namespace TextMinifier.Job
             {
                 File.WriteAllText(sourcePath, result, Encoding.UTF8);
                 string name = new Uri(_folder).MakeRelativeUri(new Uri(sourcePath)).ToString();
-                _log.Write(DateTime.Now, name, content.Length, result.Length);
+                string savings = CalcPercentageSavings(content.Length, result.Length);
+                _log.Write(DateTime.Now, name, content.Length, result.Length, savings);
             }
+        }
+        
+        private static string CalcPercentageSavings(int originalSize, int minifiedSize)
+        {
+            decimal savings = minifiedSize / Convert.ToDecimal(originalSize);
+            return (Math.Round(100 - (savings * 100), 1)).ToString();
         }
     }
 }
