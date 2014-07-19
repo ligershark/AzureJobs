@@ -23,36 +23,62 @@ $global:azurejobsbuild = New-Object psobject -Property @{
     OutputPath = ('{0}OutputRoot\' -f $scriptDir)
     Configuration = 'Release'
 }
+
+
 <#
-.SYNOPSIS  
-	This will return the path to msbuild.exe. If the path has not yet been set
-	then the highest installed version of msbuild.exe will be returned.
+.SYNOPSIS 
+    This will throw an error if the psbuild module is not installed and available.
 #>
-function Get-MSBuild{
-    [cmdletbinding()]
-        param()
-        process{
-	    $path = $script:defaultMSBuildPath
-
-	    if(!$path){
-	        $path =  Get-ChildItem "hklm:\SOFTWARE\Microsoft\MSBuild\ToolsVersions\" | 
-				        Sort-Object {[double]$_.PSChildName} -Descending | 
-				        Select-Object -First 1 | 
-				        Get-ItemProperty -Name MSBuildToolsPath |
-				        Select -ExpandProperty MSBuildToolsPath
-        
-            $path = (Join-Path -Path $path -ChildPath 'msbuild.exe')
-	    }
-
-        return Get-Item $path
-    }
-}
-
-function Get-NugetExe{
+function EnsurePsbuildInstalled(){
     [cmdletbinding()]
     param()
     process{
-        return (get-item (Join-Path $scriptDir '\BuildTools\NuGet.exe'))
+
+        if(!(Get-Module -listAvailable 'psbuild')){
+            $msg = ('psbuild is required for this script, but it does not look to be installed. Get psbuild from here: https://github.com/ligershark/psbuild')
+            throw $msg
+        }
+
+        if(!(Get-Module 'psbuild')){
+            # add psbuild to the currently loaded session modules
+            import-module psbuild -Global;
+        }
+    }
+}
+
+<#
+.SYNOPSIS
+    If nuget is not in the tools
+    folder then it will be downloaded there.
+#>
+function Get-Nuget(){
+    [cmdletbinding()]
+    param(
+        $toolsDir = ("$env:LOCALAPPDATA\LigerShark\AzureJobs\tools\"),
+
+        $nugetDownloadUrl = 'http://nuget.org/nuget.exe'
+    )
+    process{
+        $nugetDestPath = Join-Path -Path $toolsDir -ChildPath nuget.exe
+
+        if(!(Test-Path $toolsDir)){
+            New-Item -Path $toolsDir -ItemType Directory
+        }
+        
+        if(!(Test-Path $nugetDestPath)){
+            'Downloading nuget.exe' | Write-Verbose
+            # download nuget
+            $webclient = New-Object System.Net.WebClient
+            $webclient.DownloadFile($nugetDownloadUrl, $nugetDestPath)
+
+            # double check that is was written to disk
+            if(!(Test-Path $nugetDestPath)){
+                throw 'unable to download nuget'
+            }
+        }
+
+        # return the path of the file
+        $nugetDestPath
     }
 }
 
@@ -100,6 +126,14 @@ function CopyOutput-ToFolder{
     }
 }
 
+###########################################################
+# Begin script
+###########################################################
+
+'Begin started. This script uses psbuild which is available at http://aka.ms/psbuild' | Write-Host
+
+EnsurePsbuildInstalled
+
 if($CleanOutputFolder){
     Clean-OutputFolder
 }
@@ -107,23 +141,15 @@ if($CleanOutputFolder){
 'Restoring nuget packages' | Write-Host
 $slnFile = Get-Item (Join-Path $scriptDir 'AzureJobs.sln')
 # restore nuget packages
-$nugetArgs = @()
-$nugetArgs += 'restore'
-$nugetArgs += $slnFile.FullName
+$nugetArgs = @('restore',$slnFile.FullName)
 
-& ((Get-NugetExe).FullName) $nugetArgs
+&(Get-Nuget) $nugetArgs
 
-
-$msbuildArgs = @()
-$msbuildArgs += 'build-main.proj'
-$msbuildArgs += ('/p:Configuration={0}' -f $global:azurejobsbuild.Configuration)
-$msbuildArgs += '/p:VisualStudioVersion=12.0'
-$msbuildArgs += '/p:RestorePackages=true'
-$msbuildArgs += '/flp1:v=d;logfile=build.d.log'
-$msbuildArgs += '/flp2:v=diag;logfile=build.diag.log'
-$msbuildArgs += '/m'
-
-& ((Get-MSBuild).FullName) $msbuildArgs
+$projToBuild = (Resolve-Path (Join-Path -Path $scriptDir -ChildPath 'build-main.proj')).ToString()
+Invoke-MSBuild  -projectsToBuild $projToBuild `
+                -visualStudioVersion 12.0 `
+                -configuration $global:azurejobsbuild.Configuration `
+                -properties @{'RestorePackages'='true'}
 
 if($LocalDeploy){
     'Copying files to local app data folder [{0}]' -f $LocalDeployFolder | Write-Output
@@ -143,3 +169,5 @@ if($LocalDeploy){
     }
 
 }
+
+
