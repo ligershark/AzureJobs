@@ -67,5 +67,14 @@ namespace AzureJobs.Common
             string name = Assembly.GetEntryAssembly().ManifestModule.Name;
             return Path.Combine(path, name + LogFileExtension);
         }
+
+
+        public static void WriteToConsole(string message, params object[] args) {
+            System.Console.Write(message, args);
+        }
+
+        public static void WriteLineToConsole(string message, params object[] args) {
+            System.Console.WriteLine(message, args);
+        }
     }
 }

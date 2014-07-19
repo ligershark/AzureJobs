@@ -75,7 +75,6 @@ namespace ImageCompressor.Job
             QueueExistingFiles();
             ProcessQueue();
 
-
             if (options != null && 
                 options.StartListener.HasValue && 
                 options.StartListener.Value) {
@@ -97,7 +96,6 @@ Options
             Console.WriteLine(usage);
         }
         
-
         private static void QueueExistingFiles()
         {
             foreach (string filter in _filters)
@@ -149,6 +147,7 @@ Options
                     if (!_store.HasChangedOrIsNew(entry.Key))
                     {
                         _cache.Remove(entry.Key);
+                        Logger.WriteLineToConsole("{0} skipped because it's up to date", entry.Key);
                         continue;
                     }
 
