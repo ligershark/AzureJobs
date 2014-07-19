@@ -19,7 +19,12 @@ namespace AzureJobs.Common
 
         public void Write(params object[] messages)
         {
-            string messageString = string.Join(", ", messages);
+            string[] cleanedUpMessages = new string[messages.Length];
+            for (int i = 0; i < messages.Length; i++) {
+                cleanedUpMessages[i] = CleanMessageForCsv(messages[i].ToString());
+            }
+
+            string messageString = string.Join(",", cleanedUpMessages);
             Trace.WriteLine(messageString);
             Console.WriteLine(messageString);
 
@@ -60,7 +65,7 @@ namespace AzureJobs.Common
                 sw.WriteLine(messageString);
             }
         }
-        
+
         private string GetLogFilePath(string path)
         {
             Directory.CreateDirectory(path);
@@ -68,12 +73,25 @@ namespace AzureJobs.Common
             return Path.Combine(path, name + LogFileExtension);
         }
 
+        /// <summary>
+        /// Determines if the input string needs escaping in prep for writing to a csv file.
+        /// If the string contains a comma, double quote, carriage return, or newline, it should be wrapped in double quotes.
+        /// We might encounter this here because a file name may have a comma, and depending on the user's regional
+        /// setttings, numbers may be calculated with comma separators rather than decimals.
+        /// The CSV RFC: http://tools.ietf.org/html/rfc4180
+        /// </summary>
+        public string CleanMessageForCsv(string inputToClean)
+        {
+            return new CsvHelper().Escape(inputToClean);
+        }
 
-        public static void WriteToConsole(string message, params object[] args) {
+        public static void WriteToConsole(string message, params object[] args)
+        {
             System.Console.Write(message, args);
         }
 
-        public static void WriteLineToConsole(string message, params object[] args) {
+        public static void WriteLineToConsole(string message, params object[] args)
+        {
             System.Console.WriteLine(message, args);
         }
     }
