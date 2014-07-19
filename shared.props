@@ -23,9 +23,7 @@
     <MstestPath Condition=" '$(MstestPath)'=='' ">$(MSBuildProgramFiles32)\Microsoft Visual Studio 12.0\Common7\IDE\MSTest.exe</MstestPath>
     
     <!--<PackageRoot Condition=" '$(PackageRoot)'=='' ">$(OutputRoot)Nugetpkg\</PackageRoot>-->
-    <ToolsRoot Condition=" ''=='' ">$(Root)BuildTools\</ToolsRoot>
-    
-    <NugetExe Condition=" '$(NugetExe)'=='' ">$(ToolsRoot)NuGet.exe</NugetExe>
+
     <NugetLocalRepo Condition=" '$(NugetLocalRepo)'=='' ">C:\Temp\Nuget\LocalRepo\</NugetLocalRepo>    
         
     <NuSpecXmlNs Condition=" '$(NuSpecXmlNs)'=='' ">http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd</NuSpecXmlNs>
