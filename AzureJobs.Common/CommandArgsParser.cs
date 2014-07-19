@@ -84,6 +84,10 @@ namespace AzureJobs.Common {
                 options.StartListener = true;
             }
 
+            if (keys.Contains(CommandLineOptions.NoReportArg)) {
+                options.NoReport = true;
+            }
+
             return options;
         }
     }

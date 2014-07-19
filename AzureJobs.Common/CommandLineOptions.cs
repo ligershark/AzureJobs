@@ -13,11 +13,13 @@ namespace AzureJobs.Common {
         public static readonly string StartListenerArg = "--startlistener";
         public static readonly string HelpArg = "--help";
         public static readonly string HelpShortArg = "/?";
+        public static readonly string NoReportArg = "NoReport";
 
         public string LogFile { get; set; }
         public string Name { get; set; }
         public string Color { get; set; }
         public string Folder { get; set; }
+        public bool NoReport { get; set; }
         public bool? StartListener { get; set; }
         public bool? DisplayHelp { get; set; }
     }

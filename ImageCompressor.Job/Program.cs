@@ -18,6 +18,10 @@ namespace ImageCompressor.Job
         private static FileHashStore _store;
         private static object _syncRoot = new object();
         private static bool _isProcessing;
+        /// <summary>
+        /// If options are passed into the cmd line they will be availabe here
+        /// </summary>
+        private static CommandLineOptions cmdLineOptions;
 
         static void Main(string[] args)
         {
@@ -49,11 +53,11 @@ namespace ImageCompressor.Job
         }
 
         private static void StartAsConsole(string[] args) {
-            var options = new CommandArgsParser().BuildCommandLineOptions(args);
+            cmdLineOptions = new CommandArgsParser().BuildCommandLineOptions(args);
 
-            string folder = options.Folder;
-            string logFile = !string.IsNullOrEmpty(options.LogFile) ? 
-                                options.LogFile :
+            string folder = cmdLineOptions.Folder;
+            string logFile = !string.IsNullOrEmpty(cmdLineOptions.LogFile) ? 
+                                cmdLineOptions.LogFile :
                                 Environment.ExpandEnvironmentVariables(@"%APPDATA%\LigerShark\AzureJobs\imageoptimizer-cache.xml");
 
             if (string.IsNullOrEmpty(folder)) {
@@ -61,8 +65,8 @@ namespace ImageCompressor.Job
                 return;
             }
 
-            _folder = options.Folder;
-            _log = new Logger(options.Folder);
+            _folder = cmdLineOptions.Folder;
+            _log = new Logger(cmdLineOptions.Folder);
             _store = new FileHashStore(logFile);
             _compressor.Finished += WriteToLog;
 
@@ -75,9 +79,9 @@ namespace ImageCompressor.Job
             QueueExistingFiles();
             ProcessQueue();
 
-            if (options != null && 
-                options.StartListener.HasValue && 
-                options.StartListener.Value) {
+            if (cmdLineOptions != null && 
+                cmdLineOptions.StartListener.HasValue && 
+                cmdLineOptions.StartListener.Value) {
 
                 Console.Write("Listner started, press Enter to quit.");
                 Console.ReadLine();
@@ -89,8 +93,9 @@ namespace ImageCompressor.Job
 
 Options
     /? --help : To display help
-       --logfile <logfile> : Location of the log file, if none passed it will be stored under App_Data
-       --startlistener : To start the listern on that directory
+       --logfile <logfile>  : Location of the log file, if none passed it will be stored under App_Data
+       --startlistener      : To start the listern on that directory
+       --NoReport           : You can use this to prevent the .csv file from being written into the working directory.        
 ";
 
             Console.WriteLine(usage);
@@ -176,8 +181,10 @@ Options
                 if (e == null || e.ResultFileSize == 0)
                     return;
 
-                string name = new Uri(_folder).MakeRelativeUri(new Uri(e.OriginalFileName)).ToString();
-                _log.Write(DateTime.Now, name, e.OriginalFileSize, Math.Min(e.ResultFileSize, e.OriginalFileSize), e.Percent);
+                if (cmdLineOptions == null || !cmdLineOptions.NoReport) {
+                    string name = new Uri(_folder).MakeRelativeUri(new Uri(e.OriginalFileName)).ToString();
+                    _log.Write(DateTime.Now, name, e.OriginalFileSize, Math.Min(e.ResultFileSize, e.OriginalFileSize), e.Percent);
+                }
             });
         }
     }
