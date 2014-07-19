@@ -43,6 +43,7 @@
     <Compile Include="AzureHelper.cs" />
     <Compile Include="CommandArgsParser.cs" />
     <Compile Include="CommandLineOptions.cs" />
+    <Compile Include="CsvHelper.cs" />
     <Compile Include="FileHashStore.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
