@@ -19,7 +19,12 @@ namespace AzureJobs.Common
 
         public void Write(params object[] messages)
         {
-            string messageString = CleanMessageForCsv(string.Join(",", messages));
+            string[] cleanedUpMessages = new string[messages.Length];
+            for (int i = 0; i < messages.Length; i++) {
+                cleanedUpMessages[i] = CleanMessageForCsv(messages[i].ToString());
+            }
+
+            string messageString = string.Join(",", cleanedUpMessages);
             Trace.WriteLine(messageString);
             Console.WriteLine(messageString);
 
@@ -75,20 +80,9 @@ namespace AzureJobs.Common
         /// setttings, numbers may be calculated with comma separators rather than decimals.
         /// The CSV RFC: http://tools.ietf.org/html/rfc4180
         /// </summary>
-        /// <param name="inputToClean"></param>
-        /// <returns></returns>
         public string CleanMessageForCsv(string inputToClean)
         {
-            const string DoubleQuote = "\"";
-            const string EscapedItemFormat = "{0}{1}{0}";
-            const string ItemsToCleanFor = ",\r\n\"";
-            if (inputToClean.IndexOfAny(ItemsToCleanFor.ToCharArray()) > -1)
-            {
-                //wrap the input string in double quotes, while replacing any double quotes in the string with 2 double quotes
-                return string.Format(EscapedItemFormat, DoubleQuote,
-                                                        inputToClean.Replace(DoubleQuote, DoubleQuote + DoubleQuote));
-            }
-            return inputToClean;
+            return new CsvHelper().Escape(inputToClean);
         }
 
         public static void WriteToConsole(string message, params object[] args)
