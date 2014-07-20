@@ -80,7 +80,7 @@ namespace AzureJobs.SiteExtension.Web
 
         private Result CreateResult(string[] args)
         {
-            if (args.Length != 4)
+            if (args.Length < 4)
                 return null;
 
             DateTime date;
