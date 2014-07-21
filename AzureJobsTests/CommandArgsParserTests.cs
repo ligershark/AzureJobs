@@ -3,22 +3,27 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using AzureJobs.Common;
 
-namespace AzureJobsTests {
+namespace AzureJobsTests
+{
     [TestClass]
-    public class CommandArgsParserTests {
+    public class CommandArgsParserTests
+    {
         [TestClass]
-        public class TheParseArgsMethod {
+        public class TheParseArgsMethod
+        {
             [TestMethod]
-            public void ReturnsTheValues() {
-                string[] args = new string[8];
-                args[0] = "--logfile";
-                args[1] = "one.txt";
-                args[2] = "--name";
-                args[3] = "Azure";
-                args[4] = "Image";
-                args[5] = "Optimizer";
-                args[6] = "--color";
-                args[7] = "Green";
+            public void ReturnsTheValues()
+            {
+                string[] args = new[]{
+                "--logfile"
+                ,"one.txt"
+                ,"--name"
+                ,"Azure"
+                ,"Image"
+                ,"Optimizer"
+                ,"--color"
+                ,"Green"
+                ,"--force"};
 
                 IDictionary<string, string> result = new CommandArgsParser().ParseArgs(args);
                 Assert.AreEqual(3, result.Count);
@@ -28,10 +33,12 @@ namespace AzureJobsTests {
                 Assert.AreEqual("one.txt", result["--logfile"]);
                 Assert.AreEqual("Azure Image Optimizer", result["--name"]);
                 Assert.AreEqual("Green", result["--color"]);
+                Assert.IsTrue(result.Keys.Contains("--force"));
             }
 
             [TestMethod]
-            public void HandlesHelpAsShortName() {
+            public void HandlesHelpAsShortName()
+            {
                 string[] args = new string[1];
                 args[0] = "/?";
 
@@ -42,24 +49,29 @@ namespace AzureJobsTests {
         }
 
         [TestClass]
-        public class TheBuildCommandLineOptionsMethod {
-            
+        public class TheBuildCommandLineOptionsMethod
+        {
+
             [TestMethod]
-            public void BuildsTheObject() {
-                string[] args = new string[8];
-                args[0] = "--logfile";
-                args[1] = "one.txt";
-                args[2] = "--name";
-                args[3] = "Azure";
-                args[4] = "Image";
-                args[5] = "Optimizer";
-                args[6] = "--color";
-                args[7] = "Green";
+            public void BuildsTheObject()
+            {
+                string[] args = new[]{
+                 "--logfile",
+                 "one.txt",
+                 "--name",
+                 "Azure",
+                 "Image",
+                 "Optimizer",
+                 "--color",
+                 "Green",
+                 "--force"};
                 var options = new CommandArgsParser().BuildCommandLineOptions(args);
 
-                Assert.AreEqual("one.txt", options.LogFile);
+                Assert.AreEqual("one.txt", options.OptimizerCacheFile);
                 Assert.AreEqual("Azure Image Optimizer", options.Name);
                 Assert.AreEqual("Green", options.Color);
+                Assert.IsTrue(options.ShouldForceOptimize);
+
             }
         }
     }
