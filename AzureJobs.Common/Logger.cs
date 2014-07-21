@@ -20,7 +20,8 @@ namespace AzureJobs.Common
         public void Write(params object[] messages)
         {
             string[] cleanedUpMessages = new string[messages.Length];
-            for (int i = 0; i < messages.Length; i++) {
+            for (int i = 0; i < messages.Length; i++)
+            {
                 cleanedUpMessages[i] = CleanMessageForCsv(messages[i].ToString());
             }
 
@@ -66,6 +67,12 @@ namespace AzureJobs.Common
             }
         }
 
+        /// <summary>
+        /// Create a filepath combining the path of the directory to monitor, 
+        /// and the current assembly's name. CSV file extension.
+        /// </summary>
+        /// <param name="path">The directory being monitored for images to compress.</param>
+        /// <returns></returns>
         private string GetLogFilePath(string path)
         {
             Directory.CreateDirectory(path);
