@@ -5,8 +5,8 @@
     <SharedProps Condition=" '$(SharedProps)'=='' ">$(MSBuildThisFileDirectory)shared.props</SharedProps>
   </PropertyGroup>
 
-  <Import Project="$(SharedProps)"/>
-  
+  <Import Project="$(SharedProps)"/> 
+    
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)'=='' ">Release</Configuration>
   </PropertyGroup>
@@ -33,6 +33,7 @@
 
   <PropertyGroup>
     <FullBuildDependsOn>
+      GetNuget;
       CleanAndInitalize;
       BuildProjects;
       ExecuteTests;
@@ -53,6 +54,7 @@
   
   <PropertyGroup>
     <CreateNugetPackagesDependsOn>
+      GetNuget;
       BuildProjects;
       CopySharedFilesToOutputDir;
       CoreCreateNugetPackages;
