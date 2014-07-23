@@ -3,25 +3,20 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace AzureJobs.Common
-{
-    public class Logger
-    {
+namespace AzureJobs.Common {
+    public class Logger {
         private string _logFile;
         private static object _syncRoot = new object();
         const string LogFileExtension = ".csv";
         const string Header = "Date,Filename,Original Size (B),Optimized To (B),Savings (%)";
 
-        public Logger(string path)
-        {
+        public Logger(string path) {
             _logFile = GetLogFilePath(path);
         }
 
-        public void Write(params object[] messages)
-        {
+        public void Write(params object[] messages) {
             string[] cleanedUpMessages = new string[messages.Length];
-            for (int i = 0; i < messages.Length; i++)
-            {
+            for (int i = 0; i < messages.Length; i++) {
                 cleanedUpMessages[i] = CleanMessageForCsv(messages[i].ToString());
             }
 
@@ -29,16 +24,13 @@ namespace AzureJobs.Common
             Trace.WriteLine(messageString);
             Console.WriteLine(messageString);
 
-            try
-            {
-                lock (_syncRoot)
-                {
+            try {
+                lock (_syncRoot) {
                     CreateFileWithHeader();
                     AddLineToLogFile(messageString);
                 }
             }
-            catch
-            {
+            catch {
                 // Do nothing
             }
         }
@@ -46,10 +38,8 @@ namespace AzureJobs.Common
         /// <summary>
         /// Creates the log file if it doesn't exist. The header is written as well.
         /// </summary>
-        private void CreateFileWithHeader()
-        {
-            if (!File.Exists(_logFile))
-            {
+        private void CreateFileWithHeader() {
+            if (!File.Exists(_logFile)) {
                 File.WriteAllText(_logFile, Header + Environment.NewLine);
             }
         }
@@ -58,11 +48,9 @@ namespace AzureJobs.Common
         /// Appends a line of text to the log file.
         /// </summary>
         /// <param name="messageString"></param>
-        private void AddLineToLogFile(string messageString)
-        {
+        private void AddLineToLogFile(string messageString) {
             using (FileStream fs = new FileStream(_logFile, FileMode.Append, FileAccess.Write))
-            using (StreamWriter sw = new StreamWriter(fs))
-            {
+            using (StreamWriter sw = new StreamWriter(fs)) {
                 sw.WriteLine(messageString);
             }
         }
@@ -73,8 +61,7 @@ namespace AzureJobs.Common
         /// </summary>
         /// <param name="path">The directory being monitored for images to compress.</param>
         /// <returns></returns>
-        private string GetLogFilePath(string path)
-        {
+        private string GetLogFilePath(string path) {
             Directory.CreateDirectory(path);
             string name = Assembly.GetEntryAssembly().ManifestModule.Name;
             return Path.Combine(path, name + LogFileExtension);
@@ -87,18 +74,15 @@ namespace AzureJobs.Common
         /// setttings, numbers may be calculated with comma separators rather than decimals.
         /// The CSV RFC: http://tools.ietf.org/html/rfc4180
         /// </summary>
-        public string CleanMessageForCsv(string inputToClean)
-        {
+        public string CleanMessageForCsv(string inputToClean) {
             return new CsvHelper().Escape(inputToClean);
         }
 
-        public static void WriteToConsole(string message, params object[] args)
-        {
+        public static void WriteToConsole(string message, params object[] args) {
             System.Console.Write(message, args);
         }
 
-        public static void WriteLineToConsole(string message, params object[] args)
-        {
+        public static void WriteLineToConsole(string message, params object[] args) {
             System.Console.WriteLine(message, args);
         }
     }

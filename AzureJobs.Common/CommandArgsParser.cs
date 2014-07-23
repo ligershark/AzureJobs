@@ -2,39 +2,32 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AzureJobs.Common
-{
-    public class CommandArgsParser
-    {
+namespace AzureJobs.Common {
+    public class CommandArgsParser {
         /// <summary>
         /// Given all the args from the user, create key value pairs from them.
         /// Example:
         /// --file one.txt --name "azure image optimizer" --color Green
         /// --help or /?
         /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public IDictionary<string, string> ParseArgs(string[] args)
-        {
+        /// <param name="args">The args directly from the user on the cmd line.</param>
+        /// <returns>A dictionary with key/value pairs of the cmd line entries.</returns>
+        public IDictionary<string, string> ParseArgs(string[] args) {
             IDictionary<string, string> result = new Dictionary<string, string>();
 
             string currentKey = null;
             StringBuilder currentValue = new StringBuilder();
-            foreach (string argPart in args)
-            {
+            foreach (string argPart in args) {
                 string fixedArg = argPart;
 
                 if (fixedArg != null) { fixedArg = argPart.Trim(); }
 
-                if (fixedArg.StartsWith("-"))
-                {
+                if (fixedArg.StartsWith("-")) {
 
-                    if (!string.IsNullOrEmpty(currentKey))
-                    {
+                    if (!string.IsNullOrEmpty(currentKey)) {
                         // apply current key / value to the dictionary
                         string value = currentValue.ToString().Trim();
-                        if (string.IsNullOrEmpty(value))
-                        {
+                        if (string.IsNullOrEmpty(value)) {
                             value = true.ToString();
                         }
 
@@ -44,23 +37,19 @@ namespace AzureJobs.Common
 
                     currentKey = fixedArg.ToLower();
                 }
-                else if (string.Compare(CommandLineOptions.HelpShortArg, fixedArg, StringComparison.OrdinalIgnoreCase) == 0)
-                {
+                else if (string.Compare(CommandLineOptions.HelpShortArg, fixedArg, StringComparison.OrdinalIgnoreCase) == 0) {
                     currentKey = CommandLineOptions.HelpArg;
                 }
-                else
-                {
+                else {
                     currentValue.Append(argPart);
                     currentValue.Append(" ");
                 }
             }
 
-            if (!string.IsNullOrEmpty(currentKey))
-            {
+            if (!string.IsNullOrEmpty(currentKey)) {
                 // apply current key / value to the dictionary
                 string value = currentValue.ToString().Trim(); ;
-                if (string.IsNullOrEmpty(value))
-                {
+                if (string.IsNullOrEmpty(value)) {
                     value = true.ToString();
                 }
 
@@ -75,29 +64,24 @@ namespace AzureJobs.Common
         /// </summary>
         /// <param name="args">The arg list from the user.</param>
         /// <returns>CommandLineOptions object populated with the user's config.</returns>
-        public CommandLineOptions BuildCommandLineOptions(string[] args)
-        {
+        public CommandLineOptions BuildCommandLineOptions(string[] args) {
             IDictionary<string, string> argsDict = ParseArgs(args);
             ICollection<string> keys = argsDict.Keys;
             CommandLineOptions options = new CommandLineOptions();
 
-            if (keys.Contains(CommandLineOptions.ColorArg))
-            {
+            if (keys.Contains(CommandLineOptions.ColorArg)) {
                 options.Color = argsDict[CommandLineOptions.ColorArg];
             }
 
-            if (keys.Contains(CommandLineOptions.ItemsToProcessDirectoryArg))
-            {
+            if (keys.Contains(CommandLineOptions.ItemsToProcessDirectoryArg)) {
                 options.ItemsToProcessDirectory = argsDict[CommandLineOptions.ItemsToProcessDirectoryArg];
             }
 
-            if (keys.Contains(CommandLineOptions.OptimizerCacheFileArg))
-            {
+            if (keys.Contains(CommandLineOptions.OptimizerCacheFileArg)) {
                 options.OptimizerCacheFile = argsDict[CommandLineOptions.OptimizerCacheFileArg];
             }
 
-            if (keys.Contains(CommandLineOptions.NameArg))
-            {
+            if (keys.Contains(CommandLineOptions.NameArg)) {
                 options.Name = argsDict[CommandLineOptions.NameArg];
             }
 

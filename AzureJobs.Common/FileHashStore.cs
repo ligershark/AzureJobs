@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace AzureJobs.Common
-{
-    public class FileHashStore
-    {
+namespace AzureJobs.Common {
+    public class FileHashStore {
         private string _filePath;
         private Dictionary<string, string> _store = new Dictionary<string, string>();
         private static object _syncRoot = new object();
 
-        public FileHashStore(string fileName)
-        {
+        public FileHashStore(string fileName) {
             _filePath = fileName;
 
             var dir = Path.GetDirectoryName(_filePath);
@@ -26,50 +22,40 @@ namespace AzureJobs.Common
             Load();
         }
 
-        private void Load()
-        {
-            try
-            {
+        private void Load() {
+            try {
                 // If the file hasn't been created yet, just ignore it.
                 if (!File.Exists(_filePath))
                     return;
 
-                foreach (string line in File.ReadAllLines(_filePath))
-                {
+                foreach (string line in File.ReadAllLines(_filePath)) {
                     string[] args = line.Split('|');
 
                     if (args.Length == 2 && !_store.ContainsKey(args[0]))
                         _store.Add(args[0], args[1]);
                 }
             }
-            catch
-            {
+            catch {
                 // Do nothing. The file format has changed and will be overwritten next time Save() is called.
             }
         }
 
-        public void Save(string file)
-        {
+        public void Save(string file) {
             bool exist = _store.ContainsKey(file);
-            
-            try
-            {
-                lock (_syncRoot)
-                {
+
+            try {
+                lock (_syncRoot) {
                     _store[file] = GetHash(file);
 
-                    if (!exist)
-                    {
+                    if (!exist) {
                         // If the file is new to the azure job, just append it to the existing file
                         File.AppendAllLines(_filePath, new[] { file + "|" + _store[file] });
                     }
-                    else
-                    {
+                    else {
                         // If the file is known we must avoid duplicates, so this just writes the entire store
                         StringBuilder sb = new StringBuilder();
 
-                        foreach (string key in _store.Keys)
-                        {
+                        foreach (string key in _store.Keys) {
                             sb.AppendLine(key + "|" + _store[key]);
                         }
 
@@ -77,12 +63,10 @@ namespace AzureJobs.Common
                     }
                 }
             }
-            catch
-            { }
+            catch { }
         }
 
-        public bool HasChangedOrIsNew(string file)
-        {
+        public bool HasChangedOrIsNew(string file) {
             if (!_store.ContainsKey(file))
                 return true;
 
@@ -94,30 +78,25 @@ namespace AzureJobs.Common
             return currentHash != _store[file];
         }
 
-        private string GetHash(string file)
-        {
-            try
-            {
+        private string GetHash(string file) {
+            try {
                 if (!File.Exists(file))
                     return null;
 
                 using (var md5 = MD5.Create())
-                using (var stream = File.OpenRead(file))
-                {
+                using (var stream = File.OpenRead(file)) {
                     byte[] hash = md5.ComputeHash(stream);
                     return BitConverter.ToString(hash);
                 }
             }
-            catch
-            {
+            catch {
                 return null;
             }
         }
     }
 
     [XmlType(TypeName = "item")]
-    public class Item
-    {
+    public class Item {
         [XmlAttribute(AttributeName = "file")]
         public string File;
 

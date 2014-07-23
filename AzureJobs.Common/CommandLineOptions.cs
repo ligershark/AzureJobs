@@ -1,9 +1,5 @@
-﻿
-using System;
-namespace AzureJobs.Common
-{
-    public class CommandLineOptions
-    {
+﻿namespace AzureJobs.Common {
+    public class CommandLineOptions {
         public static readonly string OptimizerCacheFileArg = "--logfile";
         public static readonly string ColorArg = "--color";
         public static readonly string ItemsToProcessDirectoryArg = "--folder";
@@ -23,5 +19,4 @@ namespace AzureJobs.Common
         public bool ShouldForceOptimize { get; set; }
         public string OptimizerCacheFile { get; set; }
     }
-
 }
