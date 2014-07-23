@@ -62,7 +62,7 @@ function Get-Nuget(){
         $nugetDestPath = Join-Path -Path $toolsDir -ChildPath nuget.exe
 
         if(!(Test-Path $toolsDir)){
-            New-Item -Path $toolsDir -ItemType Directory
+            New-Item -Path $toolsDir -ItemType Directory | Out-Null
         }
         
         if(!(Test-Path $nugetDestPath)){

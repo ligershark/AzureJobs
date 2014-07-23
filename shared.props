@@ -44,7 +44,9 @@
     
     <OutputPathSiteExtWeb Condition=" '$(OutputPathSiteExtWeb)'=='' ">$(ObjRoot)AzureJobs.SiteExtension.Web\</OutputPathSiteExtWeb>
     <SiteExtPubWebsitesContentPath Condition=" ''=='' ">$(OutputPathSiteExtWeb)_PublishedWebsites\AzureJobs.SiteExtension.Web\</SiteExtPubWebsitesContentPath>
-    
+
+    <GetNugetTargetsPath Condition=" '$(GetNugetTargetsPath)'=='' ">$(MSBuildThisFileDirectory)getnuget.targets</GetNugetTargetsPath>
   </PropertyGroup>
-  
+
+  <Import Project="$(GetNugetTargetsPath)"/>
 </Project>
