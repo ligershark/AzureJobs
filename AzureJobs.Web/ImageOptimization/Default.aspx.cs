@@ -21,7 +21,7 @@ namespace AzureJobs.Web
 
             foreach (string file in Directory.EnumerateFiles(folder, "*.*").Reverse())
             {
-                if (!_extensions.Contains(Path.GetExtension(file)))
+                if (!_extensions.Contains(Path.GetExtension(file).ToLower()))
                     continue;
 
                 string src = "/imageoptimization/img/" + Path.GetFileName(file);
