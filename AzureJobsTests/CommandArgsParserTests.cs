@@ -26,7 +26,7 @@ namespace AzureJobsTests
                 ,"--force"};
 
                 IDictionary<string, string> result = new CommandArgsParser().ParseArgs(args);
-                Assert.AreEqual(3, result.Count);
+                Assert.AreEqual(4, result.Count);
                 Assert.IsTrue(result.Keys.Contains("--logfile"));
                 Assert.IsTrue(result.Keys.Contains("--name"));
                 Assert.IsTrue(result.Keys.Contains("--color"));
