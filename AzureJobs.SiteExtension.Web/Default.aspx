@@ -50,23 +50,23 @@
             BorderStyle="None" >
 
             <Columns>
-                <asp:BoundField DataField="Date" SortExpression="Date" HeaderText="Date" DataFormatString="{0:yyyy-MM-dd HH:mm}" />
+                <asp:BoundField DataField="Date (UTC)" SortExpression="Date" HeaderText="Date" DataFormatString="{0:yyyy-MM-dd HH:mm}" />
                 <asp:TemplateField HeaderText="File" SortExpression="ShortFileName">
                     <ItemTemplate>
                         <span title="<%# Item.FileName %>"><%# Item.ShortFileName %></span>
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="Before" SortExpression="Original">
+                <asp:TemplateField HeaderText="Before (B)" SortExpression="Original">
                     <ItemTemplate>
                         <%# Item.Original.ToString("#,#0") %>
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="After" SortExpression="Optimized">
+                <asp:TemplateField HeaderText="After (B)" SortExpression="Optimized">
                     <ItemTemplate>
                         <%# Item.Optimized.ToString("#,#0") %>
                     </ItemTemplate>
                 </asp:TemplateField>
-                <asp:TemplateField HeaderText="Saving" SortExpression="Saving">
+                <asp:TemplateField HeaderText="Savings (B)" SortExpression="Saving">
                     <ItemTemplate>
                         <%# Item.Saving.ToString("#,#0") %>
                     </ItemTemplate>

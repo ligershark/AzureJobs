@@ -46,6 +46,7 @@
     <Compile Include="CsvHelper.cs" />
     <Compile Include="FileHashStore.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="LogItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

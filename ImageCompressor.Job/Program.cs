@@ -50,7 +50,7 @@ namespace ImageCompressor.Job {
 
         private static void StartAsConsole(string[] args) {
             cmdLineOptions = new CommandArgsParser().BuildCommandLineOptions(args);
-
+            cmdLineOptions.ItemsToProcessDirectory = @"C:\Users\Phil\Desktop\resize";
             if (string.IsNullOrEmpty(cmdLineOptions.ItemsToProcessDirectory)) {
                 ShowUsage();
                 return;
@@ -181,7 +181,8 @@ Options
 
                 if (cmdLineOptions == null || !cmdLineOptions.SuppressCsvReport) {
                     string name = new Uri(_directoryToOptimize).MakeRelativeUri(new Uri(e.OriginalFileName)).ToString();
-                    _logger.Write(DateTime.Now, name, e.OriginalFileSize, Math.Min(e.ResultFileSize, e.OriginalFileSize), e.Percent);
+                    var logItem = new LogItem { FileName = name, OriginalSizeBytes = e.OriginalFileSize, NewSizeBytes = e.ResultFileSize };
+                    _logger.Write(logItem);
                 }
             });
         }

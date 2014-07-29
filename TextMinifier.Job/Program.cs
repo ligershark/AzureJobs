@@ -1,15 +1,13 @@
-﻿using System;
+﻿using AzureJobs.Common;
+using Microsoft.Ajax.Utilities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using AzureJobs.Common;
-using Microsoft.Ajax.Utilities;
 
-namespace TextMinifier.Job
-{
-    class Program
-    {
+namespace TextMinifier.Job {
+    class Program {
         private static string _folder = @"D:\home\site\wwwroot\";
         private static string[] _filters = { "*.css", "*.js" };
         private static Dictionary<string, DateTime> _cache = new Dictionary<string, DateTime>();
@@ -17,20 +15,17 @@ namespace TextMinifier.Job
         private static Logger _log;
         private static FileHashStore _store;
 
-        private static CssSettings _cssSettings = new CssSettings
-        {
+        private static CssSettings _cssSettings = new CssSettings {
             CommentMode = CssComment.Important
         };
 
-        private static CodeSettings _jsSettings = new CodeSettings
-        {
+        private static CodeSettings _jsSettings = new CodeSettings {
             EvalTreatment = EvalTreatment.MakeImmediateSafe,
             TermSemicolons = true,
             PreserveImportantComments = false
         };
 
-        static void Main(string[] args)
-        {
+        static void Main(string[] args) {
             //_folder = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\Minification\files";
             _log = new Logger(Path.Combine(_folder, "app_data"));
             _store = new FileHashStore(Path.Combine(_folder, "app_data\\TextMinifierHashTable.xml"));
@@ -39,22 +34,19 @@ namespace TextMinifier.Job
             ProcessQueue();
             StartListener();
 
-            while (true)
-            {
+            while (true) {
                 System.Threading.Thread.Sleep(1000);
                 ProcessQueue();
             }
         }
 
-        private static void QueueExistingFiles()
-        {
+        private static void QueueExistingFiles() {
             foreach (string filter in _filters)
                 foreach (string file in Directory.EnumerateFiles(_folder, filter, SearchOption.AllDirectories))
                     AddToQueue(file, DateTime.MinValue);
         }
 
-        private static void AddToQueue(string file, DateTime date)
-        {
+        private static void AddToQueue(string file, DateTime date) {
             string ext = Path.GetExtension(file).ToLowerInvariant();
 
             if (file.EndsWith(".min" + ext, StringComparison.OrdinalIgnoreCase) ||
@@ -65,10 +57,8 @@ namespace TextMinifier.Job
             _cache[file] = date;
         }
 
-        public static void StartListener()
-        {
-            foreach (string filter in _filters)
-            {
+        public static void StartListener() {
+            foreach (string filter in _filters) {
                 FileSystemWatcher w = new FileSystemWatcher(_folder);
                 w.Filter = filter;
                 w.IncludeSubdirectories = true;
@@ -78,42 +68,35 @@ namespace TextMinifier.Job
             }
         }
 
-        private static void ProcessQueue()
-        {
-            for (int i = _cache.Count - 1; i >= 0; i--)
-            {
+        private static void ProcessQueue() {
+            for (int i = _cache.Count - 1; i >= 0; i--) {
                 var entry = _cache.ElementAt(i);
 
                 // The file should be 1 second old before we start processing
                 if (entry.Value > DateTime.Now.AddSeconds(-1))
                     continue;
 
-                if (!_store.HasChangedOrIsNew(entry.Key))
-                {
+                if (!_store.HasChangedOrIsNew(entry.Key)) {
                     _cache.Remove(entry.Key);
                     continue;
                 }
 
-                try
-                {
+                try {
                     Minify(entry.Key);
-                    
+
                     _store.Save(entry.Key);
                     _cache.Remove(entry.Key);
                 }
-                catch (IOException)
-                {
+                catch (IOException) {
                     // Do nothing, let's try again next time
                 }
-                catch
-                {
+                catch {
                     _cache.Remove(entry.Key);
                 }
             }
         }
 
-        private static void Minify(string sourcePath)
-        {
+        private static void Minify(string sourcePath) {
             string ext = Path.GetExtension(sourcePath).ToLowerInvariant();
             string content = File.ReadAllText(sourcePath);
             string result;
@@ -125,19 +108,12 @@ namespace TextMinifier.Job
             else
                 return;
 
-            if (content != result)
-            {
+            if (content != result) {
                 File.WriteAllText(sourcePath, result, Encoding.UTF8);
                 string name = new Uri(_folder).MakeRelativeUri(new Uri(sourcePath)).ToString();
-                string savings = CalcPercentageSavings(content.Length, result.Length);
-                _log.Write(DateTime.Now, name, content.Length, result.Length, savings);
+                var logItem = new LogItem { FileName = name, OriginalSizeBytes = content.Length, NewSizeBytes = result.Length };
+                _log.Write(logItem);
             }
-        }
-        
-        private static string CalcPercentageSavings(int originalSize, int minifiedSize)
-        {
-            decimal savings = minifiedSize / Convert.ToDecimal(originalSize);
-            return (Math.Round(100 - (savings * 100), 1)).ToString();
         }
     }
 }
