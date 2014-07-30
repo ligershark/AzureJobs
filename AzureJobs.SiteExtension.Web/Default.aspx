@@ -50,7 +50,7 @@
             BorderStyle="None" >
 
             <Columns>
-                <asp:BoundField DataField="Date (UTC)" SortExpression="Date" HeaderText="Date" DataFormatString="{0:yyyy-MM-dd HH:mm}" />
+                <asp:BoundField DataField="Date" SortExpression="Date" HeaderText="Date (UTC)" DataFormatString="{0:yyyy-MM-dd HH:mm}" />
                 <asp:TemplateField HeaderText="File" SortExpression="ShortFileName">
                     <ItemTemplate>
                         <span title="<%# Item.FileName %>"><%# Item.ShortFileName %></span>
