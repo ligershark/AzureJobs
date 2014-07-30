@@ -86,8 +86,8 @@ function OptimizeImages(){
         [string]$folderToOptimize = (Resolve-path $folder)
 
         'Starting image optimizer on folder [{0}]' -f $folder | Write-Host
-        # .\.tools\AzureImageOptimizer.0.0.10-beta\tools\ImageCompressor.Job.exe --folder M:\temp\images\opt\to-optimize
-        $cmdArgs = @('--folder', $folderToOptimize)
+        # .\.tools\AzureImageOptimizer.0.0.10-beta\tools\ImageCompressor.Job.exe --dir M:\temp\images\opt\to-optimize
+        $cmdArgs = @('--dir', $folderToOptimize)
 
         'Calling img optimizer with the following args [{0} {1}]' -f $imgOptExe, ($cmdArgs -join ' ') | Write-Host
         &$imgOptExe $cmdArgs
