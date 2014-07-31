@@ -55,7 +55,7 @@
   <PropertyGroup>
     <CreateNugetPackagesDependsOn>
       GetNuget;
-      BuildProjects;
+      <!--BuildProjects;-->
       CopySharedFilesToOutputDir;
       CoreCreateNugetPackages;
     </CreateNugetPackagesDependsOn>

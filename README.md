@@ -1,6 +1,8 @@
 Azure Webjobs and Site Extensions
 =========
 
+[![Build status](https://ci.appveyor.com/api/projects/status/pg4isaw6y9dhih5u)](https://ci.appveyor.com/project/sayedihashimi/azurejobs)
+
 This is home of a few Azure Webjobs and matching Site Extensions.
 
 ## Image Optimizer
