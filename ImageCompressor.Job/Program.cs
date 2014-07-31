@@ -50,8 +50,9 @@ namespace ImageCompressor.Job {
 
         private static void StartAsConsole(string[] args) {
             cmdLineOptions = new CommandArgsParser().BuildCommandLineOptions(args);
-
-            if (string.IsNullOrEmpty(cmdLineOptions.ItemsToProcessDirectory)) {
+            //cmdLineOptions.ItemsToProcessDirectory = @"C:\Users\Phil\Desktop\resize";
+            //cmdLineOptions.ShouldForceOptimize = true;
+            if (cmdLineOptions.DisplayHelp || string.IsNullOrEmpty(cmdLineOptions.ItemsToProcessDirectory)) {
                 ShowUsage();
                 return;
             }
@@ -90,15 +91,8 @@ namespace ImageCompressor.Job {
         }
 
         private static void ShowUsage() {
-            string usage = @"ImageCompressor.Job.exe --folder <folder-path> [options]
-
-Options
-    /? --help : To display help
-       --logfile <logfile>  : Location of the log file. If none passed, it will be stored under App_Data
-       --startlistener      : To start the listern on that directory
-       --NoReport           : You can use this to prevent the .csv file from being written into the working directory.        
-";
-
+            string helpText = new CommandLineOptions().ToString();
+            string usage = string.Format("{0}\r\n{1}", AppDomain.CurrentDomain.FriendlyName, helpText);
             Console.WriteLine(usage);
         }
 
@@ -181,7 +175,8 @@ Options
 
                 if (cmdLineOptions == null || !cmdLineOptions.SuppressCsvReport) {
                     string name = new Uri(_directoryToOptimize).MakeRelativeUri(new Uri(e.OriginalFileName)).ToString();
-                    _logger.Write(DateTime.Now, name, e.OriginalFileSize, Math.Min(e.ResultFileSize, e.OriginalFileSize), e.Percent);
+                    var logItem = new LogItem { FileName = name, OriginalSizeBytes = e.OriginalFileSize, NewSizeBytes = e.ResultFileSize };
+                    _logger.Write(logItem);
                 }
             });
         }

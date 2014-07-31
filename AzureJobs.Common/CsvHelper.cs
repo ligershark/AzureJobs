@@ -18,5 +18,11 @@ namespace AzureJobs.Common
             }
             return inputToClean;
         }
+
+        public IEnumerable<string> EscapeAll(params object[] lineItems) {
+            for (int i = 0; i < lineItems.Length; i++) {
+                yield return this.Escape(lineItems[i].ToString());
+            }
+        }
     }
 }

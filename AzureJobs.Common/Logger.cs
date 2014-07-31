@@ -8,19 +8,14 @@ namespace AzureJobs.Common {
         private string _logFile;
         private static object _syncRoot = new object();
         const string LogFileExtension = ".csv";
-        const string Header = "Date,Filename,Original Size (B),Optimized To (B),Savings (%)";
+        const string Header = "Date (UTC),File Name,Original Size (B),Optimized To (B),Savings (%)";
 
         public Logger(string path) {
             _logFile = GetLogFilePath(path);
         }
 
-        public void Write(params object[] messages) {
-            string[] cleanedUpMessages = new string[messages.Length];
-            for (int i = 0; i < messages.Length; i++) {
-                cleanedUpMessages[i] = CleanMessageForCsv(messages[i].ToString());
-            }
-
-            string messageString = string.Join(",", cleanedUpMessages);
+        public void Write(LogItem logItem) {
+            string messageString = logItem.ToString();
             Trace.WriteLine(messageString);
             Console.WriteLine(messageString);
 
