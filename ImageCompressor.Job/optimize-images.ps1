@@ -76,18 +76,18 @@ function OptimizeImages(){
     [cmdletbinding()]
     param(
         [Parameter(Mandatory=$true,Position=0)]
-        $folder,
+        $dir,
         $toolsDir = ("$env:LOCALAPPDATA\LigerShark\tools\"),
         $nugetDownloadUrl = 'http://nuget.org/nuget.exe'
     )
     process{        
         [string]$imgOptExe = (GetImageOptimizer -toolsDir $toolsDir -nugetDownloadUrl $nugetDownloadUrl)
 
-        [string]$folderToOptimize = (Resolve-path $folder)
+        [string]$folderToOptimize = (Resolve-path $dir)
 
-        'Starting image optimizer on folder [{0}]' -f $folder | Write-Host
-        # .\.tools\AzureImageOptimizer.0.0.10-beta\tools\ImageCompressor.Job.exe --folder M:\temp\images\opt\to-optimize
-        $cmdArgs = @('--folder', $folderToOptimize)
+        'Starting image optimizer on folder [{0}]' -f $dir | Write-Host
+        # .\.tools\AzureImageOptimizer.0.0.10-beta\tools\ImageCompressor.Job.exe --dir M:\temp\images\opt\to-optimize
+        $cmdArgs = @('--dir', $folderToOptimize)
 
         'Calling img optimizer with the following args [{0} {1}]' -f $imgOptExe, ($cmdArgs -join ' ') | Write-Host
         &$imgOptExe $cmdArgs
@@ -96,4 +96,4 @@ function OptimizeImages(){
     }
 }
 
-OptimizeImages -folder $folderToOptimize -toolsDir $toolsDir -nugetDownloadUrl $nugetDownloadUrl
+OptimizeImages -dir $folderToOptimize -toolsDir $toolsDir -nugetDownloadUrl $nugetDownloadUrl
