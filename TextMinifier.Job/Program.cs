@@ -8,12 +8,13 @@ using System.Text;
 
 namespace TextMinifier.Job {
     class Program {
-        private static string _folder = @"D:\home\site\wwwroot\";
-        private static string[] _filters = { "*.css", "*.js" };
-        private static Dictionary<string, DateTime> _cache = new Dictionary<string, DateTime>();
+        private static string _directoryToOptimize = @"D:\home\site\wwwroot\";
+        private static string[] _fileExtentionsToCompress = { "*.css", "*.js" };
+        private static Dictionary<string, DateTime> _filesToCompress = new Dictionary<string, DateTime>();
         private static Minifier _minifier = new Minifier();
-        private static Logger _log;
+        private static Logger _logger;
         private static FileHashStore _store;
+        private static CommandLineOptions cmdLineOptions;
 
         private static CssSettings _cssSettings = new CssSettings {
             CommentMode = CssComment.Important
@@ -26,10 +27,14 @@ namespace TextMinifier.Job {
         };
 
         static void Main(string[] args) {
+            cmdLineOptions = new CommandArgsParser().BuildCommandLineOptions(args);
+            cmdLineOptions.ItemsToProcessDirectory = @"C:\Users\Phil\Documents\GitHub\RssPerson";
             //_folder = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\Minification\files";
-            _log = new Logger(Path.Combine(_folder, "app_data"));
-            _store = new FileHashStore(Path.Combine(_folder, "app_data\\TextMinifierHashTable.xml"));
-
+            if (cmdLineOptions.DisplayHelp || string.IsNullOrEmpty(cmdLineOptions.ItemsToProcessDirectory)) {
+                ShowUsage();
+                return;
+            }
+            SetupMinificationDependencies();
             QueueExistingFiles();
             ProcessQueue();
             StartListener();
@@ -39,10 +44,28 @@ namespace TextMinifier.Job {
                 ProcessQueue();
             }
         }
+        private static void SetupMinificationDependencies() {
+            EnsureTextMinifierCacheFileExists();
+            _directoryToOptimize = cmdLineOptions.ItemsToProcessDirectory;
+            _logger = new Logger(cmdLineOptions.ItemsToProcessDirectory);
+        }
 
+        private static void ShowUsage() {
+            string helpText = new CommandLineOptions().ToString();
+            string usage = string.Format("{0}\r\n{1}", AppDomain.CurrentDomain.FriendlyName, helpText);
+            Console.WriteLine(usage);
+        }
+
+        private static void EnsureTextMinifierCacheFileExists() {
+            string logFile = !string.IsNullOrEmpty(cmdLineOptions.OptimizerCacheFile) ?
+                                cmdLineOptions.OptimizerCacheFile :
+                                Environment.ExpandEnvironmentVariables(@"%APPDATA%\LigerShark\AzureJobs\textminifier-cache.xml");
+
+            _store = new FileHashStore(logFile);
+        }
         private static void QueueExistingFiles() {
-            foreach (string filter in _filters)
-                foreach (string file in Directory.EnumerateFiles(_folder, filter, SearchOption.AllDirectories))
+            foreach (string filter in _fileExtentionsToCompress)
+                foreach (string file in Directory.EnumerateFiles(_directoryToOptimize, filter, SearchOption.AllDirectories))
                     AddToQueue(file, DateTime.MinValue);
         }
 
@@ -54,12 +77,12 @@ namespace TextMinifier.Job {
                 file.EndsWith(".debug" + ext, StringComparison.OrdinalIgnoreCase))
                 return;
 
-            _cache[file] = date;
+            _filesToCompress[file] = date;
         }
 
         public static void StartListener() {
-            foreach (string filter in _filters) {
-                FileSystemWatcher w = new FileSystemWatcher(_folder);
+            foreach (string filter in _fileExtentionsToCompress) {
+                FileSystemWatcher w = new FileSystemWatcher(_directoryToOptimize);
                 w.Filter = filter;
                 w.IncludeSubdirectories = true;
                 w.NotifyFilter = NotifyFilters.LastWrite;
@@ -69,15 +92,15 @@ namespace TextMinifier.Job {
         }
 
         private static void ProcessQueue() {
-            for (int i = _cache.Count - 1; i >= 0; i--) {
-                var entry = _cache.ElementAt(i);
+            for (int i = _filesToCompress.Count - 1; i >= 0; i--) {
+                var entry = _filesToCompress.ElementAt(i);
 
                 // The file should be 1 second old before we start processing
                 if (entry.Value > DateTime.Now.AddSeconds(-1))
                     continue;
 
                 if (!_store.HasChangedOrIsNew(entry.Key)) {
-                    _cache.Remove(entry.Key);
+                    _filesToCompress.Remove(entry.Key);
                     continue;
                 }
 
@@ -85,13 +108,13 @@ namespace TextMinifier.Job {
                     Minify(entry.Key);
 
                     _store.Save(entry.Key);
-                    _cache.Remove(entry.Key);
+                    _filesToCompress.Remove(entry.Key);
                 }
                 catch (IOException) {
                     // Do nothing, let's try again next time
                 }
                 catch {
-                    _cache.Remove(entry.Key);
+                    _filesToCompress.Remove(entry.Key);
                 }
             }
         }
@@ -110,9 +133,9 @@ namespace TextMinifier.Job {
 
             if (content != result) {
                 File.WriteAllText(sourcePath, result, Encoding.UTF8);
-                string name = new Uri(_folder).MakeRelativeUri(new Uri(sourcePath)).ToString();
+                string name = new Uri(_directoryToOptimize).MakeRelativeUri(new Uri(sourcePath)).ToString();
                 var logItem = new LogItem { FileName = name, OriginalSizeBytes = content.Length, NewSizeBytes = result.Length };
-                _log.Write(logItem);
+                _logger.Write(logItem);
             }
         }
     }
