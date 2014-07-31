@@ -5,10 +5,10 @@ using System.Reflection;
 using System.Text;
 namespace AzureJobs.Common {
     public class CommandLineOptions {
-        [CommandLineArg(Alias = "--name", ShortAlias = "/n", Description = @"TBD")]
+        [CommandLineArg(Alias = "--name", ShortAlias = "/n", Description = @"(not used for command line)")]
         public string Name { get; set; }
 
-        [CommandLineArg(Alias = "--color", ShortAlias = "/c", Description = @"TBD")]
+        [CommandLineArg(Alias = "--color", ShortAlias = "/c", Description = @"(not used for command line)")]
         public string Color { get; set; }
 
         [CommandLineArg(Alias = "--dir", ShortAlias = "/d", IsRequired = true, Description = @"The directory containing files you want to compress. Subdirectories will be included.")]
@@ -17,7 +17,7 @@ namespace AzureJobs.Common {
         [CommandLineArg(Alias = "--noreport", ShortAlias = "/nr", Description = @"Won't output a .csv file with compression results.")]
         public bool SuppressCsvReport { get; set; }
 
-        [CommandLineArg(Alias = "--startlistener", ShortAlias = "/sl", Description = @"TBD")]
+        [CommandLineArg(Alias = "--startlistener", ShortAlias = "/sl", Description = @"When passed after optimizing images in the dir folder, a file watcher will run on the folder to optimize any new or modified images.")]
         public bool? StartListener { get; set; }
 
         [CommandLineArg(Alias = "--help", ShortAlias = "/?", Description = @"Displays this text.")]
