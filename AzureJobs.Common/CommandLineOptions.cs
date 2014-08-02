@@ -29,6 +29,9 @@ namespace AzureJobs.Common {
         [CommandLineArg(Alias = "--cache", ShortAlias = "/ca", Description = @"Specify the file to keep working set of files. If unspecified, then %APPDATA%\LigerShark\....")]
         public string OptimizerCacheFile { get; set; }
 
+        public IEnumerable<string> FileExtensionsToCompress { get; set; }
+
+
         /// <summary>
         /// Build the Help display for console users. Grab all info from the attributes and format nicely for display.
         /// </summary>        
@@ -50,7 +53,10 @@ namespace AzureJobs.Common {
         }
         private IEnumerable<CommandLineArgAttribute> ListAllCommandLineArgs() {
             foreach (PropertyInfo prop in typeof(CommandLineOptions).GetProperties()) {
-                yield return prop.GetCustomAttributes(typeof(CommandLineArgAttribute)).OfType<CommandLineArgAttribute>().FirstOrDefault();
+                var cmdLineArg = prop.GetCustomAttributes(typeof(CommandLineArgAttribute)).OfType<CommandLineArgAttribute>().FirstOrDefault();
+                if (cmdLineArg != null) {
+                    yield return cmdLineArg;
+                }
             }
         }
     }
