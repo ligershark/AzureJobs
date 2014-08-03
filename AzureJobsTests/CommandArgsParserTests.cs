@@ -75,7 +75,7 @@ namespace AzureJobsTests {
 
                 string helpText = cmdLineOptions.ToString();
 
-                int numProperties = typeof(CommandLineOptions).GetProperties().Count();
+                int numProperties = cmdLineOptions.ListAllCommandLineArgs().Count();
                 int numLinesOfHelpText = helpText.Count(c => c == '\n') - 1; //subtract 1 to accomodate for the header/title
                 Assert.IsFalse(string.IsNullOrEmpty(helpText));
                 Assert.AreEqual(numProperties, numLinesOfHelpText);

@@ -18,7 +18,7 @@ namespace AzureJobs.Common {
         public bool SuppressCsvReport { get; set; }
 
         [CommandLineArg(Alias = "--startlistener", ShortAlias = "/sl", Description = @"When passed after optimizing images in the dir folder, a file watcher will run on the folder to optimize any new or modified images.")]
-        public bool? StartListener { get; set; }
+        public bool StartListener { get; set; }
 
         [CommandLineArg(Alias = "--help", ShortAlias = "/?", Description = @"Displays this text.")]
         public bool DisplayHelp { get; set; }
@@ -51,7 +51,7 @@ namespace AzureJobs.Common {
             }
             return helpText.ToString();
         }
-        private IEnumerable<CommandLineArgAttribute> ListAllCommandLineArgs() {
+        public IEnumerable<CommandLineArgAttribute> ListAllCommandLineArgs() {
             foreach (PropertyInfo prop in typeof(CommandLineOptions).GetProperties()) {
                 var cmdLineArg = prop.GetCustomAttributes(typeof(CommandLineArgAttribute)).OfType<CommandLineArgAttribute>().FirstOrDefault();
                 if (cmdLineArg != null) {
