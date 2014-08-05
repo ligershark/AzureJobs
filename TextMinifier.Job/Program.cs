@@ -10,8 +10,7 @@ namespace TextMinifier.Job {
         static void Main(string[] args) {
             cmdLineOptions = new CommandArgsParser().BuildCommandLineOptions(args);
             cmdLineOptions.FileExtensionsToCompress = _fileExtentionsToCompress;
-            cmdLineOptions.ItemsToProcessDirectory = @"C:\Users\Phil\Documents\GitHub\RssPerson\RssPerson\Content\";
-            cmdLineOptions.StartListener = true;
+            
             if (cmdLineOptions.DisplayHelp || string.IsNullOrEmpty(cmdLineOptions.ItemsToProcessDirectory)) {
                 CompressorBase.ShowUsage();
                 Console.ReadLine();
