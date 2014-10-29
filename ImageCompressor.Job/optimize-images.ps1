@@ -1,6 +1,8 @@
 [cmdletbinding()]
 param(
     $folderToOptimize = ($pwd),
+    [switch]
+    $force = $false,
 
     $toolsDir = ("$env:LOCALAPPDATA\LigerShark\tools\"),
 
@@ -85,14 +87,17 @@ function OptimizeImages(){
 
         [string]$folderToOptimize = (Resolve-path $dir)
 
-        'Starting image optimizer on folder [{0}]' -f $dir | Write-Host
+        'Starting image optimizer on folder [{0}]' -f $dir | Write-Output
         # .\.tools\AzureImageOptimizer.0.0.10-beta\tools\ImageCompressor.Job.exe --dir M:\temp\images\opt\to-optimize
-        $cmdArgs = @('--dir', $folderToOptimize)
+        $cmdArgs = @('--dir', ('{0}\' -f (get-item $folderToOptimize).FullName))
+        if($force){
+            $cmdArgs += '--force'
+        }
 
-        'Calling img optimizer with the following args [{0} {1}]' -f $imgOptExe, ($cmdArgs -join ' ') | Write-Host
+        'Calling img optimizer with the following args [{0} {1}]' -f $imgOptExe, ($cmdArgs -join ' ') | Write-Output
         &$imgOptExe $cmdArgs
 
-        'Images optimized' | Write-Host
+        'Images optimized' | Write-Output
     }
 }
 
