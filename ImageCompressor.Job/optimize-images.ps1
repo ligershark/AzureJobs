@@ -1,6 +1,8 @@
 [cmdletbinding()]
 param(
+    [Parameter(Position=0)]
     $folderToOptimize = ($pwd),
+    [Parameter(Position=1)]
     [switch]
     $force = $false,
 
