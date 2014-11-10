@@ -9,7 +9,7 @@ namespace ImageCompressor.Job {
         public event EventHandler<CompressionResult> Finished;
 
         public void CompressFile(string sourceFile) {
-            string targetFile = Path.ChangeExtension(Path.GetTempFileName(), Path.GetExtension(sourceFile));
+            string targetFile = Path.GetTempFileName();
 
             ProcessStartInfo start = new ProcessStartInfo("cmd") {
                 WindowStyle = ProcessWindowStyle.Hidden,
