@@ -28,7 +28,7 @@ namespace ImageCompressor.Job {
         private void RunProcess(string sourceFile, string targetFile, ProcessStartInfo start) {
             try {
                 using (var process = Process.Start(start)) {
-                    process.WaitForExit(5000);
+                    process.WaitForExit(7000);
                     var result = new CompressionResult(sourceFile, targetFile);
                     HandleResult(result);
                 }
