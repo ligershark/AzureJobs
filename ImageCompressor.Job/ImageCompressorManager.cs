@@ -22,9 +22,9 @@ namespace ImageCompressor.Job {
                 ThreadPool.QueueUserWorkItem((o) => {
                     _store.Save(e.OriginalFileName);
 
-                    if (e == null || e.ResultFileSize == 0)
+                    if (e == null /*|| e.ResultFileSize == 0*/) {
                         return;
-
+                    }
                     var logItem = new LogItem { FileName = BuildRelativeFilePath(e.OriginalFileName), OriginalSizeBytes = e.OriginalFileSize, NewSizeBytes = e.ResultFileSize };
                     _logger.Write(logItem);
                 });

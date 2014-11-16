@@ -22,25 +22,34 @@ namespace ImageCompressor.Job {
         }
         
         private static void StartAsAzureJob() {
-            cmdLineOptions = new CommandLineOptions();
-            cmdLineOptions.OptimizerCacheFile = Path.Combine(cmdLineOptions.ItemsToProcessDirectory, @"app_data\ImageOptimizerHashTable.xml");
-            //cmdLineOptions.ItemsToProcessDirectory = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\ImageOptimization\img";
+            try {
+                cmdLineOptions = new CommandLineOptions();
+                cmdLineOptions.ItemsToProcessDirectory = @"D:\home\site\wwwroot\";
+                cmdLineOptions.FileExtensionsToCompress = new string[] { "*.png", "*.jpg", "*.jpeg", "*.gif" };
+                cmdLineOptions.OptimizerCacheFile = Path.Combine(cmdLineOptions.ItemsToProcessDirectory, @"app_data\ImageOptimizerHashTable.xml");
+                //cmdLineOptions.ItemsToProcessDirectory = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\ImageOptimization\img";
 
-            var imgCompressorMgr = new ImageCompressorManager(cmdLineOptions);
-            imgCompressorMgr.Run();
+                var imgCompressorMgr = new ImageCompressorManager(cmdLineOptions);
+                imgCompressorMgr.Run();
 
-            Timer timer = new Timer((o) => imgCompressorMgr.ProcessQueue());
-            timer.Change(1000, 5000);
+                Timer timer = new Timer((o) => imgCompressorMgr.ProcessQueue());
+                timer.Change(1000, 5000);
 
-            while (true) {
-                Thread.Sleep(2000);
+                while (true) {
+                    Thread.Sleep(2000);
+                }
+            }
+            catch (Exception ex) {
+                System.Diagnostics.Trace.TraceError(ex.ToString());
+                throw ex;
             }
         }
 
         private static void StartAsConsole(string[] args) {
             cmdLineOptions = new CommandArgsParser().BuildCommandLineOptions(args);
             cmdLineOptions.FileExtensionsToCompress = _fileExtentionsToCompress;
-         //   cmdLineOptions.ItemsToProcessDirectory = @"C:\Users\Phil\Desktop\resize";
+
+            // cmdLineOptions.ItemsToProcessDirectory = @"C:\Users\Phil\Desktop\resize";
 
             if (cmdLineOptions.DisplayHelp || string.IsNullOrEmpty(cmdLineOptions.ItemsToProcessDirectory)) {
                 CompressorBase.ShowUsage();

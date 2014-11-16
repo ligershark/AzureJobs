@@ -25,8 +25,8 @@ namespace AzureJobs.Common {
                     AddLineToLogFile(messageString);
                 }
             }
-            catch {
-                // Do nothing
+            catch(Exception ex) {
+                System.Diagnostics.Trace.TraceError("Unable to write to log file. Ignoring it. Error:.\r\n{0}",ex.ToString());
             }
         }
 

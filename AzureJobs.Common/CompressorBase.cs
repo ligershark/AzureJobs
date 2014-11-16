@@ -44,7 +44,16 @@ namespace AzureJobs.Common {
         /// </summary>
         protected void SetupDependencies() {
             EnsureImgOptimizerCacheFileExists();
-            _logger = new Logger(_cmdLineOptions.ItemsToProcessDirectory);            
+
+            string logfolder = _cmdLineOptions.ItemsToProcessDirectory;
+            
+            // TODO: Instead this should be passed in as a command line option which is set to
+            //          ItemsToProcessDirectory by default
+            if (new AzureHelper().IsRunningAsWebJob()) {
+                logfolder = @"D:\home\site\wwwroot\app_data\";
+            }
+            System.Diagnostics.Trace.TraceInformation("SetupDependencies:logfolder:[{0}]", logfolder);
+            _logger = new Logger(logfolder);
         }
         protected void QueueExistingFiles() {
             foreach (string filter in _cmdLineOptions.FileExtensionsToCompress)

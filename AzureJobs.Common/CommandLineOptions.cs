@@ -31,7 +31,6 @@ namespace AzureJobs.Common {
 
         public IEnumerable<string> FileExtensionsToCompress { get; set; }
 
-
         /// <summary>
         /// Build the Help display for console users. Grab all info from the attributes and format nicely for display.
         /// </summary>        
