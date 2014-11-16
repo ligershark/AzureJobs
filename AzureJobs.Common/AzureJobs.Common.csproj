@@ -43,8 +43,10 @@
     <Compile Include="AzureHelper.cs" />
     <Compile Include="CommandArgsParser.cs" />
     <Compile Include="CommandLineOptions.cs" />
+    <Compile Include="CompressorBase.cs" />
     <Compile Include="CsvHelper.cs" />
     <Compile Include="FileHashStore.cs" />
+    <Compile Include="ICompressorJob.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="LogItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
