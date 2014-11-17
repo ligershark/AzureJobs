@@ -58,7 +58,7 @@ namespace AzureJobs.SiteExtension.Web
             if (_results == null)
                 return null;
 
-            return _results.Where(r => r != null && r.Saving > 0).AsQueryable();
+            return _results.Where(r => r != null).AsQueryable();
         }
 
         private IEnumerable<Result> GetResults()

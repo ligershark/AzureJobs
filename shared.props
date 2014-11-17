@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
   
   <PropertyGroup>
-    <SiteExtNuGetPkgVerNum Condition=" '$(SiteExtNuGetPkgVerNum)'=='' ">0.0.14</SiteExtNuGetPkgVerNum>
+    <SiteExtNuGetPkgVerNum Condition=" '$(SiteExtNuGetPkgVerNum)'=='' ">0.0.17</SiteExtNuGetPkgVerNum>
     <NuGetPkgVerNum Condition=" '$(NuGetPkgVerNum)'=='' ">$(SiteExtNuGetPkgVerNum)-beta</NuGetPkgVerNum>
     
     

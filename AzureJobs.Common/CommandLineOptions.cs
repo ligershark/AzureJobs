@@ -18,7 +18,7 @@ namespace AzureJobs.Common {
         public bool SuppressCsvReport { get; set; }
 
         [CommandLineArg(Alias = "--startlistener", ShortAlias = "/sl", Description = @"When passed after optimizing images in the dir folder, a file watcher will run on the folder to optimize any new or modified images.")]
-        public bool? StartListener { get; set; }
+        public bool StartListener { get; set; }
 
         [CommandLineArg(Alias = "--help", ShortAlias = "/?", Description = @"Displays this text.")]
         public bool DisplayHelp { get; set; }
@@ -28,6 +28,8 @@ namespace AzureJobs.Common {
 
         [CommandLineArg(Alias = "--cache", ShortAlias = "/ca", Description = @"Specify the file to keep working set of files. If unspecified, then %APPDATA%\LigerShark\....")]
         public string OptimizerCacheFile { get; set; }
+
+        public IEnumerable<string> FileExtensionsToCompress { get; set; }
 
         /// <summary>
         /// Build the Help display for console users. Grab all info from the attributes and format nicely for display.
@@ -48,9 +50,12 @@ namespace AzureJobs.Common {
             }
             return helpText.ToString();
         }
-        private IEnumerable<CommandLineArgAttribute> ListAllCommandLineArgs() {
+        public IEnumerable<CommandLineArgAttribute> ListAllCommandLineArgs() {
             foreach (PropertyInfo prop in typeof(CommandLineOptions).GetProperties()) {
-                yield return prop.GetCustomAttributes(typeof(CommandLineArgAttribute)).OfType<CommandLineArgAttribute>().FirstOrDefault();
+                var cmdLineArg = prop.GetCustomAttributes(typeof(CommandLineArgAttribute)).OfType<CommandLineArgAttribute>().FirstOrDefault();
+                if (cmdLineArg != null) {
+                    yield return cmdLineArg;
+                }
             }
         }
     }
