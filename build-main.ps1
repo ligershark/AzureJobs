@@ -1,4 +1,4 @@
-﻿[cmdletbinding()]
+﻿ [cmdletbinding()]
 param(
     [switch]
     $CleanOutputFolder,
@@ -132,9 +132,11 @@ Before calling this function you should make sure to call the following calls to
 >nuget.exe setApiKey <your-key-here> -source https://www.nuget.org
 >nuget.exe setApiKey <your-key-here> -source https://www.siteextensions.net
 
+.EXAMPLE
+Publish-AzureJobsToProd -version 0.0.19
 #>
-function Publish-AzureJobsToProd{
-    [cmdletbinding()]
+function Publish-AzureJobsToProd{ # Publish-AzureJobsToProd -outputpath $outputpath -version 0.0.19 -verbose -whatif
+    [cmdletbinding(SupportsShouldProcess=$true)]
     param(
         $outputpath = (Join-Path $scriptDir 'OutputRoot\'),
         [Parameter(Mandatory=$True)]
@@ -143,15 +145,15 @@ function Publish-AzureJobsToProd{
     process{
         $pkgs = @() 
         $pkgs += @{
-            'path' = (join-path $outputpath ('AzureJobsShared.{0}.nupkg' -f $version ))
+            'path' = (join-path $outputpath ('AzureJobsShared.{0}-beta.nupkg' -f $version ))
             'source' = 'https://nuget.org'
         }
         $pkgs += @{
-            'path' = (join-path $outputpath ('AzureImageOptimizer.{0}.nupkg' -f $version ))
+            'path' = (join-path $outputpath ('AzureImageOptimizer.{0}-beta.nupkg' -f $version ))
             'source' = 'https://nuget.org'
         }
         $pkgs += @{
-            'path' = (join-path $outputpath ('AzureMinifier.{0}.nupkg' -f $version ))
+            'path' = (join-path $outputpath ('AzureMinifier.{0}-beta.nupkg' -f $version ))
             'source' = 'https://nuget.org'
         }
         $pkgs += @{
@@ -165,9 +167,13 @@ function Publish-AzureJobsToProd{
 
         $pkgs | ForEach-Object{
             # nuget push $_ -source
-            $pushArgs = @('push',$_.path,'-source',$_.source)
-            'Calling [nuget.exe {0}]' -f ($pushArgs -join ' ') | Write-Verbose
-            # &(Get-NuGet)
+            if(!(Test-path $_.path)){ 'path not found [{0}]' -f $_.path|Write-Error }
+            $pushArgs = @('push',$_.path,'-source',$_.source,'-NonInteractive')
+            
+            #'Calling [nuget.exe {0}]' -f ($pushArgs -join ' ') | Write-Verbose
+            if($PSCmdlet.ShouldProcess($env:COMPUTERNAME,('nuget.exe {0}' -f ($pushArgs -join ' ')))){
+                &(Get-NuGet) $pushArgs
+            }
         }
     }
 }
