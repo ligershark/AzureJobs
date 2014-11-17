@@ -16,7 +16,7 @@
     <copyright>Copyright 2013 Sayed Ibrahim Hashimi</copyright>
     <tags></tags>
     <dependencies>
-      <dependency id="AzureJobsShared" version="0.0.17-beta" />
+      <dependency id="AzureJobsShared" version="0.0.18-beta" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System"  />

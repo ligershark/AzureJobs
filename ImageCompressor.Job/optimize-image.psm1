@@ -20,6 +20,13 @@ if(!$script:optImgRootDir){
 if(!(Test-Path $script:optImgRootDir)){
     'Optimize images tools dir ($script:optImgRootDir) not found at [{0}]' -f $script:optImgRootDir | Write-Error
 }
+<#
+.SYNOPSIS
+Will return the default path to ImageCompressor.Job.exe.
+
+.EXAMPLE
+Get-ImageOptimizer
+#>
 function Get-ImageOptimizer{
     [cmdletbinding()]
     param()

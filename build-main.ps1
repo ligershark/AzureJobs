@@ -2,12 +2,9 @@
 param(
     [switch]
     $CleanOutputFolder,
-
     [switch]
     $LocalDeploy,
-
     $dropboxOutputFolder = ("$dropBoxHome\public\azurejobs\output"),
-
     $LocalDeployFolder = ("$env:APPDATA\ligershark\AzureJobs\v0\")
 )
  
@@ -123,6 +120,55 @@ function CopyOutput-ToFolder{
         Copy-Item "$objFolder\TextMinifier.Job\*.dll" -Destination $destFolder
         Copy-Item "$objFolder\TextMinifier.Job\*.pdb" -Destination $destFolder
         Copy-Item "$objFolder\TextMinifier.Job\*.config" -Destination $destFolder
+    }
+}
+
+<#
+.SYNOPSIS
+This function can be used to publish the nuget packages to nuget.org and siteextensions.net.
+
+.DESCRIPTION
+Before calling this function you should make sure to call the following calls to nuget.exe
+>nuget.exe setApiKey <your-key-here> -source https://www.nuget.org
+>nuget.exe setApiKey <your-key-here> -source https://www.siteextensions.net
+
+#>
+function Publish-AzureJobsToProd{
+    [cmdletbinding()]
+    param(
+        $outputpath = (Join-Path $scriptDir 'OutputRoot\'),
+        [Parameter(Mandatory=$True)]
+        $version
+    )
+    process{
+        $pkgs = @() 
+        $pkgs += @{
+            'path' = (join-path $outputpath ('AzureJobsShared.{0}.nupkg' -f $version ))
+            'source' = 'https://nuget.org'
+        }
+        $pkgs += @{
+            'path' = (join-path $outputpath ('AzureImageOptimizer.{0}.nupkg' -f $version ))
+            'source' = 'https://nuget.org'
+        }
+        $pkgs += @{
+            'path' = (join-path $outputpath ('AzureMinifier.{0}.nupkg' -f $version ))
+            'source' = 'https://nuget.org'
+        }
+        $pkgs += @{
+            'path' = (join-path $outputpath ('site-extensions\AzureImageOptimizer.{0}.nupkg' -f $version ))
+            'source' = 'https://www.siteextensions.net'
+        }
+        $pkgs += @{
+            'path' = (join-path $outputpath ('site-extensions\AzureMinifier.{0}.nupkg' -f $version ))
+            'source' = 'https://www.siteextensions.net'
+        }
+
+        $pkgs | ForEach-Object{
+            # nuget push $_ -source
+            $pushArgs = @('push',$_.path,'-source',$_.source)
+            'Calling [nuget.exe {0}]' -f ($pushArgs -join ' ') | Write-Verbose
+            # &(Get-NuGet)
+        }
     }
 }
 

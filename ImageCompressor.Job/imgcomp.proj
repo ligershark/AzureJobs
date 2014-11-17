@@ -24,9 +24,10 @@
     <ToolsItems Include="$(OutputPathImgComp)tools\**\*">
       <DestDir>tools\</DestDir>
     </ToolsItems>
-    
+
+    <ToolsItems Include="$(OutputPathImgComp)optimize-image.psm1"/>
     <ToolsItems Include="$(_ls-imgcompoutfolder)*.*"
-                Exclude="$(_ls-imgcompoutfolder)*.pdb;$(_ls-imgcompoutfolder)*.nuspec;$(_ls-imgcompoutfolder)*.proj"/>   
+                Exclude="$(_ls-imgcompoutfolder)*.pdb;$(_ls-imgcompoutfolder)*.nuspec;$(_ls-imgcompoutfolder)*.proj"/>
   </ItemGroup>
 
   <PropertyGroup>
