@@ -17,7 +17,7 @@
     
     <tags></tags>
     <dependencies>
-      <dependency id="AzureJobsShared" version="0.0.16-beta" />
+      <dependency id="AzureJobsShared" version="0.0.17-beta" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System"  />

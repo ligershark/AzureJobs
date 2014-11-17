@@ -1,26 +1,50 @@
 ﻿using AzureJobs.Common;
 using System;
+using System.IO;
 
 namespace TextMinifier.Job {
     class Program {
-
-        private static CommandLineOptions cmdLineOptions;
         private static string[] _fileExtentionsToCompress = { "*.css", "*.js" };
 
         static void Main(string[] args) {
-            cmdLineOptions = new CommandArgsParser().BuildCommandLineOptions(args);
+            if (new AzureHelper().IsRunningAsWebJob()) {
+                StartAsAzureJob();
+            }
+            else {
+                StartAsConsole(args);
+            }
+
+            return;
+        }
+        private static void StartAsAzureJob() {
+            System.Diagnostics.Trace.TraceInformation("TextMin:StartAsAzureJob");
+            try {
+                CommandLineOptions cmdLineOptions = new CommandLineOptions();
+                cmdLineOptions.ItemsToProcessDirectory = @"D:\home\site\wwwroot\";
+                cmdLineOptions.FileExtensionsToCompress = _fileExtentionsToCompress;
+                cmdLineOptions.OptimizerCacheFile = Path.Combine(cmdLineOptions.ItemsToProcessDirectory, @"app_data\TextMinifierHashTable.xml");
+                //cmdLineOptions.ItemsToProcessDirectory = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\ImageOptimization\img";
+                RunMinifier(cmdLineOptions);
+            }
+            catch (Exception ex) {
+                System.Diagnostics.Trace.TraceError(ex.ToString());
+                throw ex;
+            }
+        }
+        private static void StartAsConsole(string[] args) {
+            System.Diagnostics.Trace.TraceInformation("TextMin:StartAsConsole");
+            CommandLineOptions cmdLineOptions = new CommandArgsParser().BuildCommandLineOptions(args);
             cmdLineOptions.FileExtensionsToCompress = _fileExtentionsToCompress;
-            
+
             if (cmdLineOptions.DisplayHelp || string.IsNullOrEmpty(cmdLineOptions.ItemsToProcessDirectory)) {
                 CompressorBase.ShowUsage();
                 Console.ReadLine();
                 return;
             }
-            RunMinifier();
-            return;
+            RunMinifier(cmdLineOptions);
         }
 
-        private static void RunMinifier() {
+        private static void RunMinifier(CommandLineOptions cmdLineOptions) {
             Console.WriteLine("Monitoring dir " + cmdLineOptions.ItemsToProcessDirectory);
             var minMgr = new MinifierManager(cmdLineOptions);
             minMgr.Run();
