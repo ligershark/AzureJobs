@@ -1,0 +1,24 @@
+# Full reference at http://www.appveyor.com/docs/appveyor-yml
+
+version: 1.0.{build}
+
+configuration: Release
+
+before_build:
+- nuget restore AzureJobs.sln
+
+build:
+  project: build-main.proj
+  verbosity: detailed
+
+after_build: []
+
+test:
+  assemblies:
+  - OutputRoot\obj\**\*test*.dll
+  - todelete
+
+artifacts:
+- path: OutputRoot\*.nupkg
+  name: NuGet package
+- path: OutputRoot\**\*.nupkg
