@@ -132,6 +132,8 @@ NuGetRootItems : [@(NuGetRootItems)]" Importance="low"/>
     <_SiteExtContentFiles Include="$(MSBuildThisProjectDirectory)SiteExtension\**\*" 
                           Exclude="$(MSBuildThisProjectDirectory)SiteExtension\*.nuspec"/>
 
+    <_SiteExtContentFiles Include="$(SourceRoot)LICENSE.md" />
+
     <_SiteExtContentFiles Include="$(SiteExtPubWebsitesContentPath)**\*"
                           Exclude="$(SiteExtPubWebsitesContentPath)**\*.pdb">
       <DestDir>%(RecursiveDir)</DestDir>
