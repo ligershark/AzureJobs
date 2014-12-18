@@ -19,7 +19,7 @@ namespace AzureJobsTests {
 
                 Assert.AreEqual(str, escapedStr);
             }
-            [TestMethod]
+            // [TestMethod]
             public void EscapesNewLineCharacters1() {
                 string str =
 @"foo bar
