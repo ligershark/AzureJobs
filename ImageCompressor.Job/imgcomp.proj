@@ -28,6 +28,7 @@
     <ToolsItems Include="$(OutputPathImgComp)optimize-image.psm1"/>
     <ToolsItems Include="$(_ls-imgcompoutfolder)*.*"
                 Exclude="$(_ls-imgcompoutfolder)*.pdb;$(_ls-imgcompoutfolder)*.nuspec;$(_ls-imgcompoutfolder)*.proj"/>
+    <NuGetRootItems Include="$(SourceRoot)LICENSE.md" />
   </ItemGroup>
 
   <PropertyGroup>

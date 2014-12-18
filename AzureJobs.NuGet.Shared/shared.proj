@@ -20,6 +20,7 @@
     <LibItems Include="$(NugetSourceRoot)NuGet\lib\**\*" />
     <ContentItems Include="$(NugetSourceRoot)NuGet\content\**\*"/>
     <ToolsItems Include="$(NugetSourceRoot)NuGet\tools\**\*" />
+    <NuGetRootItems Include="$(SourceRoot)LICENSE.md" />
   </ItemGroup>
   
   <PropertyGroup>
