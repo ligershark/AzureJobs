@@ -7,11 +7,14 @@ configuration: Release
 before_build:
 - nuget restore AzureJobs.sln
 
-build:
-  project: build-main.proj
-  verbosity: detailed
+build_script:
+- ps: if($env:APPVEYOR_REPO_BRANCH -ne "release"){C:\projects\azurejobs\build-main.ps1} else {C:\projects\azurejobs\build-main.ps1 -publishToProd}
 
-after_build: []
+environment:
+  NuGetApiKey:
+    secure: HFUEQanhaxHV/sRQYznQqg7LToxSGeIoSvrmyY29PJ1eDbXxUuYrEQ6MPAsZIQFT
+  SiteExtensionsNuGetApiKey:
+    secure: O/+/C4Pw22PwwM6arJ2x556zaO26Un5gYknMDo33zOJNUDbj1qfKnPpTNSqUneUc
 
 test:
   assemblies:

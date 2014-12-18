@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{95895DDD-9D49-4C33-B21A-70A6EA022E69}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
 		build-main.proj = build-main.proj
 		getnuget.targets = getnuget.targets
 		README.md = README.md

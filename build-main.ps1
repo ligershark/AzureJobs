@@ -4,11 +4,35 @@ param(
     $CleanOutputFolder,
     [switch]
     $LocalDeploy,
+    [switch]
+    $publishToProd,
+    $nugetApiKey = ($env:NuGetApiKey),
+    $siteExtNugetApiKey = ($env:SiteExtensionsNuGetApiKey),
     $dropboxOutputFolder = ("$dropBoxHome\public\azurejobs\output"),
     $LocalDeployFolder = ("$env:APPDATA\ligershark\AzureJobs\v0\")
 )
+
+function Write-Message{
+    [cmdletbinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$true,ValueFromPipeline=$true)]
+        [string[]]$message
+    )
+    process{
+        foreach($msg in $message){
+            if($nugetApiKey){
+                $msg = $msg.Replace($nugetApiKey,'REMOVED-FROM-LOG')
+            }
+            if($siteExtNugetApiKey){
+                $msg = $msg.Replace($siteExtNugetApiKey,'REMOVED-FROM-LOG')
+            }
+
+            $msg | Write-Verbose
+        }
+    }
+}
  
- function Get-ScriptDirectory
+function Get-ScriptDirectory
 {
     $Invocation = (Get-Variable MyInvocation -Scope 1).Value
     Split-Path $Invocation.MyCommand.Path
@@ -20,7 +44,6 @@ $global:azurejobsbuild = New-Object psobject -Property @{
     OutputPath = ('{0}OutputRoot\' -f $scriptDir)
     Configuration = 'Release'
 }
-
 
 <#
 .SYNOPSIS 
@@ -63,7 +86,7 @@ function Get-Nuget(){
         }
         
         if(!(Test-Path $nugetDestPath)){
-            'Downloading nuget.exe' | Write-Verbose
+            'Downloading nuget.exe' | Write-Message
             # download nuget
             $webclient = New-Object System.Net.WebClient
             $webclient.DownloadFile($nugetDownloadUrl, $nugetDestPath)
@@ -101,7 +124,7 @@ function CopyOutput-ToFolder{
         $destFolder
     )
     process{
-        'Copying files to local folder [{0}]' -f $destFolder | Write-Verbose
+        'Copying files to local folder [{0}]' -f $destFolder | Write-Message
 
         $objFolder = Resolve-Path (Join-Path $global:azurejobsbuild.OutputPath 'obj')
 
@@ -170,11 +193,87 @@ function Publish-AzureJobsToProd{ # Publish-AzureJobsToProd -outputpath $outputp
             if(!(Test-path $_.path)){ 'path not found [{0}]' -f $_.path|Write-Error }
             $pushArgs = @('push',$_.path,'-source',$_.source,'-NonInteractive')
             
-            #'Calling [nuget.exe {0}]' -f ($pushArgs -join ' ') | Write-Verbose
+            #'Calling [nuget.exe {0}]' -f ($pushArgs -join ' ') | Write-Message
             if($PSCmdlet.ShouldProcess($env:COMPUTERNAME,('nuget.exe {0}' -f ($pushArgs -join ' ')))){
                 &(Get-NuGet) $pushArgs
             }
         }
+    }
+}
+
+<#
+.SYNOPSIS
+    If nuget is in the tools
+    folder then it will be downloaded there.
+#>
+function Get-Nuget(){
+    [cmdletbinding()]
+    param(
+        $toolsDir = ("$env:LOCALAPPDATA\LigerShark\tools\"),
+        $nugetDownloadUrl = 'http://nuget.org/nuget.exe'
+    )
+    process{
+        $nugetDestPath = Join-Path -Path $toolsDir -ChildPath nuget.exe
+        
+        if(!(Test-Path $nugetDestPath)){
+            $nugetDir = ([System.IO.Path]::GetDirectoryName($nugetDestPath))
+            if(!(Test-Path $nugetDir)){
+                New-Item -Path $nugetDir -ItemType Directory | Out-Null
+            }
+
+            'Downloading nuget.exe' | Write-Message
+            (New-Object System.Net.WebClient).DownloadFile($nugetDownloadUrl, $nugetDestPath)
+
+            # double check that is was written to disk
+            if(!(Test-Path $nugetDestPath)){
+                throw 'unable to download nuget'
+            }
+        }
+
+        # return the path of the file
+        $nugetDestPath
+    }
+}
+
+function PublishNuGetPackage{
+    [cmdletbinding()]
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        [string]$nugetPackages,
+
+        [string]
+        $nugetSource,
+
+        [Parameter(Mandatory=$true)]
+        $nugetApiKey
+    )
+    process{
+        foreach($nugetPackage in $nugetPackages){
+            $pkgPath = (get-item $nugetPackage).FullName
+            $cmdArgs = @('push',$pkgPath,$nugetApiKey,'-NonInteractive')
+
+            if($nugetSource){
+                $cmdArgs += '-source'
+                $cmdArgs += $nugetSource
+            }
+
+            'TEST: Publishing nuget package with the following args: [nuget.exe {0}]' -f ($cmdArgs -join ' ') | Write-Message
+            # &(Get-Nuget) $cmdArgs
+        }
+    }
+}
+
+function PublishSiteExtensionNuGetPackage{
+    [cmdletbinding()]
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        [string]$nugetPackages,
+
+        [Parameter(Mandatory=$true)]
+        $nugetApiKey
+    )
+    process{
+        PublishNuGetPackage -nugetPackages $nugetPackages -nugetApiKey $nugetApiKey -nugetSource 'https://www.siteextensions.net'        
     }
 }
 
@@ -186,7 +285,7 @@ function Publish-AzureJobsToProd{ # Publish-AzureJobsToProd -outputpath $outputp
 
 EnsurePsbuildInstalled
 
-if($CleanOutputFolder){
+if($CleanOutputFolder -or $publishToProd){
     Clean-OutputFolder
 }
 
@@ -204,7 +303,7 @@ Invoke-MSBuild  -projectsToBuild $projToBuild `
                 -properties @{'RestorePackages'='true'}
 
 if($LocalDeploy){
-    'Copying files to local app data folder [{0}]' -f $LocalDeployFolder | Write-Output
+    'Copying files to local app data folder [{0}]' -f $LocalDeployFolder | Write-Message
     if(!(Test-Path $LocalDeployFolder)){
         md $LocalDeployFolder
     }
@@ -216,10 +315,17 @@ if($LocalDeploy){
         'dropbox folder not found at [{0}]' -f $dropboxOutputFolder | Write-Warning
     }
     else {
-        'Copying files to local dropbox folder [{0}]' -f $dropboxOutputFolder | Write-Output
+        'Copying files to local dropbox folder [{0}]' -f $dropboxOutputFolder | Write-Message
         CopyOutput-ToFolder -destFolder $dropboxOutputFolder
     }
 
 }
+if($publishToProd){   
+    $outputRoot = $global:azurejobsbuild.OutputPath
+   
+    (Get-ChildItem -Path $outputRoot '*.nupkg').FullName | PublishNuGetPackage -nugetApiKey $nugetApiKey
 
+
+    (Get-ChildItem -Path (join-path $outputRoot 'site-extensions') '*.nupkg').FullName | PublishSiteExtensionNuGetPackage -nugetApiKey $siteExtNugetApiKey
+}
 
