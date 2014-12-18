@@ -10,8 +10,8 @@
     <description>NuGet package used by AzureImageOptimizer and AzureMinifier packages.</description>
     
     <language>en-US</language>
-    <!--<projectUrl>http://xunit.codeplex.com/</projectUrl>
-    <licenseUrl>http://xunit.codeplex.com/license</licenseUrl>-->
+    <projectUrl>https://github.com/ligershark/AzureJobs</projectUrl>
+    <licenseUrl>https://github.com/ligershark/AzureJobs/blob/master/LICENSE.md</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>Copyright 2013 Sayed Ibrahim Hashimi</copyright>
     <tags></tags>
