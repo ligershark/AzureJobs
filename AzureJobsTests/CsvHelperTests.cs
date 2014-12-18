@@ -26,7 +26,7 @@ namespace AzureJobsTests {
 New line";
                 string escapedStr = new CsvHelper().Escape(str);
 
-                string expetedStr = "\"foo bar\r\nNew line\"";
+                string expetedStr = string.Format("\"foo bar{0}New line\"",Environment.NewLine);
 
                 Assert.AreEqual(expetedStr, escapedStr);
             }
