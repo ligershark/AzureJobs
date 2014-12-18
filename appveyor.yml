@@ -6,6 +6,7 @@ configuration: Release
 
 before_build:
 - nuget restore AzureJobs.sln
+- ps: (new-object Net.WebClient).DownloadString("https://raw.github.com/ligershark/psbuild/master/src/GetPSBuild.ps1") | iex
 
 build_script:
 - ps: if($env:APPVEYOR_REPO_BRANCH -ne "release"){C:\projects\azurejobs\build-main.ps1} else {C:\projects\azurejobs\build-main.ps1 -publishToProd}
