@@ -19,6 +19,8 @@ test:
   - todelete
 
 artifacts:
-- path: OutputRoot\*.nupkg
-  name: NuGet package
 - path: OutputRoot\**\*.nupkg
+
+nuget:
+  account_feed: true
+  project_feed: true
