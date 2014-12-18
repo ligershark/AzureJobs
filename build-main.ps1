@@ -1,4 +1,4 @@
-﻿ [cmdletbinding()]
+﻿ [cmdletbinding(SupportsShouldProcess = $true)]
 param(
     [switch]
     $CleanOutputFolder,
@@ -11,9 +11,8 @@ param(
     $dropboxOutputFolder = ("$dropBoxHome\public\azurejobs\output"),
     $LocalDeployFolder = ("$env:APPDATA\ligershark\AzureJobs\v0\")
 )
-
-function Write-Message{
-    [cmdletbinding()]
+function Filter-String{
+[cmdletbinding()]
     param(
         [Parameter(Position=0,Mandatory=$true,ValueFromPipeline=$true)]
         [string[]]$message
@@ -27,8 +26,18 @@ function Write-Message{
                 $msg = $msg.Replace($siteExtNugetApiKey,'REMOVED-FROM-LOG')
             }
 
-            $msg | Write-Verbose
+            $msg
         }
+    }
+}
+function Write-Message{
+    [cmdletbinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$true,ValueFromPipeline=$true)]
+        [string[]]$message
+    )
+    process{
+        Filter-String -message $message | Write-Verbose
     }
 }
  
@@ -109,7 +118,7 @@ function Clean-OutputFolder{
         $outputFolder = (Join-Path $scriptDir '\OutputRoot\')
 
         if(Test-Path $outputFolder){
-            'Deleting output folder [{0}]' -f $outputFolder | Write-Host
+            'Deleting output folder [{0}]' -f $outputFolder | Write-Message
             Remove-Item $outputFolder -Recurse -Force
         }
 
@@ -161,119 +170,47 @@ Publish-AzureJobsToProd -version 0.0.19
 function Publish-AzureJobsToProd{ # Publish-AzureJobsToProd -outputpath $outputpath -version 0.0.19 -verbose -whatif
     [cmdletbinding(SupportsShouldProcess=$true)]
     param(
-        $outputpath = (Join-Path $scriptDir 'OutputRoot\'),
-        [Parameter(Mandatory=$True)]
-        $version
+        $outputpath = (Join-Path $scriptDir 'OutputRoot\')
     )
     process{
-        $pkgs = @() 
+        $pkgs = @()
+        # clean should be called before so using * should be safe since there should only be 1 version to publish
         $pkgs += @{
-            'path' = (join-path $outputpath ('AzureJobsShared.{0}-beta.nupkg' -f $version ))
+            'path' = (join-path $outputpath 'AzureJobsShared.*-beta.nupkg')
             'source' = 'https://nuget.org'
+            'nugetkey'=$nugetApiKey
         }
         $pkgs += @{
-            'path' = (join-path $outputpath ('AzureImageOptimizer.{0}-beta.nupkg' -f $version ))
+            'path' = (join-path $outputpath 'AzureImageOptimizer.*-beta.nupkg')
             'source' = 'https://nuget.org'
+            'nugetkey'=$nugetApiKey
         }
         $pkgs += @{
-            'path' = (join-path $outputpath ('AzureMinifier.{0}-beta.nupkg' -f $version ))
+            'path' = (join-path $outputpath 'AzureMinifier.*-beta.nupkg')
             'source' = 'https://nuget.org'
+            'nugetkey'=$nugetApiKey
         }
         $pkgs += @{
-            'path' = (join-path $outputpath ('site-extensions\AzureImageOptimizer.{0}.nupkg' -f $version ))
+            'path' = (join-path $outputpath 'site-extensions\AzureImageOptimizer.*.nupkg')
             'source' = 'https://www.siteextensions.net'
+            'nugetkey'=$siteExtNugetApiKey
         }
         $pkgs += @{
-            'path' = (join-path $outputpath ('site-extensions\AzureMinifier.{0}.nupkg' -f $version ))
+            'path' = (join-path $outputpath 'site-extensions\AzureMinifier.*.nupkg')
             'source' = 'https://www.siteextensions.net'
+            'nugetkey'=$siteExtNugetApiKey
         }
 
         $pkgs | ForEach-Object{
             # nuget push $_ -source
-            if(!(Test-path $_.path)){ 'path not found [{0}]' -f $_.path|Write-Error }
-            $pushArgs = @('push',$_.path,'-source',$_.source,'-NonInteractive')
+            if(!(Test-path $_.path)){ 'path not found [{0}]' -f $_.path|Filter-String|Write-Error }
+            $pushArgs = @('push',$_.path,$_.nugetkey,'-source',$_.source,'-NonInteractive')
             
             #'Calling [nuget.exe {0}]' -f ($pushArgs -join ' ') | Write-Message
-            if($PSCmdlet.ShouldProcess($env:COMPUTERNAME,('nuget.exe {0}' -f ($pushArgs -join ' ')))){
+            if($PSCmdlet.ShouldProcess($env:COMPUTERNAME, (Filter-String ('nuget.exe {0}' -f ($pushArgs -join ' '))) )){
                 &(Get-NuGet) $pushArgs
             }
         }
-    }
-}
-
-<#
-.SYNOPSIS
-    If nuget is in the tools
-    folder then it will be downloaded there.
-#>
-function Get-Nuget(){
-    [cmdletbinding()]
-    param(
-        $toolsDir = ("$env:LOCALAPPDATA\LigerShark\tools\"),
-        $nugetDownloadUrl = 'http://nuget.org/nuget.exe'
-    )
-    process{
-        $nugetDestPath = Join-Path -Path $toolsDir -ChildPath nuget.exe
-        
-        if(!(Test-Path $nugetDestPath)){
-            $nugetDir = ([System.IO.Path]::GetDirectoryName($nugetDestPath))
-            if(!(Test-Path $nugetDir)){
-                New-Item -Path $nugetDir -ItemType Directory | Out-Null
-            }
-
-            'Downloading nuget.exe' | Write-Message
-            (New-Object System.Net.WebClient).DownloadFile($nugetDownloadUrl, $nugetDestPath)
-
-            # double check that is was written to disk
-            if(!(Test-Path $nugetDestPath)){
-                throw 'unable to download nuget'
-            }
-        }
-
-        # return the path of the file
-        $nugetDestPath
-    }
-}
-
-function PublishNuGetPackage{
-    [cmdletbinding()]
-    param(
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
-        [string]$nugetPackages,
-
-        [string]
-        $nugetSource,
-
-        [Parameter(Mandatory=$true)]
-        $nugetApiKey
-    )
-    process{
-        foreach($nugetPackage in $nugetPackages){
-            $pkgPath = (get-item $nugetPackage).FullName
-            $cmdArgs = @('push',$pkgPath,$nugetApiKey,'-NonInteractive')
-
-            if($nugetSource){
-                $cmdArgs += '-source'
-                $cmdArgs += $nugetSource
-            }
-
-            'TEST: Publishing nuget package with the following args: [nuget.exe {0}]' -f ($cmdArgs -join ' ') | Write-Message
-            # &(Get-Nuget) $cmdArgs
-        }
-    }
-}
-
-function PublishSiteExtensionNuGetPackage{
-    [cmdletbinding()]
-    param(
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
-        [string]$nugetPackages,
-
-        [Parameter(Mandatory=$true)]
-        $nugetApiKey
-    )
-    process{
-        PublishNuGetPackage -nugetPackages $nugetPackages -nugetApiKey $nugetApiKey -nugetSource 'https://www.siteextensions.net'        
     }
 }
 
@@ -312,7 +249,7 @@ if($LocalDeploy){
 
     # dropbox deploy
     if(!(Test-Path $dropboxOutputFolder)){
-        'dropbox folder not found at [{0}]' -f $dropboxOutputFolder | Write-Warning
+        'dropbox folder not found at [{0}]' -f $dropboxOutputFolder | Filter-String | Write-Warning
     }
     else {
         'Copying files to local dropbox folder [{0}]' -f $dropboxOutputFolder | Write-Message
@@ -321,11 +258,6 @@ if($LocalDeploy){
 
 }
 if($publishToProd){   
-    $outputRoot = $global:azurejobsbuild.OutputPath
-   
-    (Get-ChildItem -Path $outputRoot '*.nupkg').FullName | PublishNuGetPackage -nugetApiKey $nugetApiKey
-
-
-    (Get-ChildItem -Path (join-path $outputRoot 'site-extensions') '*.nupkg').FullName | PublishSiteExtensionNuGetPackage -nugetApiKey $siteExtNugetApiKey
+    Publish-AzureJobsToProd -outputpath (Join-Path $scriptDir 'OutputRoot\')
 }
 
