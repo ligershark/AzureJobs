@@ -1,6 +1,7 @@
 ﻿using AzureJobs.Common;
 using System;
 using System.IO;
+using Microsoft.Azure;
 
 namespace TextMinifier.Job {
     class Program {
@@ -20,7 +21,7 @@ namespace TextMinifier.Job {
             System.Diagnostics.Trace.TraceInformation("TextMin:StartAsAzureJob");
             try {
                 CommandLineOptions cmdLineOptions = new CommandLineOptions();
-                cmdLineOptions.ItemsToProcessDirectory = @"D:\home\site\wwwroot\";
+                cmdLineOptions.ItemsToProcessDirectory = CloudConfigurationManager.GetSetting("AZURE_MINIFIER_PATH") ?? @"D:\home\site\wwwroot\";
                 cmdLineOptions.FileExtensionsToCompress = _fileExtentionsToCompress;
                 cmdLineOptions.OptimizerCacheFile = Path.Combine(cmdLineOptions.ItemsToProcessDirectory, @"app_data\TextMinifierHashTable.xml");
                 //cmdLineOptions.ItemsToProcessDirectory = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\ImageOptimization\img";
@@ -45,18 +46,18 @@ namespace TextMinifier.Job {
         }
 
         private static void RunMinifier(CommandLineOptions cmdLineOptions) {
-            Console.WriteLine("Monitoring dir " + cmdLineOptions.ItemsToProcessDirectory);
-            var minMgr = new MinifierManager(cmdLineOptions);
-            minMgr.Run();
-            if (cmdLineOptions.StartListener) {
-                Console.WriteLine("Press Enter to quit at any time.");
-                do {
-                    while (!Console.KeyAvailable) {
-                        System.Threading.Thread.Sleep(1000);
-                        minMgr.ProcessQueue();
-                    }
-                } while (Console.ReadKey(intercept: true).Key != ConsoleKey.Enter);
-            }
+           Console.WriteLine("Monitoring dir " + cmdLineOptions.ItemsToProcessDirectory);
+                var minMgr = new MinifierManager(cmdLineOptions);
+                minMgr.Run();
+                if (cmdLineOptions.StartListener) {
+                    Console.WriteLine("Press Enter to quit at any time.");
+                    do {
+                        while (!Console.KeyAvailable) {
+                            System.Threading.Thread.Sleep(1000);
+                            minMgr.ProcessQueue();
+                        }
+                    } while (Console.ReadKey(intercept: true).Key != ConsoleKey.Enter);
+               }
         }
     }
 }
