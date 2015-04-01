@@ -1,7 +1,6 @@
 ﻿using AzureJobs.Common;
 using System;
 using System.IO;
-using Microsoft.Azure;
 
 namespace TextMinifier.Job {
     class Program {
@@ -21,7 +20,7 @@ namespace TextMinifier.Job {
             System.Diagnostics.Trace.TraceInformation("TextMin:StartAsAzureJob");
             try {
                 CommandLineOptions cmdLineOptions = new CommandLineOptions();
-                cmdLineOptions.ItemsToProcessDirectory = CloudConfigurationManager.GetSetting("AZURE_MINIFIER_PATH") ?? @"D:\home\site\wwwroot\";
+                cmdLineOptions.ItemsToProcessDirectory = Environment.GetEnvironmentVariable("AZURE_MINIFIER_PATH") ?? @"D:\home\site\wwwroot\";
                 cmdLineOptions.FileExtensionsToCompress = _fileExtentionsToCompress;
                 cmdLineOptions.OptimizerCacheFile = Path.Combine(cmdLineOptions.ItemsToProcessDirectory, @"app_data\TextMinifierHashTable.xml");
                 //cmdLineOptions.ItemsToProcessDirectory = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\ImageOptimization\img";

@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Threading;
-using Microsoft.Azure;
 
 namespace ImageCompressor.Job {
     class Program {
@@ -25,7 +24,7 @@ namespace ImageCompressor.Job {
         private static void StartAsAzureJob() {
             try {
                 cmdLineOptions = new CommandLineOptions();
-                cmdLineOptions.ItemsToProcessDirectory = CloudConfigurationManager.GetSetting("AZURE_IMAGE_OPTIMIZER_PATH") ?? @"D:\home\site\wwwroot\";
+                cmdLineOptions.ItemsToProcessDirectory = Environment.GetEnvironmentVariable("AZURE_IMAGE_OPTIMIZER_PATH") ?? @"D:\home\site\wwwroot\";
                 cmdLineOptions.FileExtensionsToCompress = new string[] { "*.png", "*.jpg", "*.jpeg", "*.gif" };
                 cmdLineOptions.OptimizerCacheFile = Path.Combine(cmdLineOptions.ItemsToProcessDirectory, @"app_data\ImageOptimizerHashTable.xml");
                 //cmdLineOptions.ItemsToProcessDirectory = @"C:\Users\madsk\Documents\GitHub\AzureJobs\Azurejobs.Web\ImageOptimization\img";
