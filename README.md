@@ -18,3 +18,14 @@ already minified files.
 
 Deploy manually: [NuGet package](http://www.nuget.org/packages/AzureMinifier/)  
 Deploy automatically: [Azure Site Extension](https://www.siteextensions.net/packages/AzureMinifier/)
+
+## Configuration
+By default, the Image Optimizer and Text Minifier WebJobs automatically process any files and folders in *D:\home\site\wwwroot\*
+
+If you wish to change the paths, you can override them by adding the following keys to you App Settings in the Azure Portal and setting their values to the appropriate paths:
+* AZURE_MINIFIER_PATH
+* AZURE_IMAGE_OPTIMIZER_PATH
+
+An example of this is as follows:
+
+![Azure App Settings](https://cloud.githubusercontent.com/assets/6916342/6949110/d19b0698-d8b2-11e4-9657-7ef30561091e.png)
