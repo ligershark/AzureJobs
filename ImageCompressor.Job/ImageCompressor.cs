@@ -9,7 +9,7 @@ namespace ImageCompressor.Job {
         public event EventHandler<CompressionResult> Finished;
 
         public void CompressFile(string sourceFile) {
-            string targetFile = Path.GetTempFileName();
+            string targetFile = Path.ChangeExtension(Path.GetTempFileName(), Path.GetExtension(sourceFile));
 
             ProcessStartInfo start = new ProcessStartInfo("cmd") {
                 WindowStyle = ProcessWindowStyle.Hidden,
@@ -73,10 +73,10 @@ namespace ImageCompressor.Job {
 
                 case ".jpg":
                 case ".jpeg":
-                    return string.Format(CultureInfo.CurrentCulture, "/c jpegtran -copy none -optimize -progressive \"{0}\" \"{1}\"", sourceFile, targetFile);
+                    return string.Format(CultureInfo.CurrentCulture, "/c jpegtran -copy none -optimize -progressive -outfile \"{1}\" \"{0}\"", sourceFile, targetFile);
 
                 case ".gif":
-                    return string.Format(CultureInfo.CurrentCulture, "/c gifsicle --crop-transparency --no-comments --no-extensions --no-names --optimize=3 --batch \"{0}\" --output=\"{1}\"", sourceFile, targetFile);
+                    return string.Format(CultureInfo.CurrentCulture, "/c gifsicle -O3 --batch --colors=256 \"{0}\" --output=\"{1}\"", sourceFile, targetFile);
             }
             return null;
         }
